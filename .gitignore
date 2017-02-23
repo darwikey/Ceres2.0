@@ -27,3 +27,7 @@
 *.exe
 *.out
 *.app
+
+src/.vs
+src/__vm
+src/Debug

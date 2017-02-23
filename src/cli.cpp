@@ -1,0 +1,270 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <WProgram.h>
+
+#include "position_manager.h"
+#include "trajectory_manager.h"
+#include "cli.h"
+//#include "servo.h"
+
+
+#define CLI_BUFFER_SIZE 128
+char cli_buffer[CLI_BUFFER_SIZE];
+int cli_cur_pos = 0;
+
+#define ARG_LENGTH 20
+void cli_task()
+{
+	bool end_line = false;
+	while (Serial.available() > 0)
+	{
+		char c = Serial.read();
+		cli_buffer[cli_cur_pos] = c;
+		Serial.print(c);
+		if (c == '\r' || c == '\n')
+		{
+			end_line = true;
+			break;
+		}
+		if (cli_cur_pos < CLI_BUFFER_SIZE)
+			cli_cur_pos++;
+	}
+
+	if (end_line)
+	{
+
+		// read the incoming byte:
+		char command = cli_buffer[0];
+		char arg[ARG_LENGTH] = { 0 };
+		char arg2[ARG_LENGTH] = { 0 };
+
+		int i = 2;
+		for (int j = 0;
+			i < cli_cur_pos && cli_buffer[i] != ' ' && j < ARG_LENGTH - 1;
+			i++, j++)
+		{
+			arg[j] = cli_buffer[i];
+		}
+		i++;
+		for (int j = 0;
+			i < cli_cur_pos && cli_buffer[i] != ' ' && j < ARG_LENGTH - 1;
+			i++, j++)
+		{
+			arg2[j] = cli_buffer[i];
+		}
+
+		cli_cur_pos = 0;
+		//Serial.printf("commande %c \"%s\" \"%s\"\r\n", command, arg, arg2);
+
+		if (command == 'd') {
+			double value = atof(arg);
+			trajectory_goto_d_mm(value);
+			Serial.printf("Distance: %f\r\n", value);
+		}
+		else if (command == 'a') {
+			double value = atof(arg);
+			trajectory_goto_a_rel_deg(value);
+			Serial.printf("Angle: %f\r\n", (double)value);
+		}
+		/*else if (command == 'c') {
+			double x = atof(arg);
+			double x = atof(arg2);
+			trajectory_goto_xy_mm(x, y);
+			Serial.printf("Goto xy: %f  %f\r\n", x, y);
+		}*/
+		//else if (command == '*') {
+		//	float y = cli_getfloat();
+		//	set_startCoor(positionMmToCoordinate(position_get_x_mm(), position_get_y_mm()));
+		//	set_goalCoor(positionMmToCoordinate(value, y));
+		//	Serial.printf("Goto xy: %f  %f\r\n", (double)value, (double)y);
+		//	astarMv();
+		//}
+		//else if (command == 'z') {
+		//	smooth_traj_end();
+		//	Serial.printf("stop mvt\r\n");
+		//}
+		else if (command == 's') {
+			double value = atof(arg2);
+			if (!strncmp(arg, "speed_high", ARG_LENGTH)) {
+				control_system_set_speed_high();
+				Serial.print("Max speed.\r\n");
+			}
+			else if (!strncmp(arg, "speed_medium", ARG_LENGTH)) {
+				control_system_set_speed_medium();
+				Serial.print("Medium speed.\r\n");
+			}
+			else if (!strncmp(arg, "speed_low", ARG_LENGTH)) {
+				control_system_set_speed_low();
+				Serial.print("Low speed.\r\n");
+			}
+			else if (!strncmp(arg, "speed", ARG_LENGTH)) {
+				control_system_set_speed_ratio(value);
+				Serial.printf("Speed: %f\r\n", value);
+			}
+			else if (!strncmp(arg, "pid_d_p", ARG_LENGTH)) {
+				ausbee_pid_set_kp(control_system_get_pid_distance(), value);
+				Serial.printf("Distance P: %f\r\n", value);
+			}
+			else if (!strncmp(arg, "pid_d_i", ARG_LENGTH)) {
+				ausbee_pid_set_ki(control_system_get_pid_distance(), value);
+				Serial.printf("Distance I: %f\r\n", value);
+			}
+			else if (!strncmp(arg, "pid_d_d", ARG_LENGTH)) {
+				ausbee_pid_set_kd(control_system_get_pid_distance(), value);
+				Serial.printf("Distance D: %f\r\n", value);
+			}
+			else if (!strncmp(arg, "pid_a_p", ARG_LENGTH)) {
+				ausbee_pid_set_kp(control_system_get_pid_angle(), value);
+				Serial.printf("Angle P: %f\r\n", value);
+			}
+			else if (!strncmp(arg, "pid_a_i", ARG_LENGTH)) {
+				ausbee_pid_set_ki(control_system_get_pid_angle(), value);
+				Serial.printf("Angle I: %f\r\n", value);
+			}
+			else if (!strncmp(arg, "pid_a_d", ARG_LENGTH)) {
+				ausbee_pid_set_kd(control_system_get_pid_angle(), value);
+				Serial.printf("Angle D: %f\r\n", value);
+			}
+			else if (!strncmp(arg, "axle_track", ARG_LENGTH)) {
+				position_set_axle_track_mm(value);
+				Serial.printf("Axle track: %f\r\n", value);
+			}
+			else if (!strncmp(arg, "speed_d", ARG_LENGTH)) {
+				control_system_set_distance_max_speed(value);
+				Serial.printf("distance max speed: %f\r\n", value);
+			}
+			else if (!strncmp(arg, "speed_a", ARG_LENGTH)) {
+				control_system_set_angle_max_speed(value);
+				Serial.printf("angle max speed: %f\r\n", value);
+			}
+			else if (!strncmp(arg, "acc_d", ARG_LENGTH)) {
+				control_system_set_distance_max_acc(value);
+				Serial.printf("distance max acceleration: %f\r\n", value);
+			}
+			else if (!strncmp(arg, "acc_a", ARG_LENGTH)) {
+				control_system_set_angle_max_acc(value);
+				Serial.printf("angle max acceleration: %f\r\n", value);
+			}
+			else {
+				Serial.printf("Invalid argument '%s'.\r\n", arg);
+			}
+		}
+		else if (command == 'p') {
+			if (!strncmp(arg, "x", ARG_LENGTH)) {
+				Serial.printf("Robot x mm: %f\r\n", position_get_x_mm());
+			}
+			else if (!strncmp(arg, "y", ARG_LENGTH)) {
+				Serial.printf("Robot y mm: %f\r\n", position_get_y_mm());
+			}
+			else if (!strncmp(arg, "a", ARG_LENGTH)) {
+				Serial.printf("Robot angle deg: %f\r\n", position_get_angle_deg());
+			}
+			else if (!strncmp(arg, "d", ARG_LENGTH)) {
+				Serial.printf("Robot distance mm: %f\r\n", position_get_distance_mm());
+			}
+			else if (!strncmp(arg, "enc_r", ARG_LENGTH)) {
+				Serial.printf("Right encoder value: %f\r\n", position_get_right_encoder());
+			}
+			else if (!strncmp(arg, "enc_l", ARG_LENGTH)) {
+				Serial.printf("Left encoder value: %f\r\n", position_get_left_encoder());
+			}
+			/*else if (!strncmp(arg, "cur_id", ARG_LENGTH)) {
+			  Serial.printf("Traj manager cur_id: %d\r\n", (int)trajectory_get_cur_id());
+			}
+			else if (!strncmp(arg, "last_id", ARG_LENGTH)) {
+			  Serial.print("Traj manager last_id: %d\r\n", (int)trajectory_get_last_id());
+			}*/
+			else if (!strncmp(arg, "pid", ARG_LENGTH)) {
+				Serial.printf("Distance PID: %f, %f, %f\r\n", ausbee_pid_get_kp(control_system_get_pid_distance()),
+					ausbee_pid_get_ki(control_system_get_pid_distance()),
+					ausbee_pid_get_kd(control_system_get_pid_distance()));
+				Serial.printf("Angle PID:    %f, %f, %f\r\n", ausbee_pid_get_kp(control_system_get_pid_angle()),
+					ausbee_pid_get_ki(control_system_get_pid_angle()),
+					ausbee_pid_get_kd(control_system_get_pid_angle()));
+			}
+			/*else if (!strncmp(arg, "graph", ARG_LENGTH)) {
+				printGraphe();
+			}*/
+			else {
+				Serial.printf("Invalid argument '%s'.\r\n", arg);
+			}
+		}
+		/*else if (command == 'm') {
+			if (!strncmp(arg, "lift", ARG_LENGTH)) {
+				if (!strncmp(arg2, "up", ARG_LENGTH)) {
+					action_raise_lift();
+					Serial.print("Lift up\r\n");
+				}
+				else if (!strncmp(arg2, "down", ARG_LENGTH)) {
+					action_lower_lift();
+					Serial.print("Lift down\r\n");
+				}
+				else {
+					Serial.print("Invalid argument '%s'.\r\n", arg2);
+				}
+			}
+			else if (!strncmp(arg, "grip", ARG_LENGTH)) {
+				ausbeeSetAngleServo(&servo_grip, atoi(arg2));
+				Serial.print("command servo.\r\n");
+			}
+			else if (!strncmp(arg, "clapet", ARG_LENGTH)) {
+				ausbeeSetAngleServo(&servo_clapet, atoi(arg2));
+				Serial.print("command servo.\r\n");
+			}
+			else {
+				Serial.print("Invalid argument '%s'.\r\n", arg);
+			}
+		}*/
+		else if (command == 'h') {
+			Serial.print("Help:\r\n");
+			Serial.print("  Available commands are:\r\n");
+			Serial.print("  d <float>: Go forward/backward with the specified distance in mm.\r\n");
+			Serial.print("  a <float>: Rotate with the specified angle in degrees.\r\n");
+			Serial.print("  c <float> <float>: goto to the position (x, y) in mm.\r\n");
+			Serial.print("  * <float> <float>: goto to the position (x, y) in mm with A*.\r\n");
+			Serial.print("  s <arg> <value>:   Set internal value.\r\n");
+			Serial.print("             <value> should be a float.\r\n");
+			Serial.print("             <arg> can be one of:\r\n");
+			Serial.print("             speed_high:   set highest translation and rotation speed.\r\n");
+			Serial.print("             speed_medium: set medium translation and rotation speed.\r\n");
+			Serial.print("             speed_low:    set low translation and rotation speed.\r\n");
+			Serial.print("             speed :       set translation and rotation speed ratio to value (0 <= value <= 1).\r\n");
+			Serial.print("             pid_d_p :     set distance PID proportional value.\r\n");
+			Serial.print("             pid_d_i :     set distance PID integral value.\r\n");
+			Serial.print("             pid_d_d :     set distance PID derivative value.\r\n");
+			Serial.print("             pid_a_p :     set angle PID proportional value.\r\n");
+			Serial.print("             pid_a_i :     set angle PID integral value.\r\n");
+			Serial.print("             pid_a_d :     set angle PID derivative value.\r\n");
+			Serial.print("             axle_track :  set axle track in mm.\r\n");
+			Serial.print("             speed_d :     set max speed for distance.\r\n");
+			Serial.print("             speed_a :     set max speed for angle.\r\n");
+			Serial.print("             acc_d :       set max acceleration for distance.\r\n");
+			Serial.print("             acc_a :       set max acceleration for angle.\r\n");
+			Serial.print("  m <arg> <arg2> : move an actuator\r\n");
+			Serial.print("             <arg> can be one of: \r\n");
+			Serial.print("             arm_l: left_arm \r\n");
+			Serial.print("             arm_r: right_arm \r\n");
+			Serial.print("                <arg2> can be one of: \r\n");
+			Serial.print("                close: close the arm \r\n");
+			Serial.print("                open: open the arm \r\n");
+			Serial.print("  p <arg>:   Print internal value.\r\n");
+			Serial.print("             <arg> can be one of:\r\n");
+			Serial.print("             x:        print robot's x position.\r\n");
+			Serial.print("             y:        print robot's y position.\r\n");
+			Serial.print("             a:        print robot's angle.\r\n");
+			Serial.print("             d:        print robot's distance.\r\n");
+			Serial.print("             enc_l:    print left encoder's value.\r\n");
+			Serial.print("             enc_r:    print right encoder's value.\r\n");
+			Serial.print("             cur_id:   print Traj manager's current point id.\r\n");
+			Serial.print("             last_id:  print Traj manager's last point id.\r\n");
+			Serial.print("             pid:      print PID.\r\n");
+			Serial.print("             graphe:   print A* graphe.\r\n");
+		}
+		else {
+			Serial.printf("Unknown command '%c'. Type 'h' for help.\r\n", command);
+		}
+
+		cli_cur_pos = 0;
+	}
+}
