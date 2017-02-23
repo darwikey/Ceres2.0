@@ -28,6 +28,6 @@
 *.out
 *.app
 
-src/.vs
-src/__vm
-src/Debug
+Main/.vs
+Main/__vm
+Main/Debug

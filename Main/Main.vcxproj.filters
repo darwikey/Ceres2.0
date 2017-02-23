@@ -15,10 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Hermes.ino" />
+    <None Include="Main.ino" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="__vm\.Hermes.vsarduino.h">
+    <ClInclude Include="__vm\.Main.vsarduino.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cli.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="control_system.h">
@@ -48,17 +51,14 @@
     <ClInclude Include="quadramp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cli.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="trajectory_manager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="__vm\.src.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="cli.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="control_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -78,9 +78,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="quadramp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cli.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="trajectory_manager.cpp">
