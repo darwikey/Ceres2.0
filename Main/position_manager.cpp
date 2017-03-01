@@ -31,7 +31,9 @@ struct position_manager {
 
 void position_init(uint32_t ticks_per_m, double axle_track_mm) {
 	encoder1.setup();
-  encoder2.setup();
+	encoder2.setup();
+	encoder1.start();
+	encoder2.start();
 	
 	pm.ticks_per_m = ticks_per_m;
 	pm.axle_track_mm = axle_track_mm;
