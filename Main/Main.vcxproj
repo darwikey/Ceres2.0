@@ -98,6 +98,7 @@
     <ClInclude Include="pid.h">
       <FileType>CppCode</FileType>
     </ClInclude>
+    <ClInclude Include="Platform.h" />
     <ClInclude Include="position_manager.h">
       <FileType>CppCode</FileType>
     </ClInclude>
@@ -122,6 +123,7 @@
     <ClCompile Include="diff.cpp" />
     <ClCompile Include="MotorManager.cpp" />
     <ClCompile Include="pid.cpp" />
+    <ClCompile Include="Platform.cpp" />
     <ClCompile Include="position_manager.cpp" />
     <ClCompile Include="quadramp.cpp" />
     <ClCompile Include="trajectory_manager.cpp" />

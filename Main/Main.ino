@@ -3,26 +3,10 @@
 #include "position_manager.h"
 #include "trajectory_manager.h"
 #include "cli.h"
+#include "Platform.h"
 
-#define NB_LEDS 5
-const int leds[] = { 11, 12, 13, 20, 21 };
-
-#define NB_BUTTONS 4
-const int buttons[] = { 5, 6, 7 , 8 };
-
-const int startPull = 2;
-
-#define NB_GP2S 4
-const int gp2s[] = { 0, 1, 2, 3 };
-#define GP2_BLOCK_AT   1000 /*432*/ /*288*/
-#define GP2_UNBLOCK_AT 1000 /*324*/ /*216*/
 
 #define SPEED 125
-
-void display(int n) {
-  for(int i = 0; i <= NB_LEDS; ++i)
-    digitalWrite(leds[i], ((1<<i) & n) ? HIGH : LOW);
-}
 
 
 
@@ -30,18 +14,8 @@ void setup() {
   // put your setup code here, to run once:
   delay(500);
 
-  for(int i = 0; i < NB_LEDS; ++i)
-    pinMode(leds[i], OUTPUT);
-
-  display(0x1F);
-
-  for(int i = 0; i < NB_BUTTONS; ++i)
-    pinMode(buttons[i], INPUT);
-
-  pinMode(startPull, INPUT);
-
-  for(int i = 0; i < NB_GP2S; ++i)
-    pinMode(gp2s[i], INPUT);
+  Platform::Init();
+  Platform::DisplayNumber(0x1F);
 
   InitMotors();
 
@@ -58,10 +32,10 @@ void loop() {
   //static int step = 0;
 
     int speed = 0;
-    if (digitalRead(buttons[0]) == LOW)
+    if (Platform::IsButtonPressed(0))
       speed = SPEED;
 
-    display((speed>0) | ((time % 1024 > 512) ? 2 : 0));
+    Platform::DisplayNumber((speed>0) | ((time % 1024 > 512) ? 2 : 0));
     
 	cli_task();
 
@@ -102,30 +76,9 @@ void loop() {
   else if(step == 2) {
     int speed = SPEED;
     long long dist;
-    static bool lastBlocked = false;
-    int gp2Sum = 0;
     
     updateEnc();
     dist = curEnc[0] + curEnc[1];
-
-    for(int i = 0; i < 2 && speed != 0; ++i)
-      if(lastBlocked) {
-        if(analogRead(gp2s[i]) <= GP2_UNBLOCK_AT)
-          ++gp2Sum;
-      }
-      else {
-        if(analogRead(gp2s[i]) >= GP2_BLOCK_AT)
-          ++gp2Sum;
-      }
-
-    if(lastBlocked && gp2Sum < 2)
-      speed = 0;
-    else if(lastBlocked && gp2Sum == 2)
-      lastBlocked = false;
-    else if(!lastBlocked && gp2Sum > 0) {
-      lastBlocked = true;
-      speed = 0;
-    }
 
     display(step | ((lastBlocked) ? 0b11000 : 0));
     
