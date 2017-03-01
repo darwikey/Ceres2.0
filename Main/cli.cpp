@@ -4,7 +4,7 @@
 #include <WProgram.h>
 
 #include "PositionManager.h"
-#include "trajectory_manager.h"
+#include "TrajectoryManager.h"
 #include "cli.h"
 //#include "servo.h"
 
@@ -59,12 +59,12 @@ void cli_task()
 
 		if (command == 'd') {
 			double value = atof(arg);
-			trajectory_goto_d_mm(value);
+			TrajectoryManager::Instance.trajectory_goto_d_mm(value);
 			Serial.printf("Distance: %f\r\n", value);
 		}
 		else if (command == 'a') {
 			double value = atof(arg);
-			trajectory_goto_a_rel_deg(value);
+			TrajectoryManager::Instance.trajectory_goto_a_rel_deg(value);
 			Serial.printf("Angle: %f\r\n", (double)value);
 		}
 		/*else if (command == 'c') {

@@ -1,7 +1,7 @@
 #include "MotorManager.h"
 #include "control_system.h"
 #include "PositionManager.h"
-#include "trajectory_manager.h"
+#include "TrajectoryManager.h"
 #include "cli.h"
 #include "Platform.h"
 
@@ -21,7 +21,7 @@ void setup() {
 
   PositionManager::Instance.Init(41826, 150);
   control_system_start();
-  trajectory_init();
+  TrajectoryManager::Instance.trajectory_init();
 
   delay(500);
 }
@@ -42,7 +42,7 @@ void loop() {
     //updateMotors(speed);
     //updateAngleSpeed(0, speed);
     control_system_task();
-	trajectory_task();
+	TrajectoryManager::Instance.trajectory_task();
 
   //Serial.println(position_get_x_mm());
   //Serial.println(position_get_y_mm());
