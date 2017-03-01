@@ -1,6 +1,6 @@
 #include "MotorManager.h"
 #include "control_system.h"
-#include "position_manager.h"
+#include "PositionManager.h"
 #include "trajectory_manager.h"
 #include "cli.h"
 #include "Platform.h"
@@ -19,7 +19,7 @@ void setup() {
 
   InitMotors();
 
-  position_init(41826, 150);
+  PositionManager::Instance.Init(41826, 150);
   control_system_start();
   trajectory_init();
 

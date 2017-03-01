@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "position_manager.h"
+#include "PositionManager.h"
 #include "trajectory_manager.h"
 
 #define SMOOTH_TRAJ 0
@@ -206,7 +206,7 @@ void trajectory_add_point(struct trajectory_dest point, enum trajectory_when whe
 static void trajectory_manage_order_d(struct trajectory_dest *p)
 {
   float d_mm_ref = p->starting_d_mm + p->d.mm;
-  if (ABS(d_mm_ref - position_get_distance_mm()) < p->d.precision) {
+  if (ABS(d_mm_ref - PositionManager::Instance.GetDistanceMm()) < p->d.precision) {
     trajectory_next_point();
   }
   else {
@@ -217,7 +217,7 @@ static void trajectory_manage_order_d(struct trajectory_dest *p)
 static void trajectory_manage_order_a_abs(struct trajectory_dest *p)
 {
   // TODO: Better handle
-  if (ABS(p->a.deg - position_get_angle_deg()) < p->a.precision) {
+  if (ABS(p->a.deg - PositionManager::Instance.GetAngleDeg()) < p->a.precision) {
     trajectory_next_point();
   }
   else {
@@ -228,7 +228,7 @@ static void trajectory_manage_order_a_abs(struct trajectory_dest *p)
 static void trajectory_manage_order_a_rel(struct trajectory_dest *p)
 {
   float a_deg_ref = p->starting_a_deg + p->a.deg;
-  if (ABS(a_deg_ref - position_get_angle_deg()) < p->a.precision) {
+  if (ABS(a_deg_ref - PositionManager::Instance.GetAngleDeg()) < p->a.precision) {
     trajectory_next_point();
   }
   else {
@@ -254,8 +254,8 @@ static inline void trajectory_update()
 
   /* Get current starting position in distance and angle */
   if (!p->is_init) {
-    p->starting_d_mm = position_get_distance_mm();
-    p->starting_a_deg = position_get_angle_deg();
+    p->starting_d_mm = PositionManager::Instance.GetDistanceMm();
+    p->starting_a_deg = PositionManager::Instance.GetAngleDeg();
     p->is_init = 1;
   }
 

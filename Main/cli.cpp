@@ -3,7 +3,7 @@
 #include <string.h>
 #include <WProgram.h>
 
-#include "position_manager.h"
+#include "PositionManager.h"
 #include "trajectory_manager.h"
 #include "cli.h"
 //#include "servo.h"
@@ -127,7 +127,7 @@ void cli_task()
 				Serial.printf("Angle D: %f\r\n", value);
 			}
 			else if (!strncmp(arg, "axle_track", ARG_LENGTH)) {
-				position_set_axle_track_mm(value);
+				PositionManager::Instance.SetAxleTrackMm(value);
 				Serial.printf("Axle track: %f\r\n", value);
 			}
 			else if (!strncmp(arg, "speed_d", ARG_LENGTH)) {
@@ -152,22 +152,22 @@ void cli_task()
 		}
 		else if (command == 'p') {
 			if (!strncmp(arg, "x", ARG_LENGTH)) {
-				Serial.printf("Robot x mm: %f\r\n", position_get_x_mm());
+				Serial.printf("Robot x mm: %f\r\n", PositionManager::Instance.GetXMm());
 			}
 			else if (!strncmp(arg, "y", ARG_LENGTH)) {
-				Serial.printf("Robot y mm: %f\r\n", position_get_y_mm());
+				Serial.printf("Robot y mm: %f\r\n", PositionManager::Instance.GetYMm());
 			}
 			else if (!strncmp(arg, "a", ARG_LENGTH)) {
-				Serial.printf("Robot angle deg: %f\r\n", position_get_angle_deg());
+				Serial.printf("Robot angle deg: %f\r\n", PositionManager::Instance.GetAngleDeg());
 			}
 			else if (!strncmp(arg, "d", ARG_LENGTH)) {
-				Serial.printf("Robot distance mm: %f\r\n", position_get_distance_mm());
+				Serial.printf("Robot distance mm: %f\r\n", PositionManager::Instance.GetDistanceMm());
 			}
 			else if (!strncmp(arg, "enc_r", ARG_LENGTH)) {
-				Serial.printf("Right encoder value: %f\r\n", position_get_right_encoder());
+				Serial.printf("Right encoder value: %f\r\n", PositionManager::Instance.GetRightEncoder());
 			}
 			else if (!strncmp(arg, "enc_l", ARG_LENGTH)) {
-				Serial.printf("Left encoder value: %f\r\n", position_get_left_encoder());
+				Serial.printf("Left encoder value: %f\r\n", PositionManager::Instance.GetLeftEncoder());
 			}
 			/*else if (!strncmp(arg, "cur_id", ARG_LENGTH)) {
 			  Serial.printf("Traj manager cur_id: %d\r\n", (int)trajectory_get_cur_id());
