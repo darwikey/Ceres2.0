@@ -112,7 +112,7 @@
     <ClInclude Include="QuadDecode_def.h">
       <FileType>CppCode</FileType>
     </ClInclude>
-    <ClInclude Include="quadramp.h">
+    <ClInclude Include="QuadrampFilter.h">
       <FileType>CppCode</FileType>
     </ClInclude>
     <ClInclude Include="TrajectoryManager.h">
@@ -129,7 +129,7 @@
     <ClCompile Include="PIDController.cpp" />
     <ClCompile Include="Platform.cpp" />
     <ClCompile Include="PositionManager.cpp" />
-    <ClCompile Include="quadramp.cpp" />
+    <ClCompile Include="QuadrampFilter.cpp" />
     <ClCompile Include="TrajectoryManager.cpp" />
   </ItemGroup>
   <PropertyGroup>

@@ -13,7 +13,7 @@
 #include "FilteredController.h"
 #include "PIDController.h"
 #include "diff.h"
-#include "quadramp.h"
+#include "QuadrampFilter.h"
 
 #define CONTROL_SYSTEM_PERIOD_S 0.01 // in s
 
@@ -70,8 +70,8 @@ private:
 	PIDController m_pid_distance;
 	PIDController m_pid_angle;
 
-	ausbee_quadramp m_quadramp_distance;
-	ausbee_quadramp m_quadramp_angle;
+	QuadrampFilter m_quadramp_distance;
+	QuadrampFilter m_quadramp_angle;
 
 	float m_distance_mm_diff;
 	float m_angle_rad_diff;

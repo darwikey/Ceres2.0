@@ -41,20 +41,15 @@ void ControlSystem::Start()
 	m_pid_angle.SetOutputRange(-100, 100);
 
 	// Quadramp setup
-	ausbee_quadramp_init(&(m_quadramp_distance));
-	ausbee_quadramp_init(&(m_quadramp_angle));
+	m_quadramp_distance.Init();
+	m_quadramp_angle.Init();
 
-	// Setting quadramp eval period to the control system period
-	ausbee_quadramp_set_eval_period(&(m_quadramp_distance), CONTROL_SYSTEM_PERIOD_S);
-	ausbee_quadramp_set_eval_period(&(m_quadramp_angle), CONTROL_SYSTEM_PERIOD_S);
+	// Setting QuadrampFilter eval period to the control system period
+	m_quadramp_distance.SetEvalPeriod(CONTROL_SYSTEM_PERIOD_S);
+	m_quadramp_angle.SetEvalPeriod(CONTROL_SYSTEM_PERIOD_S);
 
-	ausbee_quadramp_set_2nd_order_vars(&(m_quadramp_distance),
-		DISTANCE_MAX_ACC,
-		DISTANCE_MAX_ACC); // Translation acceleration (in mm/s^2)
-
-	ausbee_quadramp_set_2nd_order_vars(&(m_quadramp_angle),
-		DEG2RAD(ANGLE_MAX_ACC_DEG),
-		DEG2RAD(ANGLE_MAX_ACC_DEG)); // Rotation acceleration (in rad/s^2)
+	m_quadramp_distance.Set2ndOrderVars(DISTANCE_MAX_ACC, DISTANCE_MAX_ACC); // Translation acceleration (in mm/s^2)
+	m_quadramp_angle.Set2ndOrderVars(DEG2RAD(ANGLE_MAX_ACC_DEG),	DEG2RAD(ANGLE_MAX_ACC_DEG)); // Rotation acceleration (in rad/s^2)
 
 	SetSpeedHigh();
 
@@ -63,8 +58,8 @@ void ControlSystem::Start()
 	m_csm_angle.Init();
 
 	// Set reference filter
-	m_csm_distance.SetReferenceFilter(ausbee_quadramp_eval, (void*)&(m_quadramp_distance));
-	m_csm_angle.SetReferenceFilter(ausbee_quadramp_eval, (void*)&(m_quadramp_angle));
+	m_csm_distance.SetReferenceFilter(QuadrampFilter::Evaluate, (void*)&(m_quadramp_distance));
+	m_csm_angle.SetReferenceFilter(QuadrampFilter::Evaluate, (void*)&(m_quadramp_angle));
 
 	// Set measure functions
 	m_csm_distance.SetMeasureFetcher(measureDistanceMm);
@@ -119,8 +114,8 @@ void ControlSystem::SetMotorsRef(float d_mm, float theta)
 	SendCommandToMotor(RIGHT_MOTOR, right_motor_ref);
 	SendCommandToMotor(LEFT_MOTOR, left_motor_ref);
 
-	//ausbee_cs_set_reference(&(m_csm_right_motor), right_motor_ref);
-	//ausbee_cs_set_reference(&(m_csm_left_motor), left_motor_ref);
+	//SetReference(&(m_csm_right_motor), right_motor_ref);
+	//SetReference(&(m_csm_left_motor), left_motor_ref);
 }
 
 void ControlSystem::SetDistanceMmDiff(float ref)
@@ -136,48 +131,48 @@ void ControlSystem::SetAngleRadDiff(float ref)
 // User functions
 void ControlSystem::SetDistanceRef(float ref)
 {
-	m_csm_distance.ausbee_cs_set_reference(ref);
+	m_csm_distance.SetReference(ref);
 }
 
 void ControlSystem::SetDegAngleRef(float ref_deg)
 {
 	float ref_rad = DEG2RAD(ref_deg);
-	m_csm_angle.ausbee_cs_set_reference(ref_rad);
+	m_csm_angle.SetReference(ref_rad);
 }
 
 void ControlSystem::SetRadAngleRef(float ref_rad)
 {
-	m_csm_angle.ausbee_cs_set_reference(ref_rad);
+	m_csm_angle.SetReference(ref_rad);
 }
 
 void ControlSystem::SetRightMotorRef(int32_t ref)
 {
-	m_csm_right_motor.ausbee_cs_set_reference(ref);
+	m_csm_right_motor.SetReference(ref);
 }
 
 void ControlSystem::SetLeftMotorRef(int32_t ref)
 {
-	m_csm_left_motor.ausbee_cs_set_reference(ref);
+	m_csm_left_motor.SetReference(ref);
 }
 
 void ControlSystem::SetDistanceMaxSpeed(float max_speed)
 {
-	ausbee_quadramp_set_1st_order_vars(&(m_quadramp_distance), max_speed, max_speed);
+	m_quadramp_distance.Set1stOrderVars(max_speed, max_speed);
 }
 
 void ControlSystem::SetDistanceMaxAcc(float max_acc)
 {
-	ausbee_quadramp_set_2nd_order_vars(&(m_quadramp_distance), max_acc, max_acc);
+	m_quadramp_distance.Set2ndOrderVars(max_acc, max_acc);
 }
 
 void ControlSystem::SetAngleMaxSpeed(float max_speed)
 {
-	ausbee_quadramp_set_1st_order_vars(&(m_quadramp_angle), DEG2RAD(max_speed), DEG2RAD(max_speed));
+	m_quadramp_angle.Set1stOrderVars(DEG2RAD(max_speed), DEG2RAD(max_speed));
 }
 
 void ControlSystem::SetAngleMaxAcc(float max_acc)
 {
-	ausbee_quadramp_set_2nd_order_vars(&(m_quadramp_angle), DEG2RAD(max_acc), DEG2RAD(max_acc));
+	m_quadramp_angle.Set2ndOrderVars(DEG2RAD(max_acc), DEG2RAD(max_acc));
 }
 
 void ControlSystem::SetSpeedRatio(float ratio)
@@ -222,7 +217,5 @@ PIDController& ControlSystem::GetAnglePID()
 //TODO prendre en compte les angles != 0
 void ControlSystem::ResetAngle()
 {
-	m_quadramp_angle.prev_in = 0.f;
-	m_quadramp_angle.prev_out = 0.f;
-	m_quadramp_angle.prev_var = 0.f;
+	m_quadramp_angle.ResetPrevious();
 }

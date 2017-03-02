@@ -75,7 +75,7 @@ public:
 	float GetError();
 	float GetCommand();
 
-	void ausbee_cs_set_reference(float ref);
+	void SetReference(float ref);
 
 private:
 	float(*m_reference_filter)(void *, float);

@@ -36,9 +36,6 @@
     <ClInclude Include="QuadDecode_def.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="quadramp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Platform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -57,6 +54,9 @@
     <ClInclude Include="FilteredController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="QuadrampFilter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cli.cpp">
@@ -66,9 +66,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MotorManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="quadramp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Platform.cpp">
@@ -87,6 +84,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FilteredController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="QuadrampFilter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

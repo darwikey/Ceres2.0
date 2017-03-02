@@ -278,13 +278,13 @@ float FilteredController::GetCommand()
 }
 
 /**
- * @fn void ausbee_cs_set_reference(float ref)
+ * @fn void SetReference(float ref)
  * @brief Setting the reference we want to reach.
  *
  * @param ref Reference value.
  *
  */
-void FilteredController::ausbee_cs_set_reference(float ref)
+void FilteredController::SetReference(float ref)
 {
 	m_reference = ref;
 }

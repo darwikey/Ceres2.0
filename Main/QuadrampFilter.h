@@ -1,6 +1,6 @@
 /**
  ********************************************************************
- * @file    quadramp.h
+ * @file    QuadrampFilter.h
  * @author  David BITONNEAU <david.bitonneau@gmail.com>
  * @version V1.1
  * @date    24-May-2014
@@ -73,90 +73,86 @@
 #ifndef QUADRAMP_H
 #define QUADRAMP_H
 
-/** @addtogroup Libausbee
-  * @{
-  */
+ /** @addtogroup Libausbee
+   * @{
+   */
 
-/** @addtogroup Control_System
-  * @brief Control engineering module
-  * @{
-  */
+   /** @addtogroup Control_System
+	 * @brief Control engineering module
+	 * @{
+	 */
 
-/** @addtogroup Filters
-  * @brief Filters for the control engineering module
-  * @{
-  */
+	 /** @addtogroup Filters
+	   * @brief Filters for the control engineering module
+	   * @{
+	   */
 
-/** @addtogroup Quadramp
-  * @brief Quadramp filter
-  * @{
-  */
+	   /** @addtogroup Quadramp
+		 * @brief Quadramp filter
+		 * @{
+		 */
 
-/**
- * @struct ausbee_quadramp
- * @brief Quadramp filter structure
- *
- * ausbee_quadramp contains all the parameters and status of the quadramp
- * filter.
- *
- */
-struct ausbee_quadramp {
-    float var_2nd_ord_pos;
-    float var_2nd_ord_neg;
-    float var_1st_ord_pos;
-    float var_1st_ord_neg;
+		 /**
+		  * @struct ausbee_quadramp
+		  * @brief Quadramp filter structure
+		  *
+		  * ausbee_quadramp contains all the parameters and status of the QuadrampFilter
+		  * filter.
+		  *
+		  */
+class QuadrampFilter
+{
+public:
+	/** Initialization of the filter */
+	void Init();
 
-    float prev_var; /*!< Previous variation. */
-    float prev_out; /*!< Previous ouput value. */
-    float prev_in;  /*!< Previous input value. */
+	/**
+	* By default eval period is set to 1.
+	* Setting this parameter to the period Evaluate is called
+	* allows to have 1st and 2nd order variations value independent from
+	* this period.
+	*
+	* Let [V] be the unit of the value given as input to
+	* Evaluate and [T] the calling period.
+	* 1st and 2nd order variations' unit will be respectively [V]/[T] and
+	* [V]/([T]^2).
+	*
+	* For instance let's say the input is a distance which unit is in mm.
+	* The 1st order will be a speed in mm/[T] and 2nd order an
+	* acceleration in mm/([T]^2).
+	* This is not inconvenient to use for to reasons:
+	*  - These units are not meaningful, it is more likely we want to set
+	*  the speed in mm/s and the acceleration in mm/s^2.
+	*  - If the period changes, we have 1st and 2nd order variations'
+	*  value because their unit have changed.
+	*
+	* Thus this function is provided so that if we want [T] to be seconds
+	* and Evaluate is called 10 times per second we just have
+	* to set the period to 0.1 (s) and things will get more pleasant.
+	*/
+	void SetEvalPeriod(float period);
 
-    float eval_period;
+	void Set2ndOrderVars(float var_2nd_ord_pos, float var_2nd_ord_neg);
+
+	void Set1stOrderVars(float var_1st_ord_pos, float var_1st_ord_neg);
+
+	void ResetPrevious();
+
+	static float Evaluate(void *q, float in);
+
+private:
+	float m_var_2nd_ord_pos;
+	float m_var_2nd_ord_neg;
+	float m_var_1st_ord_pos;
+	float m_var_1st_ord_neg;
+
+	float m_prev_var; /*!< Previous variation. */
+	float m_prev_out; /*!< Previous ouput value. */
+	float m_prev_in;  /*!< Previous input value. */
+
+	float m_eval_period;
 };
 
-/** Initialization of the filter */
-void ausbee_quadramp_init(struct ausbee_quadramp *q);
-
-/**
- * By default eval period is set to 1.
- * Setting this parameter to the period ausbee_quadramp_eval is called
- * allows to have 1st and 2nd order variations value independent from
- * this period.
- *
- * Let [V] be the unit of the value given as input to
- * ausbee_quadramp_eval and [T] the calling period.
- * 1st and 2nd order variations' unit will be respectively [V]/[T] and
- * [V]/([T]^2).
- *
- * For instance let's say the input is a distance which unit is in mm.
- * The 1st order will be a speed in mm/[T] and 2nd order an
- * acceleration in mm/([T]^2).
- * This is not inconvenient to use for to reasons:
- *  - These units are not meaningful, it is more likely we want to set
- *  the speed in mm/s and the acceleration in mm/s^2.
- *  - If the period changes, we have 1st and 2nd order variations'
- *  value because their unit have changed.
- *
- * Thus this function is provided so that if we want [T] to be seconds
- * and ausbee_quadramp_eval is called 10 times per second we just have
- * to set the period to 0.1 (s) and things will get more pleasant.
- */
-void ausbee_quadramp_set_eval_period(struct ausbee_quadramp *q, float period);
-
-void ausbee_quadramp_set_2nd_order_vars(struct ausbee_quadramp *q,
-				 float var_2nd_ord_pos,
-				 float var_2nd_ord_neg);
-
-void ausbee_quadramp_set_1st_order_vars(struct ausbee_quadramp *q,
-				 float var_1st_ord_pos,
-				 float var_1st_ord_neg);
-
-/**
- * Return 1 when (filter_input == filter_output && 1st_ord variation
- * is 0 --speed is 0-- ).
- */
-int ausbee_quadramp_is_finished(struct ausbee_quadramp *q);
-
-float ausbee_quadramp_eval(void *q, float in);
 
 #endif /* QUADRAMP_H */
 
@@ -164,16 +160,16 @@ float ausbee_quadramp_eval(void *q, float in);
   * @}
   */
 
-/**
-  * @}
-  */
+  /**
+	* @}
+	*/
 
-/**
-  * @}
-  */
+	/**
+	  * @}
+	  */
 
-/**
-  * @}
-  */
+	  /**
+		* @}
+		*/
 
-/************** (C) COPYRIGHT 2013-2014 Eirbot **** END OF FILE ****/
+		/************** (C) COPYRIGHT 2013-2014 Eirbot **** END OF FILE ****/
