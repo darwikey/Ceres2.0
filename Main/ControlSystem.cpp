@@ -10,7 +10,7 @@
 #include <stdint.h>
 #include <inttypes.h>
 
-#include "pid.h"
+#include "PIDController.h"
 
 #include "MotorManager.h"
 #include "ControlSystem.h"
@@ -34,11 +34,11 @@ static float measureAngleRad()
 
 void ControlSystem::Start()
 {
-	ausbee_pid_init(&(m_pid_distance), 0.1, 0.0, 0.1);
-	ausbee_pid_init(&(m_pid_angle), 0.2, 0.0, 0.2);
+	m_pid_distance.Init(0.1, 0.0, 0.1);
+	m_pid_angle.Init(0.2, 0.0, 0.2);
 
-	ausbee_pid_set_output_range(&(m_pid_distance), -100, 100);
-	ausbee_pid_set_output_range(&(m_pid_angle), -100, 100);
+	m_pid_distance.SetOutputRange(-100, 100);
+	m_pid_angle.SetOutputRange(-100, 100);
 
 	// Quadramp setup
 	ausbee_quadramp_init(&(m_quadramp_distance));
@@ -59,24 +59,24 @@ void ControlSystem::Start()
 	SetSpeedHigh();
 
 	// Initialise each control system manager
-	ausbee_cs_init(&(m_csm_distance));
-	ausbee_cs_init(&(m_csm_angle));
+	m_csm_distance.Init();
+	m_csm_angle.Init();
 
 	// Set reference filter
-	ausbee_cs_set_reference_filter(&(m_csm_distance), ausbee_quadramp_eval, (void*)&(m_quadramp_distance));
-	ausbee_cs_set_reference_filter(&(m_csm_angle), ausbee_quadramp_eval, (void*)&(m_quadramp_angle));
+	m_csm_distance.SetReferenceFilter(ausbee_quadramp_eval, (void*)&(m_quadramp_distance));
+	m_csm_angle.SetReferenceFilter(ausbee_quadramp_eval, (void*)&(m_quadramp_angle));
 
 	// Set measure functions
-	ausbee_cs_set_measure_fetcher(&(m_csm_distance), measureDistanceMm);
-	ausbee_cs_set_measure_fetcher(&(m_csm_angle), measureAngleRad);
+	m_csm_distance.SetMeasureFetcher(measureDistanceMm);
+	m_csm_angle.SetMeasureFetcher(measureAngleRad);
 
 	// We use a pid controller because we like it here at Eirbot
-	ausbee_cs_set_controller(&(m_csm_distance), ausbee_pid_eval, (void*)&(m_pid_distance));
-	ausbee_cs_set_controller(&(m_csm_angle), ausbee_pid_eval, (void*)&(m_pid_angle));
+	m_csm_distance.SetController(&PIDController::EvaluatePID, (void*)&(m_pid_distance));
+	m_csm_angle.SetController(&PIDController::EvaluatePID, (void*)&(m_pid_angle));
 
 	// Set processing command
-	ausbee_cs_set_process_command(&(m_csm_distance), SetDistanceMmDiff);
-	ausbee_cs_set_process_command(&(m_csm_angle), SetAngleRadDiff);
+	m_csm_distance.SetProcessCommand(SetDistanceMmDiff);
+	m_csm_angle.SetProcessCommand(SetAngleRadDiff);
 
 	SetDistanceMmDiff(0);
 	SetAngleRadDiff(0);
@@ -93,8 +93,8 @@ void ControlSystem::Task()
 		{
 			//platform_led_toggle(PLATFORM_LED1);
 
-			ausbee_cs_manage(&(m_csm_distance));
-			ausbee_cs_manage(&(m_csm_angle));
+			m_csm_distance.Update();
+			m_csm_angle.Update();
 
 			SetMotorsRef(m_distance_mm_diff, m_angle_rad_diff);
 		}
@@ -136,28 +136,28 @@ void ControlSystem::SetAngleRadDiff(float ref)
 // User functions
 void ControlSystem::SetDistanceRef(float ref)
 {
-	ausbee_cs_set_reference(&(m_csm_distance), ref);
+	m_csm_distance.ausbee_cs_set_reference(ref);
 }
 
 void ControlSystem::SetDegAngleRef(float ref_deg)
 {
 	float ref_rad = DEG2RAD(ref_deg);
-	ausbee_cs_set_reference(&(m_csm_angle), ref_rad);
+	m_csm_angle.ausbee_cs_set_reference(ref_rad);
 }
 
 void ControlSystem::SetRadAngleRef(float ref_rad)
 {
-	ausbee_cs_set_reference(&(m_csm_angle), ref_rad);
+	m_csm_angle.ausbee_cs_set_reference(ref_rad);
 }
 
 void ControlSystem::SetRightMotorRef(int32_t ref)
 {
-	ausbee_cs_set_reference(&(m_csm_right_motor), ref);
+	m_csm_right_motor.ausbee_cs_set_reference(ref);
 }
 
 void ControlSystem::SetLeftMotorRef(int32_t ref)
 {
-	ausbee_cs_set_reference(&(m_csm_left_motor), ref);
+	m_csm_left_motor.ausbee_cs_set_reference(ref);
 }
 
 void ControlSystem::SetDistanceMaxSpeed(float max_speed)
@@ -209,14 +209,14 @@ void ControlSystem::SetSpeedLow()
 	SetSpeedRatio(0.5);
 }
 
-struct ausbee_pid* ControlSystem::GetDistancePID()
+PIDController& ControlSystem::GetDistancePID()
 {
-	return &m_pid_distance;
+	return m_pid_distance;
 }
 
-struct ausbee_pid* ControlSystem::GetAnglePID()
+PIDController& ControlSystem::GetAnglePID()
 {
-	return &m_pid_angle;
+	return m_pid_angle;
 }
 
 //TODO prendre en compte les angles != 0

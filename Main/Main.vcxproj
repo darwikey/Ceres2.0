@@ -90,7 +90,7 @@
     <ClInclude Include="ControlSystem.h">
       <FileType>CppCode</FileType>
     </ClInclude>
-    <ClInclude Include="control_system_manager.h">
+    <ClInclude Include="FilteredController.h">
       <FileType>CppCode</FileType>
     </ClInclude>
     <ClInclude Include="diff.h">
@@ -99,7 +99,7 @@
     <ClInclude Include="MotorManager.h">
       <FileType>CppCode</FileType>
     </ClInclude>
-    <ClInclude Include="pid.h">
+    <ClInclude Include="PIDController.h">
       <FileType>CppCode</FileType>
     </ClInclude>
     <ClInclude Include="Platform.h" />
@@ -123,10 +123,10 @@
   <ItemGroup>
     <ClCompile Include="cli.cpp" />
     <ClCompile Include="ControlSystem.cpp" />
-    <ClCompile Include="control_system_manager.cpp" />
+    <ClCompile Include="FilteredController.cpp" />
     <ClCompile Include="diff.cpp" />
     <ClCompile Include="MotorManager.cpp" />
-    <ClCompile Include="pid.cpp" />
+    <ClCompile Include="PIDController.cpp" />
     <ClCompile Include="Platform.cpp" />
     <ClCompile Include="PositionManager.cpp" />
     <ClCompile Include="quadramp.cpp" />

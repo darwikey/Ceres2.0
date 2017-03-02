@@ -24,16 +24,10 @@
     <ClInclude Include="cli.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="control_system_manager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="diff.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MotorManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="pid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="QuadDecode.h">
@@ -57,21 +51,21 @@
     <ClInclude Include="ControlSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PIDController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FilteredController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cli.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="control_system_manager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="diff.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MotorManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="pid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="quadramp.cpp">
@@ -87,6 +81,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ControlSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PIDController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FilteredController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

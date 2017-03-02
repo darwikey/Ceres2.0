@@ -10,8 +10,8 @@
 #ifndef CONTROL_SYSTEM_H
 #define CONTROL_SYSTEM_H
 
-#include "control_system_manager.h"
-#include "pid.h"
+#include "FilteredController.h"
+#include "PIDController.h"
 #include "diff.h"
 #include "quadramp.h"
 
@@ -47,8 +47,8 @@ public:
 	void SetSpeedMedium();
 	void SetSpeedLow();
 
-	ausbee_pid* GetDistancePID();
-	ausbee_pid* GetAnglePID();
+	PIDController& GetDistancePID();
+	PIDController& GetAnglePID();
 
 	void ResetAngle();
 
@@ -57,18 +57,18 @@ private:
 	static void SetDistanceMmDiff(float ref);
 	static void SetAngleRadDiff(float ref);
 
-	ausbee_cs m_csm_right_motor;
-	ausbee_cs m_csm_left_motor;
-	ausbee_cs m_csm_distance;
-	ausbee_cs m_csm_angle;
+	FilteredController m_csm_right_motor;
+	FilteredController m_csm_left_motor;
+	FilteredController m_csm_distance;
+	FilteredController m_csm_angle;
 
 	/*ausbee_diff diff_right_motor;
 	ausbee_diff diff_left_motor;*/
 
-	ausbee_pid m_pid_right_motor;
-	ausbee_pid m_pid_left_motor;
-	ausbee_pid m_pid_distance;
-	ausbee_pid m_pid_angle;
+	PIDController m_pid_right_motor;
+	PIDController m_pid_left_motor;
+	PIDController m_pid_distance;
+	PIDController m_pid_angle;
 
 	ausbee_quadramp m_quadramp_distance;
 	ausbee_quadramp m_quadramp_angle;

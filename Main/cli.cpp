@@ -103,27 +103,27 @@ void cli_task()
 				Serial.printf("Speed: %f\r\n", value);
 			}
 			else if (!strncmp(arg, "pid_d_p", ARG_LENGTH)) {
-				ausbee_pid_set_kp(ControlSystem::Instance.GetDistancePID(), value);
+				ControlSystem::Instance.GetDistancePID().SetKP(value);
 				Serial.printf("Distance P: %f\r\n", value);
 			}
 			else if (!strncmp(arg, "pid_d_i", ARG_LENGTH)) {
-				ausbee_pid_set_ki(ControlSystem::Instance.GetDistancePID(), value);
+				ControlSystem::Instance.GetDistancePID().SetKI(value);
 				Serial.printf("Distance I: %f\r\n", value);
 			}
 			else if (!strncmp(arg, "pid_d_d", ARG_LENGTH)) {
-				ausbee_pid_set_kd(ControlSystem::Instance.GetDistancePID(), value);
+				ControlSystem::Instance.GetDistancePID().SetKD(value);
 				Serial.printf("Distance D: %f\r\n", value);
 			}
 			else if (!strncmp(arg, "pid_a_p", ARG_LENGTH)) {
-				ausbee_pid_set_kp(ControlSystem::Instance.GetAnglePID(), value);
+				ControlSystem::Instance.GetAnglePID().SetKP(value);
 				Serial.printf("Angle P: %f\r\n", value);
 			}
 			else if (!strncmp(arg, "pid_a_i", ARG_LENGTH)) {
-				ausbee_pid_set_ki(ControlSystem::Instance.GetAnglePID(), value);
+				ControlSystem::Instance.GetAnglePID().SetKI(value);
 				Serial.printf("Angle I: %f\r\n", value);
 			}
 			else if (!strncmp(arg, "pid_a_d", ARG_LENGTH)) {
-				ausbee_pid_set_kd(ControlSystem::Instance.GetAnglePID(), value);
+				ControlSystem::Instance.GetAnglePID().SetKD(value);
 				Serial.printf("Angle D: %f\r\n", value);
 			}
 			else if (!strncmp(arg, "axle_track", ARG_LENGTH)) {
@@ -176,12 +176,12 @@ void cli_task()
 			  Serial.print("Traj manager last_id: %d\r\n", (int)GetLastId());
 			}*/
 			else if (!strncmp(arg, "pid", ARG_LENGTH)) {
-				Serial.printf("Distance PID: %f, %f, %f\r\n", ausbee_pid_get_kp(ControlSystem::Instance.GetDistancePID()),
-					ausbee_pid_get_ki(ControlSystem::Instance.GetDistancePID()),
-					ausbee_pid_get_kd(ControlSystem::Instance.GetDistancePID()));
-				Serial.printf("Angle PID:    %f, %f, %f\r\n", ausbee_pid_get_kp(ControlSystem::Instance.GetAnglePID()),
-					ausbee_pid_get_ki(ControlSystem::Instance.GetAnglePID()),
-					ausbee_pid_get_kd(ControlSystem::Instance.GetAnglePID()));
+				Serial.printf("Distance PID: %f, %f, %f\r\n", ControlSystem::Instance.GetDistancePID().GetKP(),
+					ControlSystem::Instance.GetDistancePID().GetKI(),
+					ControlSystem::Instance.GetDistancePID().GetKd());
+				Serial.printf("Angle PID:    %f, %f, %f\r\n", ControlSystem::Instance.GetAnglePID().GetKP(),
+					ControlSystem::Instance.GetAnglePID().GetKI(),
+					ControlSystem::Instance.GetAnglePID().GetKd());
 			}
 			/*else if (!strncmp(arg, "graph", ARG_LENGTH)) {
 				printGraphe();
