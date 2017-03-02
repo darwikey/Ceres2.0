@@ -59,12 +59,12 @@ void cli_task()
 
 		if (command == 'd') {
 			double value = atof(arg);
-			TrajectoryManager::Instance.trajectory_goto_d_mm(value);
+			TrajectoryManager::Instance.GotoDistance(value);
 			Serial.printf("Distance: %f\r\n", value);
 		}
 		else if (command == 'a') {
 			double value = atof(arg);
-			TrajectoryManager::Instance.trajectory_goto_a_rel_deg(value);
+			TrajectoryManager::Instance.GotoRelativeAngle(value);
 			Serial.printf("Angle: %f\r\n", (double)value);
 		}
 		/*else if (command == 'c') {
@@ -87,43 +87,43 @@ void cli_task()
 		else if (command == 's') {
 			double value = atof(arg2);
 			if (!strncmp(arg, "speed_high", ARG_LENGTH)) {
-				control_system_set_speed_high();
+				ControlSystem::Instance.SetSpeedHigh();
 				Serial.print("Max speed.\r\n");
 			}
 			else if (!strncmp(arg, "speed_medium", ARG_LENGTH)) {
-				control_system_set_speed_medium();
+				ControlSystem::Instance.SetSpeedMedium();
 				Serial.print("Medium speed.\r\n");
 			}
 			else if (!strncmp(arg, "speed_low", ARG_LENGTH)) {
-				control_system_set_speed_low();
+				ControlSystem::Instance.SetSpeedLow();
 				Serial.print("Low speed.\r\n");
 			}
 			else if (!strncmp(arg, "speed", ARG_LENGTH)) {
-				control_system_set_speed_ratio(value);
+				ControlSystem::Instance.SetSpeedRatio(value);
 				Serial.printf("Speed: %f\r\n", value);
 			}
 			else if (!strncmp(arg, "pid_d_p", ARG_LENGTH)) {
-				ausbee_pid_set_kp(control_system_get_pid_distance(), value);
+				ausbee_pid_set_kp(ControlSystem::Instance.GetDistancePID(), value);
 				Serial.printf("Distance P: %f\r\n", value);
 			}
 			else if (!strncmp(arg, "pid_d_i", ARG_LENGTH)) {
-				ausbee_pid_set_ki(control_system_get_pid_distance(), value);
+				ausbee_pid_set_ki(ControlSystem::Instance.GetDistancePID(), value);
 				Serial.printf("Distance I: %f\r\n", value);
 			}
 			else if (!strncmp(arg, "pid_d_d", ARG_LENGTH)) {
-				ausbee_pid_set_kd(control_system_get_pid_distance(), value);
+				ausbee_pid_set_kd(ControlSystem::Instance.GetDistancePID(), value);
 				Serial.printf("Distance D: %f\r\n", value);
 			}
 			else if (!strncmp(arg, "pid_a_p", ARG_LENGTH)) {
-				ausbee_pid_set_kp(control_system_get_pid_angle(), value);
+				ausbee_pid_set_kp(ControlSystem::Instance.GetAnglePID(), value);
 				Serial.printf("Angle P: %f\r\n", value);
 			}
 			else if (!strncmp(arg, "pid_a_i", ARG_LENGTH)) {
-				ausbee_pid_set_ki(control_system_get_pid_angle(), value);
+				ausbee_pid_set_ki(ControlSystem::Instance.GetAnglePID(), value);
 				Serial.printf("Angle I: %f\r\n", value);
 			}
 			else if (!strncmp(arg, "pid_a_d", ARG_LENGTH)) {
-				ausbee_pid_set_kd(control_system_get_pid_angle(), value);
+				ausbee_pid_set_kd(ControlSystem::Instance.GetAnglePID(), value);
 				Serial.printf("Angle D: %f\r\n", value);
 			}
 			else if (!strncmp(arg, "axle_track", ARG_LENGTH)) {
@@ -131,19 +131,19 @@ void cli_task()
 				Serial.printf("Axle track: %f\r\n", value);
 			}
 			else if (!strncmp(arg, "speed_d", ARG_LENGTH)) {
-				control_system_set_distance_max_speed(value);
+				ControlSystem::Instance.SetDistanceMaxSpeed(value);
 				Serial.printf("distance max speed: %f\r\n", value);
 			}
 			else if (!strncmp(arg, "speed_a", ARG_LENGTH)) {
-				control_system_set_angle_max_speed(value);
+				ControlSystem::Instance.SetAngleMaxSpeed(value);
 				Serial.printf("angle max speed: %f\r\n", value);
 			}
 			else if (!strncmp(arg, "acc_d", ARG_LENGTH)) {
-				control_system_set_distance_max_acc(value);
+				ControlSystem::Instance.SetDistanceMaxAcc(value);
 				Serial.printf("distance max acceleration: %f\r\n", value);
 			}
 			else if (!strncmp(arg, "acc_a", ARG_LENGTH)) {
-				control_system_set_angle_max_acc(value);
+				ControlSystem::Instance.SetAngleMaxAcc(value);
 				Serial.printf("angle max acceleration: %f\r\n", value);
 			}
 			else {
@@ -170,18 +170,18 @@ void cli_task()
 				Serial.printf("Left encoder value: %f\r\n", PositionManager::Instance.GetLeftEncoder());
 			}
 			/*else if (!strncmp(arg, "cur_id", ARG_LENGTH)) {
-			  Serial.printf("Traj manager cur_id: %d\r\n", (int)trajectory_get_cur_id());
+			  Serial.printf("Traj manager cur_id: %d\r\n", (int)GetCurId());
 			}
 			else if (!strncmp(arg, "last_id", ARG_LENGTH)) {
-			  Serial.print("Traj manager last_id: %d\r\n", (int)trajectory_get_last_id());
+			  Serial.print("Traj manager last_id: %d\r\n", (int)GetLastId());
 			}*/
 			else if (!strncmp(arg, "pid", ARG_LENGTH)) {
-				Serial.printf("Distance PID: %f, %f, %f\r\n", ausbee_pid_get_kp(control_system_get_pid_distance()),
-					ausbee_pid_get_ki(control_system_get_pid_distance()),
-					ausbee_pid_get_kd(control_system_get_pid_distance()));
-				Serial.printf("Angle PID:    %f, %f, %f\r\n", ausbee_pid_get_kp(control_system_get_pid_angle()),
-					ausbee_pid_get_ki(control_system_get_pid_angle()),
-					ausbee_pid_get_kd(control_system_get_pid_angle()));
+				Serial.printf("Distance PID: %f, %f, %f\r\n", ausbee_pid_get_kp(ControlSystem::Instance.GetDistancePID()),
+					ausbee_pid_get_ki(ControlSystem::Instance.GetDistancePID()),
+					ausbee_pid_get_kd(ControlSystem::Instance.GetDistancePID()));
+				Serial.printf("Angle PID:    %f, %f, %f\r\n", ausbee_pid_get_kp(ControlSystem::Instance.GetAnglePID()),
+					ausbee_pid_get_ki(ControlSystem::Instance.GetAnglePID()),
+					ausbee_pid_get_kd(ControlSystem::Instance.GetAnglePID()));
 			}
 			/*else if (!strncmp(arg, "graph", ARG_LENGTH)) {
 				printGraphe();

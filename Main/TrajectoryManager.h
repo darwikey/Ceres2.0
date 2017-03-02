@@ -1,7 +1,7 @@
 #ifndef TRAJECTORY_MANAGER_H
 #define TRAJECTORY_MANAGER_H
 
-#include "control_system.h"
+#include "ControlSystem.h"
 
 #define TRAJECTORY_UPDATE_PERIOD_S 0.1 // 100 ms
 
@@ -17,31 +17,31 @@ class TrajectoryManager {
 public:
 	static TrajectoryManager Instance;
 
-	void trajectory_init();
+	void Init();
 
-	void trajectory_task();
+	void Task();
 
 	/* Remove every points from the trajectory */
-	void trajectory_end();
+	void Reset();
 	/* Check whether points remain in the trajectory*/
-	int trajectory_is_ended();
+	int IsEnded();
 
-	void trajectory_next_point();
+	void NextPoint();
 
-	uint32_t trajectory_get_cur_id();
-	uint32_t trajectory_get_last_id();
+	uint32_t GetCurId();
+	uint32_t GetLastId();
 
-	bool trajectory_is_paused();
-	void trajectory_pause();
-	void trajectory_resume();
+	bool IsPaused();
+	void Pause();
+	void Resume();
 
-	void trajectory_goto_d_mm(float d_mm);
+	void GotoDistance(float d_mm);
 
 	/* Set absolute angle. Does not depend on current angle. */
-	void trajectory_goto_a_abs_deg(float a_deg_ref);
+	void GotoAbsoluteAngle(float a_deg_ref);
 
 	/* Set relative angle. Depends on current angle. */
-	void trajectory_goto_a_rel_deg(float a_deg);
+	void GotoRelativeAngle(float a_deg);
 
 private:
 	enum order_type {
@@ -77,16 +77,15 @@ private:
 	};
 
 
-
-	bool trajectory_is_full();
-	void trajectory_decrease_id(uint32_t *id);
-	void trajectory_manage_order_d(struct trajectory_dest *p);
-	void trajectory_manage_order_a_abs(struct trajectory_dest *p);
-	void trajectory_manage_order_a_rel(struct trajectory_dest *p);
-	void trajectory_manage_order_pause(struct trajectory_dest *p);
-	void trajectory_update();
+	bool IsFull();
+	void DecreaseId(uint32_t *id);
+	void ManageDistanceOrder(struct trajectory_dest *p);
+	void ManageAbsoluteAngleOrder(struct trajectory_dest *p);
+	void ManageRelativeAngleOrder(struct trajectory_dest *p);
+	void ManagePauseOrder(struct trajectory_dest *p);
+	void Update();
 	//void trajectory_update_smoothly();
-	void trajectory_add_point(struct trajectory_dest point, enum trajectory_when when);
+	void AddPoint(struct trajectory_dest point, enum trajectory_when when);
 
 	struct trajectory_dest m_points[TRAJECTORY_MAX_NB_POINTS];
 	uint32_t m_cur_id;

@@ -24,9 +24,6 @@
     <ClInclude Include="cli.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="control_system.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="control_system_manager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -57,12 +54,12 @@
     <ClInclude Include="TrajectoryManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ControlSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cli.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="control_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="control_system_manager.cpp">
@@ -87,6 +84,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TrajectoryManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ControlSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

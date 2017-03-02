@@ -7,7 +7,7 @@
  */
 
 #include "PositionManager.h"
-#include "control_system.h"
+#include "ControlSystem.h"
 #include "QuadDecode_def.h"
 #include <math.h>
 
@@ -131,8 +131,8 @@ float PositionManager::GetAngleDeg(void) {
 
 void PositionManager::SetAngleDeg(float a){
 	m_AngleRad = a * PI / 180.f;
-	control_system_set_angle_rad_ref(m_AngleRad);
-	control_system_reset_angle();
+	ControlSystem::Instance.SetRadAngleRef(m_AngleRad);
+	ControlSystem::Instance.ResetAngle();
 }
 
 float PositionManager::GetXMm(void) {

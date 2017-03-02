@@ -19,7 +19,7 @@ namespace Platform
 
 	void DisplayNumber(int n)
 	{
-		for (int i = 0; i <= _countof(leds); ++i)
+		for (unsigned i = 0; i <= _countof(leds); ++i)
 			digitalWrite(leds[i], ((1 << i) & n) ? HIGH : LOW);
 	}
 
@@ -45,7 +45,7 @@ namespace Platform
 			}
 		}
 
-		if (lastBlocked && gp2Sum < _countof(gp2s))
+		if (lastBlocked && gp2Sum < (int)_countof(gp2s))
 			return true;
 		else if (lastBlocked && gp2Sum == _countof(gp2s))
 			lastBlocked = false;
