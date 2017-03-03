@@ -84,7 +84,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cli.h">
+    <ClInclude Include="CommandLineInterface.h">
       <FileType>CppCode</FileType>
     </ClInclude>
     <ClInclude Include="ControlSystem.h">
@@ -121,7 +121,7 @@
     <ClInclude Include="__vm\.Main.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="cli.cpp" />
+    <ClCompile Include="CommandLineInterface.cpp" />
     <ClCompile Include="ControlSystem.cpp" />
     <ClCompile Include="FilteredController.cpp" />
     <ClCompile Include="DiffFilter.cpp" />

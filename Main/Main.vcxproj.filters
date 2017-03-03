@@ -21,9 +21,6 @@
     <ClInclude Include="__vm\.Main.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cli.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MotorManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -57,11 +54,11 @@
     <ClInclude Include="DiffFilter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CommandLineInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="cli.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MotorManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -87,6 +84,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DiffFilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandLineInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
