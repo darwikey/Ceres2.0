@@ -5,56 +5,53 @@
 
 #include "PositionManager.h"
 #include "TrajectoryManager.h"
-#include "cli.h"
+#include "CommandLineInterface.h"
 //#include "servo.h"
 
-
-#define CLI_BUFFER_SIZE 128
-char cli_buffer[CLI_BUFFER_SIZE];
-int cli_cur_pos = 0;
+CommandLineInterface CommandLineInterface::Instance;
 
 #define ARG_LENGTH 20
-void cli_task()
+void CommandLineInterface::Task()
 {
 	bool end_line = false;
 	while (Serial.available() > 0)
 	{
 		char c = Serial.read();
-		cli_buffer[cli_cur_pos] = c;
+		m_Buffer[m_CurPos] = c;
 		Serial.print(c);
 		if (c == '\r' || c == '\n')
 		{
 			end_line = true;
 			break;
 		}
-		if (cli_cur_pos < CLI_BUFFER_SIZE)
-			cli_cur_pos++;
+		if (m_CurPos < CLI_BUFFER_SIZE)
+			m_CurPos++;
 	}
 
 	if (end_line)
 	{
 
 		// read the incoming byte:
-		char command = cli_buffer[0];
+		char command = m_Buffer[0];
 		char arg[ARG_LENGTH] = { 0 };
 		char arg2[ARG_LENGTH] = { 0 };
 
 		int i = 2;
 		for (int j = 0;
-			i < cli_cur_pos && cli_buffer[i] != ' ' && j < ARG_LENGTH - 1;
+			i < m_CurPos && m_Buffer[i] != ' ' && j < ARG_LENGTH - 1;
 			i++, j++)
 		{
-			arg[j] = cli_buffer[i];
+			arg[j] = m_Buffer[i];
 		}
 		i++;
 		for (int j = 0;
-			i < cli_cur_pos && cli_buffer[i] != ' ' && j < ARG_LENGTH - 1;
+			i < m_CurPos && m_Buffer[i] != ' ' && j < ARG_LENGTH - 1;
 			i++, j++)
 		{
-			arg2[j] = cli_buffer[i];
+			arg2[j] = m_Buffer[i];
 		}
 
-		cli_cur_pos = 0;
+		m_CurPos = 0;
 		//Serial.printf("commande %c \"%s\" \"%s\"\r\n", command, arg, arg2);
 
 		if (command == 'd') {
@@ -265,6 +262,6 @@ void cli_task()
 			Serial.printf("Unknown command '%c'. Type 'h' for help.\r\n", command);
 		}
 
-		cli_cur_pos = 0;
+		m_CurPos = 0;
 	}
 }

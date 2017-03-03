@@ -2,7 +2,7 @@
 #include "ControlSystem.h"
 #include "PositionManager.h"
 #include "TrajectoryManager.h"
-#include "cli.h"
+#include "CommandLineInterface.h"
 #include "Platform.h"
 
 
@@ -37,7 +37,7 @@ void loop() {
 
 	Platform::DisplayNumber((speed > 0) | ((time % 1024 > 512) ? 2 : 0));
 
-	cli_task();
+	CommandLineInterface::Instance.Task();
 
 	//updateMotors(speed);
 	//updateAngleSpeed(0, speed);
