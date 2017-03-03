@@ -32,41 +32,46 @@
 
 #include <inttypes.h>
 
-/** @addtogroup Libausbee
-  * @{
-  */
+ /** @addtogroup Libausbee
+   * @{
+   */
 
-/** @addtogroup Control_System
-  * @brief Control engineering module
-  * @{
-  */
+   /** @addtogroup Control_System
+	 * @brief Control engineering module
+	 * @{
+	 */
 
-/** @addtogroup Filters
-  * @brief Filters for the control engineering module
-  * @{
-  */
+	 /** @addtogroup Filters
+	   * @brief Filters for the control engineering module
+	   * @{
+	   */
 
-/** @addtogroup Diff
-  * @brief Diff filter
-  * @{
-  */
+	   /** @addtogroup Diff
+		 * @brief Diff filter
+		 * @{
+		 */
 
-/**
- * @struct ausbee_diff
- * @brief Diff filter structure
- *
- * ausbee_diff contains all the parameters and status of the diff
- * filter.
- *
- */
-struct ausbee_diff {
-  float   prev_in;    /*!< Previous input value. */
-  float   delta;      /*!< Diff factor. */
-  uint8_t first_call; /*!< Whether ausbee_diff_eval has already be called or not. */
+		 /**
+		  * @struct DiffFilter
+		  * @brief Diff filter structure
+		  *
+		  * DiffFilter contains all the parameters and status of the diff
+		  * filter.
+		  *
+		  */
+class DiffFilter 
+{
+public:
+	void Init();
+	void SetDelta(float delta);
+	static float Evaluate(void *diff, float in);
+
+private:
+	float   m_prev_in;    /*!< Previous input value. */
+	float   m_delta;      /*!< Diff factor. */
+	bool	m_first_call; /*!< Whether ausbee_diff_eval has already be called or not. */
 };
 
-void  ausbee_diff_init(struct ausbee_diff *diff);
-float ausbee_diff_eval(void *diff , float in);
 
 #endif /* DIFF_H */
 
@@ -74,16 +79,16 @@ float ausbee_diff_eval(void *diff , float in);
   * @}
   */
 
-/**
-  * @}
-  */
+  /**
+	* @}
+	*/
 
-/**
-  * @}
-  */
+	/**
+	  * @}
+	  */
 
-/**
-  * @}
-  */
+	  /**
+		* @}
+		*/
 
-/************** (C) COPYRIGHT 2013-2014 Eirbot **** END OF FILE ****/
+		/************** (C) COPYRIGHT 2013-2014 Eirbot **** END OF FILE ****/

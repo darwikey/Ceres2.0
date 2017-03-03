@@ -93,7 +93,7 @@
     <ClInclude Include="FilteredController.h">
       <FileType>CppCode</FileType>
     </ClInclude>
-    <ClInclude Include="diff.h">
+    <ClInclude Include="DiffFilter.h">
       <FileType>CppCode</FileType>
     </ClInclude>
     <ClInclude Include="MotorManager.h">
@@ -124,7 +124,7 @@
     <ClCompile Include="cli.cpp" />
     <ClCompile Include="ControlSystem.cpp" />
     <ClCompile Include="FilteredController.cpp" />
-    <ClCompile Include="diff.cpp" />
+    <ClCompile Include="DiffFilter.cpp" />
     <ClCompile Include="MotorManager.cpp" />
     <ClCompile Include="PIDController.cpp" />
     <ClCompile Include="Platform.cpp" />

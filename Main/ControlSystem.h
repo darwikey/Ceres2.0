@@ -12,7 +12,7 @@
 
 #include "FilteredController.h"
 #include "PIDController.h"
-#include "diff.h"
+#include "DiffFilter.h"
 #include "QuadrampFilter.h"
 
 #define CONTROL_SYSTEM_PERIOD_S 0.01 // in s
@@ -62,8 +62,8 @@ private:
 	FilteredController m_csm_distance;
 	FilteredController m_csm_angle;
 
-	/*ausbee_diff diff_right_motor;
-	ausbee_diff diff_left_motor;*/
+	/*DiffFilter diff_right_motor;
+	DiffFilter diff_left_motor;*/
 
 	PIDController m_pid_right_motor;
 	PIDController m_pid_left_motor;

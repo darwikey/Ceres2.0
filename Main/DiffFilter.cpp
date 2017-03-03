@@ -26,50 +26,50 @@
  * <h2><centor>&copy;  Copyright 2013-2014 (C) EIRBOT </center></h2>
  ********************************************************************
  */
-#include "diff.h"
+#include "DiffFilter.h"
 
-/** @addtogroup Libausbee
-  * @{
-  */
+ /** @addtogroup Libausbee
+   * @{
+   */
 
-/** @addtogroup Control_System
-  * @brief Control engineering module
-  * @{
-  */
+   /** @addtogroup Control_System
+	 * @brief Control engineering module
+	 * @{
+	 */
 
-/** @defgroup Filters
-  * @brief Filters for the control engineering module
-  * @{
-  */
+	 /** @defgroup Filters
+	   * @brief Filters for the control engineering module
+	   * @{
+	   */
 
-/** @defgroup Diff
-  * @brief Diff filter
-  * @{
-  */
+	   /** @defgroup Diff
+		 * @brief Diff filter
+		 * @{
+		 */
 
-/**
- * @fn void ausbee_diff_init(struct ausbee_diff *diff)
- * @brief ausbee_diff structure initialisation.
- *
- * @param diff Structure reference.
- */
-void ausbee_diff_init(struct ausbee_diff *diff)
+		 /**
+		  * @fn void ausbee_diff_init(struct DiffFilter *diff)
+		  * @brief DiffFilter structure initialisation.
+		  *
+		  * @param diff Structure reference.
+		  */
+void DiffFilter::Init()
 {
-  diff->prev_in = 0;
-  diff->first_call = 1;
-  diff->delta = 1;
+	m_prev_in = 0;
+	m_first_call = true;
+	m_delta = 1;
 }
 
 /**
- * @fn void ausbee_diff_set_delta(struct ausbee_diff *diff, float delta)
- * @brief Set ausbee_diff delta parameter.
+ * @fn void ausbee_diff_set_delta(struct DiffFilter *diff, float delta)
+ * @brief Set DiffFilter delta parameter.
  *
  * @param diff  Structure reference.
  * @param delta Delta value.
  */
-void ausbee_diff_set_delta(struct ausbee_diff *diff, float delta)
+void DiffFilter::SetDelta(float delta)
 {
-  diff->delta = delta;
+	m_delta = delta;
 }
 
 /**
@@ -79,37 +79,37 @@ void ausbee_diff_set_delta(struct ausbee_diff *diff, float delta)
  * @param diff Structure reference.
  * @param in The current input value
  */
-float ausbee_diff_eval(void *filter, float in)
+float DiffFilter::Evaluate(void *filter, float in)
 {
-  struct ausbee_diff *diff = (struct ausbee_diff *)filter;
+	DiffFilter *diff = (DiffFilter *)filter;
 
-  if (diff->first_call) {
-    diff->first_call = 0;
-    diff->prev_in = in;
-    return 0;
-  }
+	if (diff->m_first_call) {
+		diff->m_first_call = false;
+		diff->m_prev_in = in;
+		return 0;
+	}
 
-  float out = (in - diff->prev_in) / (diff->delta);
+	float out = (in - diff->m_prev_in) / (diff->m_delta);
 
-  diff->prev_in = in;
+	diff->m_prev_in = in;
 
-  return out;
+	return out;
 }
 
 /**
   * @}
   */
 
-/**
-  * @}
-  */
+  /**
+	* @}
+	*/
 
-/**
-  * @}
-  */
+	/**
+	  * @}
+	  */
 
-/**
-  * @}
-  */
+	  /**
+		* @}
+		*/
 
-/************** (C) COPYRIGHT 2013-2014 Eirbot **** END OF FILE ****/
+		/************** (C) COPYRIGHT 2013-2014 Eirbot **** END OF FILE ****/
