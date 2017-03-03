@@ -19,24 +19,9 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 
 //  Version 0.9 October 2014
 
-#ifndef __QUADDECODEDEF_H__
-#define __QUADDECODEDEF_H__
-
-
-#include "QuadDecode.h"
+//#include "QuadDecode.h"
 #include "wiring.h"
-#include "mk20dx128.h"
-#include "usb_serial.h"
-#include <inttypes.h>
-
-// FTM Interrupt Service routines - on overflow and position compare
-void ftm1_isr(void){
-    apQDcd1->ftm_isr();
-};
-
-void ftm2_isr(void){
-    apQDcd2->ftm_isr();
-};
+//#include "usb_serial.h"
 
 //  Constructor execution not guaranteed, need to explictly call setup
 template <int N>
@@ -334,6 +319,3 @@ int32_t QuadDecode<N>::calcPosn(void){
 	return v_basePosn;  // Position is new basePosition, no addtl counts
     }
 }
-
-#endif
-

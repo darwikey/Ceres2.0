@@ -16,6 +16,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Main.ino" />
+    <None Include="QuadDecode_Def.h">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="__vm\.Main.vsarduino.h">
@@ -25,9 +28,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="QuadDecode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="QuadDecode_def.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Platform.h">

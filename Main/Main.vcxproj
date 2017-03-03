@@ -82,6 +82,7 @@
     <None Include="Main.ino">
       <FileType>CppCode</FileType>
     </None>
+    <None Include="QuadDecode_Def.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommandLineInterface.h">
@@ -107,9 +108,6 @@
       <FileType>CppCode</FileType>
     </ClInclude>
     <ClInclude Include="QuadDecode.h">
-      <FileType>CppCode</FileType>
-    </ClInclude>
-    <ClInclude Include="QuadDecode_def.h">
       <FileType>CppCode</FileType>
     </ClInclude>
     <ClInclude Include="QuadrampFilter.h">

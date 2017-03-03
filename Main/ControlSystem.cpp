@@ -16,7 +16,7 @@
 #include "ControlSystem.h"
 #include "PositionManager.h"
 
-#define PI 3.1415926535
+//#define PI 3.1415926535
 #define DEG2RAD(a) ((a) * PI / 180.0)
 
 ControlSystem ControlSystem::Instance;

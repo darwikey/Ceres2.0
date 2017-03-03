@@ -9,7 +9,7 @@
 #ifndef POSITION_MANAGER_H
 #define POSITION_MANAGER_H
 
-#include <stdint.h>
+#include "QuadDecode.h"
 
 class PositionManager
 {
@@ -34,6 +34,9 @@ public:
 	void SetXYMm(float x, float y);
 
 	int32_t MmToTicks(float value_mm);
+
+	QuadDecode<1> m_Encoder1;  // Template using FTM1
+	QuadDecode<2> m_Encoder2;  // Template using FTM2
 
 private:
 	uint32_t m_TicksPerM;

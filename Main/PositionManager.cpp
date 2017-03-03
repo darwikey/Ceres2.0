@@ -8,23 +8,28 @@
 
 #include "PositionManager.h"
 #include "ControlSystem.h"
-#include "QuadDecode_def.h"
 #include <math.h>
 
 PositionManager PositionManager::Instance;
-QuadDecode<1> encoder1;  // Template using FTM1
-QuadDecode<2> encoder2;  // Template using FTM2
 
-//#define PI 3.1415926535f
+// FTM Interrupt Service routines - on overflow and position compare
+void ftm1_isr(void) 
+{
+	PositionManager::Instance.m_Encoder1.ftm_isr();
+}
 
+void ftm2_isr(void) 
+{
+	PositionManager::Instance.m_Encoder2.ftm_isr();
+}
 
 #define position_ticks_to_mm(value_ticks) ((value_ticks) * 1000.0 / m_TicksPerM)
 
 void PositionManager::Init(uint32_t ticks_per_m, double axle_track_mm) {
-	encoder1.setup();
-	encoder2.setup();
-	encoder1.start();
-	encoder2.start();
+	m_Encoder1.setup();
+	m_Encoder2.setup();
+	m_Encoder1.start();
+	m_Encoder2.start();
 	
 	m_TicksPerM = ticks_per_m;
 	m_AxleTrackMm = axle_track_mm;
@@ -42,8 +47,8 @@ void PositionManager::Init(uint32_t ticks_per_m, double axle_track_mm) {
 void PositionManager::Update()
 {
 	// Reading encoder value
-  int32_t new_left_enc = encoder1.calcPosn();
-  int32_t new_right_enc = -encoder2.calcPosn();
+  int32_t new_left_enc = m_Encoder1.calcPosn();
+  int32_t new_right_enc = -m_Encoder2.calcPosn();
   
 	int16_t left_enc_diff = m_LeftEncoder - new_left_enc;
 	int16_t right_enc_diff = m_RightEncoder - new_right_enc;
@@ -126,11 +131,11 @@ float PositionManager::GetAngleRad(void) {
 }
 
 float PositionManager::GetAngleDeg(void) {
-	return m_AngleRad * 180.f / PI;
+	return m_AngleRad * 180.f / M_PI;
 }
 
 void PositionManager::SetAngleDeg(float a){
-	m_AngleRad = a * PI / 180.f;
+	m_AngleRad = a * M_PI / 180.f;
 	ControlSystem::Instance.SetRadAngleRef(m_AngleRad);
 	ControlSystem::Instance.ResetAngle();
 }
