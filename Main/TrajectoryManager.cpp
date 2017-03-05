@@ -1,6 +1,6 @@
-#include <stdio.h>
 #include "PositionManager.h"
 #include "TrajectoryManager.h"
+#include "WProgram.h"
 
 TrajectoryManager TrajectoryManager::Instance;
 
@@ -136,7 +136,7 @@ void TrajectoryManager::AddPoint(struct trajectory_dest point, enum trajectory_w
 
 	if (when == END) {
 		if (IsFull()) {
-			printf("[trajectory_manager] Warning: List of points is full. Last point not added.\n");
+			Serial.println("[trajectory_manager] Warning: List of points is full. Last point not added.");
 			return;
 		}
 
@@ -149,7 +149,7 @@ void TrajectoryManager::AddPoint(struct trajectory_dest point, enum trajectory_w
 	else if (when == NOW) {
 		if (IsFull()) {
 			DecreaseId(&(m_last_id));
-			printf("[trajectory_manager] Warning: List of points is full. Last point was removed.\n");
+			Serial.println("[trajectory_manager] Warning: List of points is full. Last point was removed");
 		}
 
 		/* Insert a point before the current one */

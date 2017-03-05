@@ -26,7 +26,7 @@
  * <h2><centor>&copy;  Copyright 2013-2014 (C) EIRBOT </center></h2>
  ********************************************************************
  */
-#include <stdlib.h>
+//#include <stdlib.h>
 #include "FilteredController.h"
 
 #define AUSBEE_DEBUG_PRINTF 0
@@ -35,7 +35,7 @@
 #include <stdio.h>
 #define debug_printf(args...) do { printf(args); } while(0)
 #else
-#define debug_printf(args...) do { } while(0)
+#define debug_printf(args,...) ((void)0)
 #endif
 
  /** @addtogroup Libausbee
@@ -69,18 +69,18 @@ static float safe_filter(float(*f)(void *, float), void *params, float value)
  */
 void FilteredController::Init()
 {
-	m_reference_filter = NULL;
-	m_reference_filter_params = NULL;
+	m_reference_filter = nullptr;
+	m_reference_filter_params = nullptr;
 
-	m_measure_fetcher = NULL;
+	m_measure_fetcher = nullptr;
 
-	m_measure_filter = NULL;
-	m_measure_filter_params = NULL;
+	m_measure_filter = nullptr;
+	m_measure_filter_params = nullptr;
 
-	m_controller = NULL;
-	m_controller_params = NULL;
+	m_controller = nullptr;
+	m_controller_params = nullptr;
 
-	m_process_command = NULL;
+	m_process_command = nullptr;
 
 	m_reference = 0;
 	m_filtered_reference = 0;
