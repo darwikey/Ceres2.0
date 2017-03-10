@@ -3,7 +3,7 @@
 
 #include "ControlSystem.h"
 
-#define TRAJECTORY_UPDATE_PERIOD_S 0.1 // 100 ms
+#define TRAJECTORY_UPDATE_PERIOD_S 0.01 // 10 ms
 
 #define TRAJECTORY_MAX_NB_POINTS 50
 

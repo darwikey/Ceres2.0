@@ -17,7 +17,7 @@
 
 #define CONTROL_SYSTEM_PERIOD_S 0.01 // in s
 
-#define DISTANCE_MAX_SPEED 240 // in mm/s
+#define DISTANCE_MAX_SPEED 180//240 // in mm/s
 #define DISTANCE_MAX_ACC   300 // in mm/s^2
 
 #define ANGLE_MAX_SPEED_DEG 90 // in deg/s
