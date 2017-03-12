@@ -24,6 +24,7 @@ namespace Platform
 			pinMode(gp2s[i], INPUT);
 
 		//init servo
+		SerialUart2.begin(115200);
 		Servo.begin(SerialUart2);
 		// fast moving servos, so set the joint speed to max!
 		Servo.setJointSpeed(254, 1023);
@@ -71,16 +72,16 @@ namespace Platform
 
 	void SetServoLED(ServoID id, int color)
 	{
-		Servo.LED(id, color);
+		Servo.LED((int)id, color);
 	}
 
 	void SetServoPos(ServoID id, int pos)
 	{
-		Servo.moveJoint(id, pos);
+		Servo.moveJoint((int)id, pos);
 	}
 
 	void SetServoSpeed(ServoID id, int speed)
 	{
-		Servo.setJointSpeed(id, speed);
+		Servo.setJointSpeed((int)id, speed);
 	}
 }

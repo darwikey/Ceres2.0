@@ -6,9 +6,10 @@
 #define GP2_BLOCK_AT   1000 /*432*/ /*288*/
 #define GP2_UNBLOCK_AT 1000 /*324*/ /*216*/
 
-enum ServoID
+enum class ServoID
 {
-	SERVO1,
+	SERVO1 = 1,
+	ALL = 254,
 };
 
 namespace Platform
@@ -24,7 +25,9 @@ namespace Platform
 	bool IsButtonPressed(int id);
 	bool IsGp2Occluded();
 	void SetServoLED(ServoID id, int color);
+	//pos: 0 to 1023
 	void SetServoPos(ServoID id, int pos);
+	//speed 0 to 1023
 	void SetServoSpeed(ServoID id, int speed);
 }
 
