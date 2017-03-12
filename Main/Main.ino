@@ -1,3 +1,4 @@
+#include <SoftwareSerial.h>
 #include "MotorManager.h"
 #include "ControlSystem.h"
 #include "PositionManager.h"

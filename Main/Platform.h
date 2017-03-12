@@ -6,6 +6,11 @@
 #define GP2_BLOCK_AT   1000 /*432*/ /*288*/
 #define GP2_UNBLOCK_AT 1000 /*324*/ /*216*/
 
+enum ServoID
+{
+	SERVO1,
+};
+
 namespace Platform
 {
 	const int leds[] = { 11, 12, 13, 20, 21 };
@@ -17,7 +22,10 @@ namespace Platform
 
 	void DisplayNumber(int n);
 	bool IsButtonPressed(int id);
-	bool IsGp2Occluded(int id);
+	bool IsGp2Occluded();
+	void SetServoLED(ServoID id, int color);
+	void SetServoPos(ServoID id, int pos);
+	void SetServoSpeed(ServoID id, int speed);
 }
 
 #endif
