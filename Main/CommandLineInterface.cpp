@@ -143,6 +143,15 @@ void CommandLineInterface::Task()
 				ControlSystem::Instance.SetAngleMaxAcc(value);
 				Serial.printf("angle max acceleration: %f\r\n", value);
 			}
+			else if (!strncmp(arg, "servo_baudrate", ARG_LENGTH)) {
+				Platform::ForceServoBaudRate();
+				Serial.print("Force servo baudrate\r\n");
+			}
+			else if (!strncmp(arg, "servo_id", ARG_LENGTH)) {
+				int id = atoi(arg2);
+				Platform::ForceServoId(id);
+				Serial.printf("Force all connected servo to id %d\r\n", id);
+			}
 			else {
 				Serial.printf("Invalid argument '%s'.\r\n", arg);
 			}

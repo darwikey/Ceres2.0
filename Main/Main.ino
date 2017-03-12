@@ -30,13 +30,32 @@ void setup() {
 void loop() {
 	// put your main code here, to run repeatedly:
 	static int time = 0;
+	static int clock = 0;
 	//static int step = 0;
 
 	int speed = 0;
 	if (Platform::IsButtonPressed(0))
 		speed = SPEED;
 
-	Platform::DisplayNumber((speed > 0) | ((time % 1024 > 512) ? 2 : 0));
+	// Debug
+	if (clock >= 1000)
+	{
+		static int led = 0;
+		clock = 0;
+		if (led == 0)
+			Platform::SetServoLED(ServoID::SERVO1, ServoLED::RED);
+		else if (led == 1)
+			Platform::SetServoLED(ServoID::SERVO2, ServoLED::GREEN);
+		else if (led == 2)
+			Platform::SetServoLED(ServoID::SERVO3, ServoLED::BLUE);
+		else
+		{
+			Platform::SetServoLED(ServoID::ALL, ServoLED::NONE);
+			led = -1;
+		}
+		led++;
+	}
+	Platform::DisplayNumber((speed > 0) | ((time & 0x7FF) > 512 ? 2 : 0));
 
 	CommandLineInterface::Instance.Task();
 
@@ -45,62 +64,9 @@ void loop() {
 	ControlSystem::Instance.Task();
 	TrajectoryManager::Instance.Task();
 
-	//Serial.println(position_get_x_mm());
-	//Serial.println(position_get_y_mm());
-	 //Serial.println("\n");
-
-	 // if(dist >= 1024*34)
-	   // step = 3;
-
-  /*  display(step);
-
-	if(time >= 85000) {
-	  display(0x1F);
-	  while(1) {
-		analogWrite(motorPWMs[0], 0);
-		analogWrite(motorPWMs[1], 0);
-	  }
-	}
-
-	if(step == 0) {
-	  while(digitalRead(buttons[0]) == HIGH);
-	  step = 1;
-	}
-	else if(step == 1) {
-	  //while(digitalRead(buttons[1]) == HIGH);
-	  while(digitalRead(startPull) == LOW);
-	  time = 0;
-	  step = 2;
-	  encoder1.start();
-	  encoder2.start();
-	}
-	else if(step == 2) {
-	  int speed = SPEED;
-	  long long dist;
-
-	  updateEnc();
-	  dist = curEnc[0] + curEnc[1];
-
-	  display(step | ((lastBlocked) ? 0b11000 : 0));
-
-	  //updateMotors(speed);
-	  updateAngleSpeed(0, speed);
-
-	  if(dist >= 1024*34)
-		step = 3;
-	}
-	else if(step == 3) {
-	  updateEnc();
-	  updateMotors(0);
-	  if(time >= 80000)
-		step = 4;
-	}
-	else {
-	  updateEnc();
-	  updateMotors(0);
-	}
-	*/
+	
 	delay(10);
 	time += 10;
+	clock += 10;
 }
 

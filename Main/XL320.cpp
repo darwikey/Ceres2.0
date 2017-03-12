@@ -24,28 +24,13 @@
 
  // Macro for the selection of the Serial Port
 #define sendData(args)  (this->stream->write(args))    // Write Over Serial
-#define beginCom(args)      // Begin Serial Comunication
 #define readData()		(this->stream->read())	
-
-// Select the Switch to TX/RX Mode Pin
-#define setDPin(DirPin,Mode)    
-#define switchCom(DirPin,Mode)   // Switch to TX/RX Mode
 
 #define SERVO_TIME_DELAY 12000
 
 	///////////////// utility for value ///////////////////////////
-#define DXL_MAKEWORD(a, b)      ((unsigned short)(((unsigned char)(((unsigned long)(a)) & 0xff)) | ((unsigned short)((unsigned char)(((unsigned long)(b)) & 0xff))) << 8))
-#define DXL_MAKEDWORD(a, b)     ((unsigned int)(((unsigned short)(((unsigned long)(a)) & 0xffff)) | ((unsigned int)((unsigned short)(((unsigned long)(b)) & 0xffff))) << 16))
-#define DXL_LOWORD(l)           ((unsigned short)(((unsigned long)(l)) & 0xffff))
-#define DXL_HIWORD(l)           ((unsigned short)((((unsigned long)(l)) >> 16) & 0xffff))
 #define DXL_LOBYTE(w)           ((unsigned char)(((unsigned long)(w)) & 0xff))
 #define DXL_HIBYTE(w)           ((unsigned char)((((unsigned long)(w)) >> 8) & 0xff))
-
-
-#define RX_TIMEOUT_COUNT2		(1600L) //(1000L) //porting
-#define SERVO_TIME_DELAY			(12000) //ydh added 20111228 -> 20120210 edited ydh
-#define RX_TIMEOUT_COUNT1  		(RX_TIMEOUT_COUNT2*128L)
-
 
 XL320::XL320() {
 
@@ -56,8 +41,6 @@ XL320::~XL320() {
 
 void XL320::begin(Stream &stream)
 {
-	//setDPin(Direction_Pin=4,OUTPUT);
-	//beginCom(1000000);
 	this->stream = &stream;
 }
 
@@ -81,38 +64,6 @@ void XL320::setJointSpeed(int id, int value) {
 
 void XL320::LED(int id, int color) {
 	int Address = XL_LED;
-
-	/*if(led_color[0] == 'r'){
-		val = 1;
-	}
-
-	else if(led_color[0] == 'g'){
-		val = 2;
-	}
-
-	else if(led_color[0] == 'y'){
-		val = 3;
-	}
-
-	else if(led_color[0] == 'b'){
-		val = 4;
-	}
-
-	else if(led_color[0] == 'p'){
-		val = 5;
-	}
-
-	else if(led_color[0] == 'c'){
-		val = 6;
-	}
-
-	else if(led_color[0] == 'w'){
-		val = 7;
-	}
-
-	else if(led_color[0] == 'o'){
-		val = 0;
-	}*/
 
 	sendPacket(id, Address, color);
 	this->stream->flush();

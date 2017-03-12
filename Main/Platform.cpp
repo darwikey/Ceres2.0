@@ -42,7 +42,7 @@ namespace Platform
 		return digitalRead(buttons[id]) == LOW;
 	}
 
-	bool IsGp2Occluded()
+	bool IsGP2Occluded()
 	{
 		static bool lastBlocked = false;
 		int gp2Sum = 0;
@@ -70,9 +70,9 @@ namespace Platform
 		return false;
 	}
 
-	void SetServoLED(ServoID id, int color)
+	void SetServoLED(ServoID id, ServoLED color)
 	{
-		Servo.LED((int)id, color);
+		Servo.LED((int)id, (int)color);
 	}
 
 	void SetServoPos(ServoID id, int pos)
@@ -84,4 +84,17 @@ namespace Platform
 	{
 		Servo.setJointSpeed((int)id, speed);
 	}
+
+	void ForceServoBaudRate()
+	{
+		// 0: 9600, 1:57600, 2:115200, 3:1Mbps
+		Servo.sendPacket((int)ServoID::ALL, XL_BAUD_RATE, 2);
+	}
+
+	void ForceServoId(int id)
+	{
+		Servo.sendPacket((int)ServoID::ALL, XL_ID, id);
+	}
+
+
 }
