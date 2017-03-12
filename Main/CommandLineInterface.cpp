@@ -6,7 +6,7 @@
 #include "PositionManager.h"
 #include "TrajectoryManager.h"
 #include "CommandLineInterface.h"
-//#include "servo.h"
+#include "Platform.h"
 
 CommandLineInterface CommandLineInterface::Instance;
 
@@ -143,6 +143,15 @@ void CommandLineInterface::Task()
 				ControlSystem::Instance.SetAngleMaxAcc(value);
 				Serial.printf("angle max acceleration: %f\r\n", value);
 			}
+			else if (!strncmp(arg, "servo_baudrate", ARG_LENGTH)) {
+				Platform::ForceServoBaudRate();
+				Serial.print("Force servo baudrate\r\n");
+			}
+			else if (!strncmp(arg, "servo_id", ARG_LENGTH)) {
+				int id = atoi(arg2);
+				Platform::ForceServoId(id);
+				Serial.printf("Force all connected servo to id %d\r\n", id);
+			}
 			else {
 				Serial.printf("Invalid argument '%s'.\r\n", arg);
 			}
@@ -187,9 +196,11 @@ void CommandLineInterface::Task()
 				Serial.printf("Invalid argument '%s'.\r\n", arg);
 			}
 		}
-		/*else if (command == 'm') {
-			if (!strncmp(arg, "lift", ARG_LENGTH)) {
-				if (!strncmp(arg2, "up", ARG_LENGTH)) {
+		else if (command == 'm') {
+			if (!strncmp(arg, "servo1", ARG_LENGTH)) {
+				Platform::SetServoPos(ServoID::SERVO1, atoi(arg2));
+				Serial.print("Move servo 1\r\n");
+				/*if (!strncmp(arg2, "up", ARG_LENGTH)) {
 					action_raise_lift();
 					Serial.print("Lift up\r\n");
 				}
@@ -199,20 +210,20 @@ void CommandLineInterface::Task()
 				}
 				else {
 					Serial.print("Invalid argument '%s'.\r\n", arg2);
-				}
+				}*/
 			}
-			else if (!strncmp(arg, "grip", ARG_LENGTH)) {
+			/*else if (!strncmp(arg, "grip", ARG_LENGTH)) {
 				ausbeeSetAngleServo(&servo_grip, atoi(arg2));
 				Serial.print("command servo.\r\n");
 			}
 			else if (!strncmp(arg, "clapet", ARG_LENGTH)) {
 				ausbeeSetAngleServo(&servo_clapet, atoi(arg2));
 				Serial.print("command servo.\r\n");
-			}
+			}*/
 			else {
-				Serial.print("Invalid argument '%s'.\r\n", arg);
+				Serial.printf("Invalid argument '%s'.\r\n", arg);
 			}
-		}*/
+		}
 		else if (command == 'h') {
 			Serial.print("Help:\r\n");
 			Serial.print("  Available commands are:\r\n");

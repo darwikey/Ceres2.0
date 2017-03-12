@@ -1,8 +1,15 @@
 #include "Platform.h"
 #include "WProgram.h"
+#include <SoftwareSerial.h>
+#include "XL320.h"
 
 namespace Platform
 {
+	// Set the SoftwareSerial RX & TX pins
+	SoftwareSerial SerialUart2(9, 10); // (RX, TX)
+
+	XL320 Servo;
+
 	void Init()
 	{
 		for (unsigned i = 0; i < _countof(leds); ++i)
@@ -15,6 +22,13 @@ namespace Platform
 
 		for (unsigned i = 0; i < _countof(gp2s); ++i)
 			pinMode(gp2s[i], INPUT);
+
+		//init servo
+		SerialUart2.begin(115200);
+		Servo.begin(SerialUart2);
+		// fast moving servos, so set the joint speed to max!
+		Servo.setJointSpeed(254, 1023);
+
 	}
 
 	void DisplayNumber(int n)
@@ -28,7 +42,7 @@ namespace Platform
 		return digitalRead(buttons[id]) == LOW;
 	}
 
-	bool IsGp2Occluded()
+	bool IsGP2Occluded()
 	{
 		static bool lastBlocked = false;
 		int gp2Sum = 0;
@@ -55,5 +69,32 @@ namespace Platform
 		}
 		return false;
 	}
+
+	void SetServoLED(ServoID id, ServoLED color)
+	{
+		Servo.LED((int)id, (int)color);
+	}
+
+	void SetServoPos(ServoID id, int pos)
+	{
+		Servo.moveJoint((int)id, pos);
+	}
+
+	void SetServoSpeed(ServoID id, int speed)
+	{
+		Servo.setJointSpeed((int)id, speed);
+	}
+
+	void ForceServoBaudRate()
+	{
+		// 0: 9600, 1:57600, 2:115200, 3:1Mbps
+		Servo.sendPacket((int)ServoID::ALL, XL_BAUD_RATE, 2);
+	}
+
+	void ForceServoId(int id)
+	{
+		Servo.sendPacket((int)ServoID::ALL, XL_ID, id);
+	}
+
 
 }

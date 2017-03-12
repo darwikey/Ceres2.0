@@ -57,6 +57,9 @@
     <ClInclude Include="CommandLineInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="XL320.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MotorManager.cpp">
@@ -87,6 +90,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CommandLineInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="XL320.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

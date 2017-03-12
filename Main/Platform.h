@@ -6,6 +6,26 @@
 #define GP2_BLOCK_AT   1000 /*432*/ /*288*/
 #define GP2_UNBLOCK_AT 1000 /*324*/ /*216*/
 
+enum class ServoID
+{
+	SERVO1 = 1,
+	SERVO2 = 2,
+	SERVO3 = 3,
+	ALL = 254,
+};
+
+enum class ServoLED
+{
+	NONE = 0,
+	RED,
+	GREEN,
+	YELLOW,
+	BLUE,
+	PURPLE,
+	CYAN,
+	WHITE
+};
+
 namespace Platform
 {
 	const int leds[] = { 11, 12, 13, 20, 21 };
@@ -17,7 +37,17 @@ namespace Platform
 
 	void DisplayNumber(int n);
 	bool IsButtonPressed(int id);
-	bool IsGp2Occluded(int id);
+	bool IsGP2Occluded();
+
+	void SetServoLED(ServoID id, ServoLED color);
+	//pos: 0 to 1023
+	void SetServoPos(ServoID id, int pos);
+	//speed 0 to 1023
+	void SetServoSpeed(ServoID id, int speed);
+	// set baudrate to 115200 for all servo connected
+	void ForceServoBaudRate();
+	// set id of one servo connected, id between 1 and 253 (but not 200)
+	void ForceServoId(int id);
 }
 
 #endif
