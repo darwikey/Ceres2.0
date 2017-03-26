@@ -9,8 +9,6 @@
 
 #define SPEED 125
 
-extern void astar_test(void);
-
 void setup() {
 	// put your setup code here, to run once:
 	delay(500);
@@ -25,8 +23,6 @@ void setup() {
 	TrajectoryManager::Instance.Init();
 
 	delay(500);
-
-	astar_test();
 }
 
 void loop() {

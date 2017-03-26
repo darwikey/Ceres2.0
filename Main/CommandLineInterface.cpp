@@ -7,6 +7,7 @@
 #include "TrajectoryManager.h"
 #include "CommandLineInterface.h"
 #include "Platform.h"
+#include "astar.hpp"
 
 CommandLineInterface CommandLineInterface::Instance;
 
@@ -64,12 +65,13 @@ void CommandLineInterface::Task()
 			TrajectoryManager::Instance.GotoRelativeAngle(value);
 			Serial.printf("Angle: %f\r\n", (double)value);
 		}
-		/*else if (command == 'c') {
-			double x = atof(arg);
-			double x = atof(arg2);
-			trajectory_goto_xy_mm(x, y);
-			Serial.printf("Goto xy: %f  %f\r\n", x, y);
-		}*/
+		else if (command == 'c') {
+			//double x = atof(arg);
+			//double y = atof(arg2);
+			//trajectory_goto_xy_mm(x, y);
+			//Serial.printf("Goto xy: %f  %f\r\n", x, y);
+			astar_test(atoi(arg), atoi(arg2));
+		}
 		//else if (command == '*') {
 		//	float y = cli_getfloat();
 		//	set_startCoor(positionMmToCoordinate(position_get_x_mm(), position_get_y_mm()));
