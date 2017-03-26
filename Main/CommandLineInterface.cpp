@@ -7,7 +7,7 @@
 #include "TrajectoryManager.h"
 #include "CommandLineInterface.h"
 #include "Platform.h"
-#include "astar.hpp"
+#include "Astar.h"
 
 CommandLineInterface CommandLineInterface::Instance;
 

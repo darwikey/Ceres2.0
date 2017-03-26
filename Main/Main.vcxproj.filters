@@ -60,7 +60,7 @@
     <ClInclude Include="XL320.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Astar.hpp">
+    <ClInclude Include="Astar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

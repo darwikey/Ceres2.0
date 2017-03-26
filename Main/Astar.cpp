@@ -21,7 +21,7 @@ DummyCout& operator<<(DummyCout& cout, const DummyEndl&) {
 static DummyCout cout;
 static DummyEndl endl;
 
-#include "astar.hpp"
+#include "Astar.h"
 #include <vector>
 #include <cmath>
 

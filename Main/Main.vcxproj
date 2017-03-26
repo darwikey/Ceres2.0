@@ -85,7 +85,7 @@
     <None Include="QuadDecode_Def.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Astar.hpp" />
+    <ClInclude Include="Astar.h" />
     <ClInclude Include="CommandLineInterface.h">
       <FileType>CppCode</FileType>
     </ClInclude>
