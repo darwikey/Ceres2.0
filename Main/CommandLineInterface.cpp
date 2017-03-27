@@ -191,9 +191,9 @@ void CommandLineInterface::Task()
 					ControlSystem::Instance.GetAnglePID().GetKI(),
 					ControlSystem::Instance.GetAnglePID().GetKd());
 			}
-			/*else if (!strncmp(arg, "graph", ARG_LENGTH)) {
-				printGraphe();
-			}*/
+			else if (!strncmp(arg, "graph", ARG_LENGTH)) {
+				Graph::Instance.print();
+			}
 			else {
 				Serial.printf("Invalid argument '%s'.\r\n", arg);
 			}
