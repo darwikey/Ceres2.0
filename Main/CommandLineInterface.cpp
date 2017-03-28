@@ -62,15 +62,15 @@ void CommandLineInterface::Task()
 		}
 		else if (command == 'a') {
 			double value = atof(arg);
-			TrajectoryManager::Instance.GotoRelativeAngle(value);
+			TrajectoryManager::Instance.GotoDegreeAngle(value);
 			Serial.printf("Angle: %f\r\n", (double)value);
 		}
 		else if (command == 'c') {
-			//double x = atof(arg);
-			//double y = atof(arg2);
-			//trajectory_goto_xy_mm(x, y);
-			//Serial.printf("Goto xy: %f  %f\r\n", x, y);
-			astar_test(atoi(arg), atoi(arg2));
+			double x = atof(arg);
+			double y = atof(arg2);
+			TrajectoryManager::Instance.GotoXY(x, y);
+			Serial.printf("Goto xy: %f  %f\r\n", x, y);
+			//astar_test(atoi(arg), atoi(arg2));
 		}
 		//else if (command == '*') {
 		//	float y = cli_getfloat();

@@ -3,20 +3,20 @@
 
 #include "ControlSystem.h"
 
-#define TRAJECTORY_UPDATE_PERIOD_S 0.01 // 10 ms
 
-#define TRAJECTORY_MAX_NB_POINTS 50
+#define SMOOTH_TRAJ_UPDATE_PERIOD_S 0.01 // 100 ms
 
-#define TRAJECTORY_DEFAULT_PRECISION_D_MM  10.0
-#define TRAJECTORY_DEFAULT_PRECISION_A_DEG 5.0f //1.0
+#define SMOOTH_TRAJ_MAX_NB_POINTS 50
 
+#define SMOOTH_TRAJ_DEFAULT_PRECISION_D_MM  40.0
+#define SMOOTH_TRAJ_DEFAULT_PRECISION_A_RAD (3.0f * 0.01745329f) //1 degrees
 
-#define SMOOTH_TRAJ 0
+#define SMOOTH_TRAJ_STEER_DISTANCE_MM 70
+
 
 class TrajectoryManager {
 public:
 	static TrajectoryManager Instance;
-
 	void Init();
 
 	void Task();
@@ -35,61 +35,39 @@ public:
 	void Pause();
 	void Resume();
 
+	void GotoXY(float x_mm, float y_mm);
+
 	void GotoDistance(float d_mm);
-
-	/* Set absolute angle. Does not depend on current angle. */
-	void GotoAbsoluteAngle(float a_deg_ref);
-
-	/* Set relative angle. Depends on current angle. */
-	void GotoRelativeAngle(float a_deg);
+	void GotoDegreeAngle(float a);
+	void GotoRadianAngle(float a);
 
 private:
-	enum order_type {
-		PAUSE, D, A_ABS, A_REL
-	};
-
-	enum trajectory_when {
+	enum TrajWhen {
 		NOW, END
 	};
 
-	struct trajectory_dest {
-		union {
-			struct {
-				float mm;
-				float precision;
-			} d;
-
-			struct {
-				float deg;
-				float precision;
-			} a;
-		};
-
-#if SMOOTH_TRAJ
-		float x;
-		float y;
-#endif
-
-		float starting_d_mm;
-		float starting_a_deg;
-		uint8_t is_init;
-		enum order_type type;
+	enum OrderType {
+		COMMON, FORWARD, BACKWARD
 	};
 
+	struct TrajDest {
 
-	bool IsFull();
+		float x;//mm
+		float y;//mm
+		float a;//rad
+		OrderType movement;
+	};
+
+	bool TrajIsFull();
 	void DecreaseId(uint32_t *id);
-	void ManageDistanceOrder(struct trajectory_dest *p);
-	void ManageAbsoluteAngleOrder(struct trajectory_dest *p);
-	void ManageRelativeAngleOrder(struct trajectory_dest *p);
-	void ManagePauseOrder(struct trajectory_dest *p);
+	void AddPoint(TrajDest point, TrajWhen when);
+	void GotoTarget(TrajDest* next_point, float target_x, float target_y);
 	void Update();
-	//void trajectory_update_smoothly();
-	void AddPoint(struct trajectory_dest point, enum trajectory_when when);
 
-	struct trajectory_dest m_points[TRAJECTORY_MAX_NB_POINTS];
-	uint32_t m_cur_id;
-	uint32_t m_last_id;
+	TrajDest m_Points[SMOOTH_TRAJ_MAX_NB_POINTS];
+	uint32_t m_CurId;
+	uint32_t m_LastId;
+	float m_PreviousWaypointDist;
+	bool m_Pause;
 };
-
 #endif /* TRAJECTORY_MANAGER_H */
