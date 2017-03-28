@@ -32,7 +32,7 @@ void InitMotors()
 
 void SendCommandToMotor(int m, long long cmd)
 {
-  if(m == LEFT_MOTOR) cmd = -cmd;
+  if(m == RIGHT_MOTOR) cmd = -cmd;
   
   analogWrite(motorPWMs[m], (abs(cmd) > 255) ? 255 : abs(cmd));
   digitalWrite(motorDirs[m], (cmd >= 0) ? HIGH : LOW);
