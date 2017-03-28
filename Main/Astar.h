@@ -47,7 +47,7 @@ public:
 			return _cost;
 		}
 
-		void setParent(const Node& parent);
+		void SetParent(const Node& parent);
 
 		bool operator==(const Node& other) const {
 			return _pos == other._pos;
@@ -55,15 +55,15 @@ public:
 	};
 
 	struct Path : std::vector<Node> {
-		void flush(void) {
+		void Flush(void) {
 			this->resize(0);
 		}
 
-		bool isFull(void) {
+		bool IsFull(void) {
 			return false;
 		}
 
-		void push(const Node& e) {
+		void Push(const Node& e) {
 			this->insert(this->begin(), e);
 		}
 	};
@@ -71,7 +71,7 @@ public:
 	static AStar Instance;
 
 	AStar(Graph& g)
-		: _graph(g) {
+		: m_Graph(g) {
 	}
 
 	enum ReturnStatus {
@@ -80,24 +80,24 @@ public:
 		ERROR_OUT_OF_MEMORY
 	};
 
-	ReturnStatus buildPath(const Node& last, Path& out_path);
-	ReturnStatus findPath(const Node& source, const Node& destination, Path& out_path);
+	ReturnStatus BuildPath(const Node& last, Path& out_path);
+	ReturnStatus FindPath(const Node& source, const Node& destination, Path& out_path);
 
 private:
-	Graph& _graph;
+	Graph& m_Graph;
 
-	bool findBetter(const ClosedList& closed, const OpenList& open, const Node& node);
+	bool FindBetter(const ClosedList& closed, const OpenList& open, const Node& node);
 
 	template<class List>
-	bool tryInsert(List& list, const Node& node);
+	bool TryInsert(List& list, const Node& node);
 };
 
 class Graph {
 public:
 	static Graph Instance;
 	enum class Value : char {
-		OBSTACLE,
 		EMPTY,
+		OBSTACLE,
 		CLOSED,
 		OPEN,
 		PATH
@@ -112,7 +112,7 @@ public:
 	static const int _height = 15;
 
 private:
-	InternalNode _data[_width][_height];
+	InternalNode m_Data[_width][_height];
 
 public:
 	Graph();
@@ -120,44 +120,45 @@ public:
 	InternalNode & operator [](const AStarCoord &c);
 	const InternalNode & operator [](const AStarCoord &c) const;
 
-	void print(void) const;
+	void Print(bool _debug=true) const;
 
 	static int myAbs(int val) {
 		return val < 0 ? -val : val;
 	}
 
-	int getDistance(const AStar::Node& node1, const AStar::Node& node2) const {
+	int GetDistance(const AStar::Node& node1, const AStar::Node& node2) const {
 		return myAbs(node1._pos.x - node2._pos.x) + myAbs(node1._pos.y - node2._pos.y);
 	}
 
-	bool isNode(const AStarCoord &c) const;
-	std::vector<AStar::Node> getNeighbors(const AStar::Node& node) const;
-	std::vector<AStar::Node> getParents(const AStar::Node& node) const;
+	bool IsNode(const AStarCoord &c) const;
+	std::vector<AStar::Node> GetNeighbors(const AStar::Node& node) const;
+	std::vector<AStar::Node> GetParents(const AStar::Node& node) const;
 
-	void setParent(AStar::Node& child, const AStar::Node& parent) {
-		child.setParent(parent);
+	void SetParent(AStar::Node& child, const AStar::Node& parent) {
+		child.SetParent(parent);
 		(*this)[child._pos].parent = parent._pos;
 	}
 
-	int getCost(const AStar::Node& node) {
+	int GetCost(const AStar::Node& node) {
 		return node.cost();
 	}
 
-	void putElement(unsigned x, unsigned y, Value v) {
+	void PutElement(unsigned x, unsigned y, Value v) {
 		if (x >= _width) return;
 		if (y >= _height) return;
-		_data[x][y].v = v;
+		m_Data[x][y].v = v;
 	}
 
-	void putElement(const AStarCoord &c, Value v) {
+	void PutElement(const AStarCoord &c, Value v) {
 		if ((unsigned)c.x >= _width) return;
 		if ((unsigned)c.y >= _height) return;
-		_data[c.x][c.y].v = v;
+		m_Data[c.x][c.y].v = v;
 	}
 
-	void putObstacle(unsigned x, unsigned y) {
-		putElement(x, y, Value::OBSTACLE);
+	void PutObstacle(unsigned x, unsigned y) {
+		PutElement(x, y, Value::OBSTACLE);
 	}
+	void PutObstacle(unsigned x0, unsigned y0, unsigned x1, unsigned y1);
 };
 
 #endif

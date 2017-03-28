@@ -192,7 +192,7 @@ void CommandLineInterface::Task()
 					ControlSystem::Instance.GetAnglePID().GetKd());
 			}
 			else if (!strncmp(arg, "graph", ARG_LENGTH)) {
-				Graph::Instance.print();
+				Graph::Instance.Print();
 			}
 			else {
 				Serial.printf("Invalid argument '%s'.\r\n", arg);
@@ -260,16 +260,16 @@ void CommandLineInterface::Task()
 			Serial.print("                open: open the arm \r\n");
 			Serial.print("  p <arg>:   Print internal value.\r\n");
 			Serial.print("             <arg> can be one of:\r\n");
-			Serial.print("             x:        print robot's x position.\r\n");
-			Serial.print("             y:        print robot's y position.\r\n");
-			Serial.print("             a:        print robot's angle.\r\n");
-			Serial.print("             d:        print robot's distance.\r\n");
-			Serial.print("             enc_l:    print left encoder's value.\r\n");
-			Serial.print("             enc_r:    print right encoder's value.\r\n");
-			Serial.print("             cur_id:   print Traj manager's current point id.\r\n");
-			Serial.print("             last_id:  print Traj manager's last point id.\r\n");
-			Serial.print("             pid:      print PID.\r\n");
-			Serial.print("             graphe:   print A* graphe.\r\n");
+			Serial.print("             x:        Print robot's x position.\r\n");
+			Serial.print("             y:        Print robot's y position.\r\n");
+			Serial.print("             a:        Print robot's angle.\r\n");
+			Serial.print("             d:        Print robot's distance.\r\n");
+			Serial.print("             enc_l:    Print left encoder's value.\r\n");
+			Serial.print("             enc_r:    Print right encoder's value.\r\n");
+			Serial.print("             cur_id:   Print Traj manager's current point id.\r\n");
+			Serial.print("             last_id:  Print Traj manager's last point id.\r\n");
+			Serial.print("             pid:      Print PID.\r\n");
+			Serial.print("             graphe:   Print A* graphe.\r\n");
 		}
 		else {
 			Serial.printf("Unknown command '%c'. Type 'h' for help.\r\n", command);

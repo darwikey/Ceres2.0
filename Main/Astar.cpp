@@ -31,7 +31,7 @@ void std::__throw_length_error(char const*) {
 Graph Graph::Instance;
 AStar AStar::Instance(Graph::Instance);
 
-void AStar::Node::setParent(const Node & parent)
+void AStar::Node::SetParent(const Node & parent)
 {
 	_parent = parent._pos;
 	const double xx = _pos.x - _parent.x;
@@ -58,20 +58,20 @@ void astar_test(int x, int y)
 	AStar::Node dest(AStarCoord(x, y));
 
 	Graph &g = Graph::Instance;
-	g.putObstacle(5, 5);
-	g.putObstacle(4, 4);
-	g.putObstacle(5, 4);
-	g.putObstacle(4, 5);
+	g.PutObstacle(5, 5);
+	g.PutObstacle(4, 4);
+	g.PutObstacle(5, 4);
+	g.PutObstacle(4, 5);
 
-	g.putObstacle(5, 3);
-	g.putObstacle(4, 3);
+	g.PutObstacle(5, 3);
+	g.PutObstacle(4, 3);
 
-	g.putObstacle(3, 4);
-	g.putObstacle(3, 5);
-	g.putObstacle(2, 4);
-	g.putObstacle(2, 5);
+	g.PutObstacle(3, 4);
+	g.PutObstacle(3, 5);
+	g.PutObstacle(2, 4);
+	g.PutObstacle(2, 5);
 
-	auto ret = AStar::Instance.findPath(source, dest, path);
+	auto ret = AStar::Instance.FindPath(source, dest, path);
 
 	if (ret == AStar::SUCCESS) cout << "SUCCESS" << endl;
 	else if (ret == AStar::ERROR_NOT_FOUND) cout << "ERROR_NOT_FOUND" << endl;
@@ -80,18 +80,18 @@ void astar_test(int x, int y)
 	cout << path.size() << endl;
 
 	for (auto it = path.begin(); it != path.end(); ++it) {
-		g.putElement(it->_pos, Graph::Value::PATH);
+		g.PutElement(it->_pos, Graph::Value::PATH);
 	}
 
 	cout << endl;
-	g.print();
+	g.Print(false);
 }
 
 Graph::Graph()
 {
 	for (int y = 0; y < _height; y++) {
 		for (int x = 0; x < _width; x++) {
-			_data[x][y].v = Value::EMPTY;
+			m_Data[x][y].v = Value::EMPTY;
 		}
 	}
 }
@@ -102,7 +102,7 @@ Graph::InternalNode & Graph::operator[](const AStarCoord & c)
 		while (1)
 			cout << "ERROR : Graph::operator []" << endl;
 	}
-	return _data[c.x][c.y];
+	return m_Data[c.x][c.y];
 }
 
 const Graph::InternalNode & Graph::operator[](const AStarCoord & c) const
@@ -111,51 +111,51 @@ const Graph::InternalNode & Graph::operator[](const AStarCoord & c) const
 		while (1)
 			cout << "ERROR : Graph::operator [] const" << endl;
 	}
-	return _data[c.x][c.y];
+	return m_Data[c.x][c.y];
 }
 
-void Graph::print(void) const
+void Graph::Print(bool _debug) const
 {
 	for (int y = 0; y < _height; y++) {
 		for (int x = 0; x < _width; x++) {
-			auto v = _data[x][y].v;
-			if (v == Value::EMPTY) {
-				cout << " ";
-			}
-			if (v == Value::OBSTACLE) {
-				cout << "O";
-			}
-			if (v == Value::CLOSED) {
-				cout << "c";
-			}
-			if (v == Value::OPEN) {
-				cout << ".";
-			}
-			if (v == Value::PATH) {
+			auto v = m_Data[x][y].v;
+			if (v == Value::OBSTACLE)
+				cout << "#";
+			else if (v == Value::PATH)
 				cout << "X";
+			else if(_debug)
+			{
+				if (v == Value::CLOSED)
+					cout << "c";
+				else if (v == Value::OPEN)
+					cout << "o";
+				else
+					cout << ".";
 			}
+			else
+				cout << ".";
 		}
 		cout << endl;
 	}
 }
 
-bool Graph::isNode(const AStarCoord & c) const
+bool Graph::IsNode(const AStarCoord & c) const
 {
 	if ((unsigned)c.x >= _width) return false;
 	if ((unsigned)c.y >= _height) return false;
-	return _data[c.x][c.y].v != Value::OBSTACLE;
+	return m_Data[c.x][c.y].v != Value::OBSTACLE;
 }
 
-std::vector<AStar::Node> Graph::getNeighbors(const AStar::Node & node) const
+std::vector<AStar::Node> Graph::GetNeighbors(const AStar::Node & node) const
 {
 	std::vector<AStar::Node> ret;
 	AStarCoord c;
 	for (c.y = node._pos.y - 1; c.y <= node._pos.y + 1; c.y++) {
 		for (c.x = node._pos.x - 1; c.x <= node._pos.x + 1; c.x++) {
-			if (isNode(c)) {
+			if (IsNode(c)) {
 				AStar::Node n(c);
 				if (!(node == n)) {
-					n.setParent(node);
+					n.SetParent(node);
 					ret.push_back(n);
 				}
 			}
@@ -166,7 +166,7 @@ std::vector<AStar::Node> Graph::getNeighbors(const AStar::Node & node) const
 	return ret;
 }
 
-std::vector<AStar::Node> Graph::getParents(const AStar::Node & node) const
+std::vector<AStar::Node> Graph::GetParents(const AStar::Node & node) const
 {
 	std::vector<AStar::Node> ret;
 	AStarCoord cur = node._pos;
@@ -177,88 +177,95 @@ std::vector<AStar::Node> Graph::getParents(const AStar::Node & node) const
 	return ret;
 }
 
+void Graph::PutObstacle(unsigned x0, unsigned y0, unsigned x1, unsigned y1)
+{
+	for (unsigned x = x0; x <= x1; x++) 
+		for (unsigned y = y0; y <= y1; y++)
+			PutElement(x, y, Value::OBSTACLE);
+}
+
 struct ClosedList {
-	std::vector<AStar::Node> _data;
-	Graph& _graph;
+	std::vector<AStar::Node> m_Data;
+	Graph& m_Graph;
 
 	ClosedList(Graph& graph)
-		: _graph(graph) {
+		: m_Graph(graph) {
 
 	}
 
 	void insert(AStar::Node e) {
-		for (auto it = _data.begin(); it != _data.end(); ++it) {
+		for (auto it = m_Data.begin(); it != m_Data.end(); ++it) {
 			if (*it == e) {
-				_graph.putElement(e._pos, Graph::Value::CLOSED);
+				m_Graph.PutElement(e._pos, Graph::Value::CLOSED);
 				*it = e;
 				return;
 			}
 		}
-		_graph.putElement(e._pos, Graph::Value::CLOSED);
-		_data.push_back(e);
+		m_Graph.PutElement(e._pos, Graph::Value::CLOSED);
+		m_Data.push_back(e);
 	}
 
 	std::vector<AStar::Node>::const_iterator begin(void) const {
-		return _data.begin();
+		return m_Data.begin();
 	}
 
 	std::vector<AStar::Node>::const_iterator end(void) const {
-		return _data.end();
+		return m_Data.end();
 	}
 
 	bool isEmpty(void) const {
-		return _data.size() == 0;
+		return m_Data.size() == 0;
 	}
 
-	bool isFull(void) const {
+	bool IsFull(void) const {
 		return false;
 	}
 
-	void flush(void) {
-		_data.resize(0);
+	void Flush(void) {
+		m_Data.resize(0);
 	}
 
 };
 
 struct OpenList {
-	std::vector<AStar::Node> _data;
-	Graph& _graph;
+	std::vector<AStar::Node> m_Data;
+	Graph& m_Graph;
 	AStar::Node _dest;
 
 	OpenList(Graph& graph, AStar::Node dest)
-		: _graph(graph), _dest(dest) {
+		: m_Graph(graph), _dest(dest) {
 	}
 
 	void insert(AStar::Node e) {
-		for (auto it = _data.begin(); it != _data.end(); ++it) {
+		for (auto it = m_Data.begin(); it != m_Data.end(); ++it) {
 			if (*it == e) {
-				_graph.putElement(e._pos, Graph::Value::OPEN);
+				m_Graph.PutElement(e._pos, Graph::Value::OPEN);
 				*it = e;
 				return;
 			}
 		}
-		_graph.putElement(e._pos, Graph::Value::OPEN);
-		_data.push_back(e);
+		m_Graph.PutElement(e._pos, Graph::Value::OPEN);
+		m_Data.push_back(e);
 	}
 
 	void pop(void) {
-		auto rm = _data.begin();
-		for (auto it = _data.begin(); it != _data.end(); ++it) {
+		auto rm = m_Data.begin();
+		for (auto it = m_Data.begin(); it != m_Data.end(); ++it) {
 			if (heuristic(*it) < heuristic(*rm)) {
 				rm = it;
 			}
 		}
-		_graph.putElement(rm->_pos, Graph::Value::EMPTY);
-		_data.erase(rm);
+		m_Graph.PutElement(rm->_pos, Graph::Value::EMPTY);
+		m_Data.erase(rm);
 	}
 
 	int heuristic(const AStar::Node& n) const {
-		return n.cost() + _graph.getDistance(n, _dest);
+		return n.cost() + m_Graph.GetDistance(n, _dest);
 	}
 
 	AStar::Node head(void) const {
-		auto min = _data.begin();
-		for (auto it = _data.begin(); it != _data.end(); ++it) {
+		auto min = m_Data.begin();
+		for (auto it = m_Data.begin(); it != m_Data.end(); ++it) {
 			if (heuristic(*it) < heuristic(*min)) {
 				min = it;
 			}
@@ -267,75 +274,75 @@ struct OpenList {
 	}
 
 	std::vector<AStar::Node>::const_iterator begin(void) const {
-		return _data.begin();
+		return m_Data.begin();
 	}
 
 	std::vector<AStar::Node>::const_iterator end(void) const {
-		return _data.end();
+		return m_Data.end();
 	}
 
 	bool isEmpty(void) const {
-		return _data.size() == 0;
+		return m_Data.size() == 0;
 	}
 
-	bool isFull(void) const {
+	bool IsFull(void) const {
 		return false;
 	}
 
-	void flush(void) {
-		_data.resize(0);
+	void Flush(void) {
+		m_Data.resize(0);
 	}
 };
 
 template<class List>
-bool  AStar::tryInsert(List& list, const Node& node)
+bool  AStar::TryInsert(List& list, const Node& node)
 {
-	bool ret = !list.isFull();
+	bool ret = !list.IsFull();
 	if (ret) {
 		list.insert(node);
 	}
 	return ret;
 }
 
-bool AStar::findBetter(const ClosedList & closed, const OpenList & open, const Node & node)
+bool AStar::FindBetter(const ClosedList & closed, const OpenList & open, const Node & node)
 {
 	for (auto it = closed.begin(); it != closed.end(); ++it) {
 		if ((*it) == node) {
-			return _graph.getCost(*it) <= _graph.getCost(node);
+			return m_Graph.GetCost(*it) <= m_Graph.GetCost(node);
 		}
 	}
 
 	for (auto it = open.begin(); it != open.end(); ++it) {
 		if ((*it) == node) {
-			return _graph.getCost(*it) <= _graph.getCost(node);
+			return m_Graph.GetCost(*it) <= m_Graph.GetCost(node);
 		}
 	}
 
 	return false;
 }
 
-AStar::ReturnStatus AStar::buildPath(const Node & last, Path & out_path)
+AStar::ReturnStatus AStar::BuildPath(const Node & last, Path & out_path)
 {
-	auto parents = _graph.getParents(last);
+	auto parents = m_Graph.GetParents(last);
 	for (auto it = parents.begin(); it != parents.end(); ++it) {
 		const Node& n = *it;
 
-		if (out_path.isFull()) {
+		if (out_path.IsFull()) {
 			return ReturnStatus::ERROR_OUT_OF_MEMORY;
 		}
-		out_path.push(n);
+		out_path.Push(n);
 	}
 
 	return ReturnStatus::SUCCESS;
 }
 
-AStar::ReturnStatus AStar::findPath(const Node & source, const Node & destination, Path & out_path)
+AStar::ReturnStatus AStar::FindPath(const Node & source, const Node & destination, Path & out_path)
 {
-	OpenList open(_graph, destination);
-	ClosedList closed(_graph);
-	out_path.flush();
+	OpenList open(m_Graph, destination);
+	ClosedList closed(m_Graph);
+	out_path.Flush();
 
-	if (!tryInsert(open, source)) {
+	if (!TryInsert(open, source)) {
 		return ReturnStatus::ERROR_OUT_OF_MEMORY;
 	}
 
@@ -343,21 +350,21 @@ AStar::ReturnStatus AStar::findPath(const Node & source, const Node & destinatio
 		const Node& current = open.head();
 		open.pop();
 
-		if (!tryInsert(closed, current)) {
+		if (!TryInsert(closed, current)) {
 			return ReturnStatus::ERROR_OUT_OF_MEMORY;
 		}
 
 		if (current == destination) {
-			return buildPath(current, out_path);
+			return BuildPath(current, out_path);
 		}
 
-		auto neighbors = _graph.getNeighbors(current);
+		auto neighbors = m_Graph.GetNeighbors(current);
 		for (auto it = neighbors.begin(); it != neighbors.end(); ++it) {
 			Node& neighbor = *it;
 
-			if (!findBetter(closed, open, neighbor)) {
-				_graph.setParent(neighbor, current);
-				if (!tryInsert(open, neighbor)) {
+			if (!FindBetter(closed, open, neighbor)) {
+				m_Graph.SetParent(neighbor, current);
+				if (!TryInsert(open, neighbor)) {
 					return ReturnStatus::ERROR_OUT_OF_MEMORY;
 				}
 			}
