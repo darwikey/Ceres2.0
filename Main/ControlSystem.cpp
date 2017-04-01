@@ -34,8 +34,8 @@ static float measureAngleRad()
 
 void ControlSystem::Start()
 {
-	m_pid_distance.Init(0.15, 0.0, 0.1);
-	m_pid_angle.Init(0.2, 0.0, 0.2);
+	m_pid_distance.Init(0.15, 0/*0.005*/, 0.1);
+	m_pid_angle.Init(0.2, 0/*0.005*/, 0.2);
 
 	m_pid_distance.SetOutputRange(-100, 100);
 	m_pid_angle.SetOutputRange(-100, 100);

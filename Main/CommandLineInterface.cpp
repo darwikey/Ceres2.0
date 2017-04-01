@@ -66,11 +66,16 @@ void CommandLineInterface::Task()
 			Serial.printf("Angle: %f\r\n", (double)value);
 		}
 		else if (command == 'c') {
+#if 0
 			double x = atof(arg);
 			double y = atof(arg2);
 			TrajectoryManager::Instance.GotoXY(x, y);
 			Serial.printf("Goto xy: %f  %f\r\n", x, y);
-			//astar_test(atoi(arg), atoi(arg2));
+#else
+			AStarCoord coord;
+			coord.FromWordPosition(atoi(arg), atoi(arg2));
+			astar_test(coord);
+#endif
 		}
 		//else if (command == '*') {
 		//	float y = cli_getfloat();

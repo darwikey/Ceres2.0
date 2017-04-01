@@ -3,8 +3,6 @@
 
 #include <vector>
 
-void astar_test(int x, int y);
-
 struct AStarCoord
 {
 	AStarCoord() : x(-1), y(-1) {}
@@ -15,10 +13,13 @@ struct AStarCoord
 	bool operator!=(const AStarCoord& other) const {
 		return x != other.x || y != other.y;
 	}
+	void ToWordPosition(float &_x, float &_y) const;
+	void FromWordPosition(float _x, float _y);
 	int16_t x;
 	int16_t y;
 };
 
+void astar_test(AStarCoord _c);
 
 struct ClosedList;
 struct OpenList;
@@ -108,11 +109,11 @@ public:
 		Value v;
 	};
 
-	static const int _width = 20;
-	static const int _height = 15;
+	static const int WIDTH = 20;
+	static const int HEIGHT = 15;
 
 private:
-	InternalNode m_Data[_width][_height];
+	InternalNode m_Data[WIDTH][HEIGHT];
 
 public:
 	Graph();
@@ -144,14 +145,14 @@ public:
 	}
 
 	void PutElement(unsigned x, unsigned y, Value v) {
-		if (x >= _width) return;
-		if (y >= _height) return;
+		if (x >= WIDTH) return;
+		if (y >= HEIGHT) return;
 		m_Data[x][y].v = v;
 	}
 
 	void PutElement(const AStarCoord &c, Value v) {
-		if ((unsigned)c.x >= _width) return;
-		if ((unsigned)c.y >= _height) return;
+		if ((unsigned)c.x >= WIDTH) return;
+		if ((unsigned)c.y >= HEIGHT) return;
 		m_Data[c.x][c.y].v = v;
 	}
 

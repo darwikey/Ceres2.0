@@ -1,5 +1,6 @@
 #include <WProgram.h>
 #include "Astar.h"
+#include "TrajectoryManager.h"
 #include <cmath>
 
 class DummyCout {};
@@ -23,39 +24,13 @@ DummyCout& operator<<(DummyCout& cout, const DummyEndl&) {
 static DummyCout cout;
 static DummyEndl endl;
 
-void std::__throw_length_error(char const*) {
-	while(1)
-		cout << "ERROR : __throw_length_error" << endl;
-}
-
-Graph Graph::Instance;
-AStar AStar::Instance(Graph::Instance);
-
-void AStar::Node::SetParent(const Node & parent)
+void astar_test(AStarCoord _c)
 {
-	_parent = parent._pos;
-	const double xx = _pos.x - _parent.x;
-	const double yy = _pos.y - _parent.y;
-	const double dist = sqrt(xx*xx + yy*yy);
-	double angle = 0;
-	if (parent._parent.x != -1 && parent._parent.y != -1) {
-		const double pxx = parent._pos.x - parent._parent.x;
-		const double pyy = parent._pos.y - parent._parent.y;
-		const double pdist = sqrt(pxx*pxx + pyy*pyy);
-		const double scal = xx*pxx + yy*pyy;
-		const double cosa = scal / (dist*pdist);
-		angle = fmod(acos(cosa), 3.15 / 2);
-	}
-	_cost = parent._cost + dist + (100 * angle);
-}
-
-void astar_test(int x, int y)
-{
-	Serial.printf("Test A*: (0,0) to (%d, %d)\r\n",x,y);
+	Serial.printf("Test A*: (0,0) to (%d, %d)\r\n", _c.x, _c.y);
 	AStar::Path path;
 
 	AStar::Node source(AStarCoord(0, 0));
-	AStar::Node dest(AStarCoord(x, y));
+	AStar::Node dest(_c);
 
 	Graph &g = Graph::Instance;
 	g.PutObstacle(5, 5);
@@ -77,20 +52,62 @@ void astar_test(int x, int y)
 	else if (ret == AStar::ERROR_NOT_FOUND) cout << "ERROR_NOT_FOUND" << endl;
 	else if (ret == AStar::ERROR_OUT_OF_MEMORY) cout << "ERROR_OUT_OF_MEMORY" << endl;
 
-	cout << path.size() << endl;
+	for (const auto& it : path)
+		g.PutElement(it._pos, Graph::Value::PATH);
 
-	for (auto it = path.begin(); it != path.end(); ++it) {
-		g.PutElement(it->_pos, Graph::Value::PATH);
-	}
-
-	cout << endl;
+	cout << "Path size: " << path.size() << endl;
 	g.Print(false);
+
+	for (const auto& it : path) {
+		float x, y;
+		it._pos.ToWordPosition(x, y);
+		Serial.printf("GotoXY %f,%f\r\n", x, y);
+		TrajectoryManager::Instance.GotoXY(x, y);
+	}
+}
+
+void std::__throw_length_error(char const*) {
+	while(1)
+		cout << "ERROR : __throw_length_error" << endl;
+}
+
+Graph Graph::Instance;
+AStar AStar::Instance(Graph::Instance);
+
+void AStarCoord::ToWordPosition(float & _x, float & _y) const
+{
+	_x = x * (3000.f / Graph::WIDTH);
+	_y = y * (2000.f / Graph::HEIGHT);
+}
+
+void AStarCoord::FromWordPosition(float _x, float _y)
+{
+	x = _x * (Graph::WIDTH / 3000.f);
+	y = _y * (Graph::HEIGHT / 2000.f);
+}
+
+void AStar::Node::SetParent(const Node & parent)
+{
+	_parent = parent._pos;
+	const double xx = _pos.x - _parent.x;
+	const double yy = _pos.y - _parent.y;
+	const double dist = sqrt(xx*xx + yy*yy);
+	double angle = 0;
+	if (parent._parent.x != -1 && parent._parent.y != -1) {
+		const double pxx = parent._pos.x - parent._parent.x;
+		const double pyy = parent._pos.y - parent._parent.y;
+		const double pdist = sqrt(pxx*pxx + pyy*pyy);
+		const double scal = xx*pxx + yy*pyy;
+		const double cosa = scal / (dist*pdist);
+		angle = fmod(acos(cosa), 3.15 / 2);
+	}
+	_cost = parent._cost + dist + (100 * angle);
 }
 
 Graph::Graph()
 {
-	for (int y = 0; y < _height; y++) {
-		for (int x = 0; x < _width; x++) {
+	for (int y = 0; y < HEIGHT; y++) {
+		for (int x = 0; x < WIDTH; x++) {
 			m_Data[x][y].v = Value::EMPTY;
 		}
 	}
@@ -98,7 +115,7 @@ Graph::Graph()
 
 Graph::InternalNode & Graph::operator[](const AStarCoord & c)
 {
-	if ((unsigned)c.x >= _width || (unsigned)c.y >= _height) {
+	if ((unsigned)c.x >= WIDTH || (unsigned)c.y >= HEIGHT) {
 		while (1)
 			cout << "ERROR : Graph::operator []" << endl;
 	}
@@ -107,7 +124,7 @@ Graph::InternalNode & Graph::operator[](const AStarCoord & c)
 
 const Graph::InternalNode & Graph::operator[](const AStarCoord & c) const
 {
-	if ((unsigned)c.x >= _width || (unsigned)c.y >= _height) {
+	if ((unsigned)c.x >= WIDTH || (unsigned)c.y >= HEIGHT) {
 		while (1)
 			cout << "ERROR : Graph::operator [] const" << endl;
 	}
@@ -116,8 +133,8 @@ const Graph::InternalNode & Graph::operator[](const AStarCoord & c) const
 
 void Graph::Print(bool _debug) const
 {
-	for (int y = 0; y < _height; y++) {
-		for (int x = 0; x < _width; x++) {
+	for (int y = 0; y < HEIGHT; y++) {
+		for (int x = 0; x < WIDTH; x++) {
 			auto v = m_Data[x][y].v;
 			if (v == Value::OBSTACLE)
 				cout << "#";
@@ -141,8 +158,8 @@ void Graph::Print(bool _debug) const
 
 bool Graph::IsNode(const AStarCoord & c) const
 {
-	if ((unsigned)c.x >= _width) return false;
-	if ((unsigned)c.y >= _height) return false;
+	if ((unsigned)c.x >= WIDTH) return false;
+	if ((unsigned)c.y >= HEIGHT) return false;
 	return m_Data[c.x][c.y].v != Value::OBSTACLE;
 }
 
