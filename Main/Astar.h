@@ -117,6 +117,7 @@ private:
 
 public:
 	Graph();
+	void Init();
 
 	InternalNode & operator [](const AStarCoord &c);
 	const InternalNode & operator [](const AStarCoord &c) const;

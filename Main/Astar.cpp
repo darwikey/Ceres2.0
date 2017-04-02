@@ -1,6 +1,7 @@
 #include <WProgram.h>
 #include "Astar.h"
 #include "TrajectoryManager.h"
+#include "PositionManager.h"
 #include <cmath>
 
 class DummyCout {};
@@ -26,25 +27,16 @@ static DummyEndl endl;
 
 void astar_test(AStarCoord _c)
 {
+	Graph &g = Graph::Instance;
+	g.Init();
+
 	Serial.printf("Test A*: (0,0) to (%d, %d)\r\n", _c.x, _c.y);
 	AStar::Path path;
 
-	AStar::Node source(AStarCoord(0, 0));
+	AStarCoord Start;
+	Start.FromWordPosition(PositionManager::Instance.GetXMm(), PositionManager::Instance.GetYMm());
+	AStar::Node source(Start);
 	AStar::Node dest(_c);
-
-	Graph &g = Graph::Instance;
-	g.PutObstacle(5, 5);
-	g.PutObstacle(4, 4);
-	g.PutObstacle(5, 4);
-	g.PutObstacle(4, 5);
-
-	g.PutObstacle(5, 3);
-	g.PutObstacle(4, 3);
-
-	g.PutObstacle(3, 4);
-	g.PutObstacle(3, 5);
-	g.PutObstacle(2, 4);
-	g.PutObstacle(2, 5);
 
 	auto ret = AStar::Instance.FindPath(source, dest, path);
 
@@ -106,11 +98,29 @@ void AStar::Node::SetParent(const Node & parent)
 
 Graph::Graph()
 {
+	Init();
+}
+
+void Graph::Init()
+{
 	for (int y = 0; y < HEIGHT; y++) {
 		for (int x = 0; x < WIDTH; x++) {
 			m_Data[x][y].v = Value::EMPTY;
+			m_Data[x][y].parent = AStarCoord();
 		}
 	}
+	PutObstacle(5, 5);
+	PutObstacle(4, 4);
+	PutObstacle(5, 4);
+	PutObstacle(4, 5);
+
+	PutObstacle(5, 3);
+	PutObstacle(4, 3);
+
+	PutObstacle(3, 4);
+	PutObstacle(3, 5);
+	PutObstacle(2, 4);
+	PutObstacle(2, 5);
 }
 
 Graph::InternalNode & Graph::operator[](const AStarCoord & c)
