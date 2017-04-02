@@ -283,7 +283,7 @@ uint16_t XL320::update_crc(uint16_t crc_accum, uint8_t *data_blk_ptr, uint16_t d
 	return crc_accum;
 }
 
-int XL320::flush() {
+void XL320::flush() {
 	this->stream->flush();
 }
 
@@ -325,8 +325,7 @@ int XL320::RXsendPacket(int id, int Address, int size) {
 #define LOVERFLOW       sx_overflow :
 #define TIMEOUT         sx_timeout :
 
-int XL320::readPacket(unsigned char *BUFFER, size_t SIZE) {
-	int C;
+int XL320::readPacket(unsigned char *BUFFER, int SIZE) {
 	int I = 0;
 
 	int length = 0;

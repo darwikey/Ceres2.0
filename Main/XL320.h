@@ -96,12 +96,12 @@ public:
 	int isJointMoving(int id);
 
 	int sendPacket(int id, int Address, int value);
-	int readPacket(unsigned char *buffer, size_t size);
+	int readPacket(unsigned char *buffer, int size);
 
 	int RXsendPacket(int id, int Address);
 	int RXsendPacket(int id, int Address, int size);
 
-	int flush();
+	void flush();
 
 	class Packet {
 		bool freeData;

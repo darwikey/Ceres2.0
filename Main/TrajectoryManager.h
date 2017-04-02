@@ -67,7 +67,6 @@ private:
 	TrajDest m_Points[SMOOTH_TRAJ_MAX_NB_POINTS];
 	uint32_t m_CurId;
 	uint32_t m_LastId;
-	float m_PreviousWaypointDist;
 	bool m_Pause;
 };
 #endif /* TRAJECTORY_MANAGER_H */

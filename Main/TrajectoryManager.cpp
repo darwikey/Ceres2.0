@@ -2,8 +2,13 @@
 #include "TrajectoryManager.h"
 #include "WProgram.h"
 
-TrajectoryManager TrajectoryManager::Instance;
+#if 0
+	#define TRAJ_DEBUG(msg) Serial.println(msg)
+#else
+	#define TRAJ_DEBUG(msg) ((void)0)
+#endif
 
+TrajectoryManager TrajectoryManager::Instance;
 
 #define ABS(x) (((x) < 0)? -(x): (x))
 #define SQUARE(x) ((x)*(x))
@@ -12,14 +17,12 @@ TrajectoryManager TrajectoryManager::Instance;
 #define IS_UNDEFINED_ANGLE(x) (isnan(x))
 
 
-
 /******************** User functions ********************/
 
 void TrajectoryManager::Init()
 {
 	m_CurId = 0;
 	m_LastId = 0;
-	m_PreviousWaypointDist = 1.E20f;
 	m_Pause = false;
 }
 
@@ -37,10 +40,10 @@ int TrajectoryManager::IsEnded()
 
 void TrajectoryManager::NextPoint()
 {
+	TRAJ_DEBUG("NextPoint");
 	/* Update list pointer if not empty */
 	if (!IsEnded()) {
 		m_CurId = (m_CurId + 1) % SMOOTH_TRAJ_MAX_NB_POINTS;
-		m_PreviousWaypointDist = 1e20f;
 	}
 }
 
@@ -188,23 +191,24 @@ void TrajectoryManager::Update()
 	// position the robot want to reach
 	float target_x = 0, target_y = 0;
 
-
-	uint32_t next_id = (m_CurId + 1) % SMOOTH_TRAJ_MAX_NB_POINTS;
-
 	// it's a rotation
 	if (!IS_UNDEFINED_ANGLE(next1->a))
 	{
+		TRAJ_DEBUG("Simple rot");
 		if (ABS(next1->a - PositionManager::Instance.GetAngleRad()) < SMOOTH_TRAJ_DEFAULT_PRECISION_A_RAD) {
 			NextPoint();
 		}
 		ControlSystem::Instance.SetRadAngleRef(next1->a);
 	}
-
 	else
 	{
+#ifdef TRAJ_STEERING
+		uint32_t next_id = (m_CurId + 1) % SMOOTH_TRAJ_MAX_NB_POINTS;
+
 		// at least two waypoints
 		if (next_id != m_LastId)
 		{
+			TRAJ_DEBUG("At least two waypoints");
 			// find the second waypoint
 			TrajDest* next2 = m_Points + next_id;
 
@@ -221,6 +225,11 @@ void TrajectoryManager::Update()
 
 				target_x = next1->x + direction_x;
 				target_y = next1->y + direction_y;
+
+				if (d > 0.5f * SMOOTH_TRAJ_STEER_DISTANCE_MM)
+				{
+					NextPoint();
+				}
 			}
 			else // the next waypoint is too far, so it's our target
 			{
@@ -229,19 +238,18 @@ void TrajectoryManager::Update()
 			}
 
 			// if the robot go away the current waypoint, we switch to the next
-			if (next1_dist > m_PreviousWaypointDist + 35.f)
+			/*if (next1_dist > m_PreviousWaypointDist + 35.f)
 			{
+				Serial.printf("next1 dist %f, prev waypoint dist %f\r\n", next1_dist, m_PreviousWaypointDist);
 				NextPoint();
-			}
-			// compute the nearest distance to the next point
-			if (next1_dist < m_PreviousWaypointDist) {
-				m_PreviousWaypointDist = next1_dist;
-			}
+			}*/
 
 		}
 		// only one more waypoint
 		else
+#endif
 		{
+			TRAJ_DEBUG("one more waypoint");
 			target_x = next1->x;
 			target_y = next1->y;
 
@@ -252,10 +260,16 @@ void TrajectoryManager::Update()
 			}
 		}
 
+		//Serial.printf("pos: %f, %f  target: %f, %f\r\n", PositionManager::Instance.GetXMm(), PositionManager::Instance.GetYMm(), target_x, target_y);
 		GotoTarget(next1, target_x, target_y);
 	}
 }
 
+float WrapAngle(float a)
+{
+	a += M_PI;
+	return a - floor(a / M_TWOPI) * M_TWOPI - M_PI;
+}
 
 void TrajectoryManager::GotoTarget(TrajDest* next_point, float target_x, float target_y)
 {
@@ -270,9 +284,17 @@ void TrajectoryManager::GotoTarget(TrajDest* next_point, float target_x, float t
 	}
 	else*/
 
-	float angle_ref = atan2f(-(target_x - PositionManager::Instance.GetXMm()), target_y - PositionManager::Instance.GetYMm());
-	float remaining_dist = DISTANCE(PositionManager::Instance.GetXMm(), PositionManager::Instance.GetYMm(), target_x, target_y);
+	float AngleRef = atan2f(-(target_x - PositionManager::Instance.GetXMm()), target_y - PositionManager::Instance.GetYMm());
+	float RemainingDist = DISTANCE(PositionManager::Instance.GetXMm(), PositionManager::Instance.GetYMm(), target_x, target_y);
 
+	float DiffAngle = WrapAngle(AngleRef - PositionManager::Instance.GetAngleRad());
+	AngleRef = DiffAngle + PositionManager::Instance.GetAngleRad();
+
+	// only apply a rotation if the difference of angle is too important
+	if (fabs(AngleRef - PositionManager::Instance.GetAngleRad()) > 0.5f)
+	{
+		RemainingDist = 0.f;
+	}
 
 	//printf("tar x:%d  y:%d  dist:%f  a:%f\r\n", (int)target_x, (int)target_y, (double)next1_dist, (double)angle_ref);
 
@@ -281,15 +303,15 @@ void TrajectoryManager::GotoTarget(TrajDest* next_point, float target_x, float t
 	{
 		// just asserv in distance
 		if (next_point->movement == BACKWARD) {
-			ControlSystem::Instance.SetDistanceRef(PositionManager::Instance.GetDistanceMm() - remaining_dist);
+			ControlSystem::Instance.SetDistanceRef(PositionManager::Instance.GetDistanceMm() - RemainingDist);
 		}
 		else if (next_point->movement == FORWARD) {
-			ControlSystem::Instance.SetDistanceRef(PositionManager::Instance.GetDistanceMm() + remaining_dist);
+			ControlSystem::Instance.SetDistanceRef(PositionManager::Instance.GetDistanceMm() + RemainingDist);
 		}
 	}
 	else
 	{
-		ControlSystem::Instance.SetDistanceRef(PositionManager::Instance.GetDistanceMm() + remaining_dist);
-		ControlSystem::Instance.SetRadAngleRef(angle_ref);
+		ControlSystem::Instance.SetDistanceRef(PositionManager::Instance.GetDistanceMm() + RemainingDist);
+		ControlSystem::Instance.SetRadAngleRef(AngleRef);
 	}
 }
