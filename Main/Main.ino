@@ -18,7 +18,7 @@ void setup() {
 
 	InitMotors();
 
-	PositionManager::Instance.Init(21638, 125.5);
+	PositionManager::Instance.Init(21638, 127.2);// 125.5);
 	ControlSystem::Instance.Start();
 	TrajectoryManager::Instance.Init();
 
