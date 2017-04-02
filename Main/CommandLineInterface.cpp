@@ -66,28 +66,25 @@ void CommandLineInterface::Task()
 			Serial.printf("Angle: %f\r\n", (double)value);
 		}
 		else if (command == 'c') {
-#if 0
 			double x = atof(arg);
 			double y = atof(arg2);
 			TrajectoryManager::Instance.GotoXY(x, y);
 			Serial.printf("Goto xy: %f  %f\r\n", x, y);
-#else
+		}
+		else if (command == '*') {
 			AStarCoord coord;
 			coord.FromWordPosition(atoi(arg), atoi(arg2));
 			astar_test(coord);
-#endif
 		}
-		//else if (command == '*') {
-		//	float y = cli_getfloat();
-		//	set_startCoor(positionMmToCoordinate(position_get_x_mm(), position_get_y_mm()));
-		//	set_goalCoor(positionMmToCoordinate(value, y));
-		//	Serial.printf("Goto xy: %f  %f\r\n", (double)value, (double)y);
-		//	astarMv();
-		//}
-		//else if (command == 'z') {
-		//	smooth_traj_end();
-		//	Serial.printf("stop mvt\r\n");
-		//}
+		else if (command == 't') {
+			TrajectoryManager::Instance.GotoXY(0, 500);
+			TrajectoryManager::Instance.GotoXY(500, 500);
+			TrajectoryManager::Instance.GotoXY(500, 0);
+		}
+		else if (command == 'z') {
+			TrajectoryManager::Instance.Reset();
+			Serial.printf("stop mvt\r\n");
+		}
 		else if (command == 's') {
 			double value = atof(arg2);
 			if (!strncmp(arg, "speed_high", ARG_LENGTH)) {
@@ -182,12 +179,12 @@ void CommandLineInterface::Task()
 			else if (!strncmp(arg, "enc_l", ARG_LENGTH)) {
 				Serial.printf("Left encoder value: %f\r\n", PositionManager::Instance.GetLeftEncoder());
 			}
-			/*else if (!strncmp(arg, "cur_id", ARG_LENGTH)) {
-			  Serial.printf("Traj manager cur_id: %d\r\n", (int)GetCurId());
+			else if (!strncmp(arg, "cur_id", ARG_LENGTH)) {
+			  Serial.printf("Traj manager cur_id: %d\r\n", (int)TrajectoryManager::Instance.GetCurId());
 			}
 			else if (!strncmp(arg, "last_id", ARG_LENGTH)) {
-			  Serial.print("Traj manager last_id: %d\r\n", (int)GetLastId());
-			}*/
+			  Serial.printf("Traj manager last_id: %d\r\n", (int)TrajectoryManager::Instance.GetLastId());
+			}
 			else if (!strncmp(arg, "pid", ARG_LENGTH)) {
 				Serial.printf("Distance PID: %f, %f, %f\r\n", ControlSystem::Instance.GetDistancePID().GetKP(),
 					ControlSystem::Instance.GetDistancePID().GetKI(),
@@ -198,6 +195,11 @@ void CommandLineInterface::Task()
 			}
 			else if (!strncmp(arg, "graph", ARG_LENGTH)) {
 				Graph::Instance.Print();
+			}
+			else if (!strncmp(arg, "date", ARG_LENGTH)) {
+				extern const char* gCompileDate;
+				extern const char* gCompileTime;
+				Serial.printf("%s - %s\r\n", gCompileDate, gCompileTime);
 			}
 			else {
 				Serial.printf("Invalid argument '%s'.\r\n", arg);
@@ -237,6 +239,7 @@ void CommandLineInterface::Task()
 			Serial.print("  d <float>: Go forward/backward with the specified distance in mm.\r\n");
 			Serial.print("  a <float>: Rotate with the specified angle in degrees.\r\n");
 			Serial.print("  c <float> <float>: goto to the position (x, y) in mm.\r\n");
+			Serial.print("  t: test trajectory\r\n");
 			Serial.print("  * <float> <float>: goto to the position (x, y) in mm with A*.\r\n");
 			Serial.print("  s <arg> <value>:   Set internal value.\r\n");
 			Serial.print("             <value> should be a float.\r\n");
@@ -274,7 +277,8 @@ void CommandLineInterface::Task()
 			Serial.print("             cur_id:   Print Traj manager's current point id.\r\n");
 			Serial.print("             last_id:  Print Traj manager's last point id.\r\n");
 			Serial.print("             pid:      Print PID.\r\n");
-			Serial.print("             graphe:   Print A* graphe.\r\n");
+			Serial.print("             graph:    Print A* graph.\r\n");
+			Serial.print("             date      Print the binary creation timestamp.\r\n");
 		}
 		else {
 			Serial.printf("Unknown command '%c'. Type 'h' for help.\r\n", command);
