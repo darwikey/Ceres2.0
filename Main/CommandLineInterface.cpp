@@ -18,6 +18,11 @@ void CommandLineInterface::Task()
 	while (Serial.available() > 0)
 	{
 		char c = Serial.read();
+		if (c == CLI_DEL_CHAR && m_CurPos > 0)
+		{
+			m_CurPos--;
+			continue;
+		}
 		m_Buffer[m_CurPos] = c;
 		Serial.print(c);
 		if (c == '\r' || c == '\n')
