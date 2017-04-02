@@ -68,8 +68,8 @@ AStar AStar::Instance(Graph::Instance);
 
 void AStarCoord::ToWordPosition(float & _x, float & _y) const
 {
-	_x = x * (3000.f / Graph::WIDTH);
-	_y = y * (2000.f / Graph::HEIGHT);
+	_x = (x + 0.5f) * (3000.f / Graph::WIDTH);
+	_y = (y + 0.5f) * (2000.f / Graph::HEIGHT);
 }
 
 void AStarCoord::FromWordPosition(float _x, float _y)
