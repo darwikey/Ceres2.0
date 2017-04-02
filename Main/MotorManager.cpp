@@ -32,9 +32,13 @@ void InitMotors()
 
 void SendCommandToMotor(int m, long long cmd)
 {
-  if(m == RIGHT_MOTOR) cmd = -cmd;
-  
-  analogWrite(motorPWMs[m], (abs(cmd) > 255) ? 255 : abs(cmd));
+  if(m == RIGHT_MOTOR)
+	  cmd = -cmd;
+  long long AbsCmd = abs(cmd);
+  //Serial.printf("%d\r\n", (int)AbsCmd);
+  if (AbsCmd < 15)
+	  AbsCmd = 0;
+  analogWrite(motorPWMs[m], (AbsCmd > 255) ? 255 : AbsCmd);
   digitalWrite(motorDirs[m], (cmd >= 0) ? HIGH : LOW);
 }
 
