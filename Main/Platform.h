@@ -36,6 +36,7 @@ namespace Platform
 	void Init();
 
 	void DisplayNumber(int n);
+	void SetLed(int ledId, bool state);
 	bool IsButtonPressed(int id);
 	bool IsGP2Occluded();
 

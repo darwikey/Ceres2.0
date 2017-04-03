@@ -24,6 +24,7 @@ void setup() {
 	Strategy::Instance.Init();
 
 	delay(500);
+	Platform::DisplayNumber(0);
 }
 
 void loop() {
@@ -42,7 +43,7 @@ void loop() {
 		static int led = 0;
 		clock = 0;
 		if (led == 0)
-			Platform::SetServoLED(ServoID::SERVO1, ServoLED::BLUE);
+			Platform::SetServoLED(ServoID::SERVO1, ServoLED::RED);
 		else if (led == 1)
 			Platform::SetServoLED(ServoID::SERVO2, ServoLED::GREEN);
 		else if (led == 2)
@@ -54,7 +55,10 @@ void loop() {
 		}
 		led++;
 	}
-	Platform::DisplayNumber((speed > 0) | ((time & 0x7FF) > 512 ? 2 : 0));
+	Side side = Strategy::Instance.GetSide();
+	Platform::SetLed(0, (time & 0x7FF) > 512);
+	Platform::SetLed(3, side == Side::BLUE);
+	Platform::SetLed(4, side == Side::YELLOW);
 
 	CommandLineInterface::Instance.Task();
 

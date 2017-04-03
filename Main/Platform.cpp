@@ -33,10 +33,18 @@ namespace Platform
 
 	void DisplayNumber(int n)
 	{
-		for (unsigned i = 0; i <= _countof(leds); ++i)
+		for (unsigned i = 0; i < _countof(leds); ++i)
 			digitalWrite(leds[i], ((1 << i) & n) ? HIGH : LOW);
 	}
 
+	void SetLed(int ledId, bool state)
+	{
+		if (ledId < (int)_countof(leds))
+		{
+			digitalWrite(leds[ledId], state ? HIGH : LOW);
+		}
+	}
+	
 	bool IsButtonPressed(int id)
 	{
 		return digitalRead(buttons[id]) == LOW;
