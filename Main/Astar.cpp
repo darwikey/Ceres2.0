@@ -84,7 +84,7 @@ void AStar::Node::SetParent(const Node & parent)
 	const double xx = _pos.x - _parent.x;
 	const double yy = _pos.y - _parent.y;
 	const double dist = sqrt(xx*xx + yy*yy);
-	double angle = 0;
+	/*double angle = 0;
 	if (parent._parent.x != -1 && parent._parent.y != -1) {
 		const double pxx = parent._pos.x - parent._parent.x;
 		const double pyy = parent._pos.y - parent._parent.y;
@@ -92,8 +92,8 @@ void AStar::Node::SetParent(const Node & parent)
 		const double scal = xx*pxx + yy*pyy;
 		const double cosa = scal / (dist*pdist);
 		angle = fmod(acos(cosa), 3.15 / 2);
-	}
-	_cost = parent._cost + dist + (100 * angle);
+	}*/
+	_cost = parent._cost + dist;// +(100 * angle);
 }
 
 Graph::Graph()
