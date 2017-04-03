@@ -109,8 +109,8 @@ public:
 		Value v;
 	};
 
-	static const int WIDTH = 20;
-	static const int HEIGHT = 15;
+	static const int WIDTH = 60;
+	static const int HEIGHT = 40;
 
 private:
 	InternalNode m_Data[WIDTH][HEIGHT];
