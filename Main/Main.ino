@@ -5,7 +5,7 @@
 #include "TrajectoryManager.h"
 #include "CommandLineInterface.h"
 #include "Platform.h"
-
+#include "Strategy.h"
 
 #define SPEED 125
 
@@ -21,6 +21,7 @@ void setup() {
 	PositionManager::Instance.Init(21638, 127.2);// 125.5);
 	ControlSystem::Instance.Start();
 	TrajectoryManager::Instance.Init();
+	Strategy::Instance.Init();
 
 	delay(500);
 }
@@ -41,7 +42,7 @@ void loop() {
 		static int led = 0;
 		clock = 0;
 		if (led == 0)
-			Platform::SetServoLED(ServoID::SERVO1, ServoLED::RED);
+			Platform::SetServoLED(ServoID::SERVO1, ServoLED::BLUE);
 		else if (led == 1)
 			Platform::SetServoLED(ServoID::SERVO2, ServoLED::GREEN);
 		else if (led == 2)

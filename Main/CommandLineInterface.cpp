@@ -8,6 +8,7 @@
 #include "CommandLineInterface.h"
 #include "Platform.h"
 #include "Astar.h"
+#include "Strategy.h"
 
 CommandLineInterface CommandLineInterface::Instance;
 
@@ -161,6 +162,15 @@ void CommandLineInterface::Task()
 				Platform::ForceServoId(id);
 				Serial.printf("Force all connected servo to id %d\r\n", id);
 			}
+			else if (!strncmp(arg, "side", ARG_LENGTH)) {
+				if (arg2[0] == 'b')
+					Strategy::Instance.SetSide(Side::BLUE);
+				else if (arg2[0] == 'y')
+					Strategy::Instance.SetSide(Side::YELLOW);
+				else
+					Serial.print("incorrect side, must be \'b\' or \'y\'\r\n");
+				Strategy::Instance.PrintSide();
+			}
 			else {
 				Serial.printf("Invalid argument '%s'.\r\n", arg);
 			}
@@ -200,6 +210,9 @@ void CommandLineInterface::Task()
 			}
 			else if (!strncmp(arg, "graph", ARG_LENGTH)) {
 				Graph::Instance.Print();
+			}
+			else if (!strncmp(arg, "side", ARG_LENGTH)) {
+				Strategy::Instance.PrintSide();
 			}
 			else if (!strncmp(arg, "date", ARG_LENGTH)) {
 				extern const char* gCompileDate;
@@ -264,6 +277,7 @@ void CommandLineInterface::Task()
 			Serial.print("             speed_a :     set max speed for angle.\r\n");
 			Serial.print("             acc_d :       set max acceleration for distance.\r\n");
 			Serial.print("             acc_a :       set max acceleration for angle.\r\n");
+			Serial.print("             side <b|y> :  set color of the start zone\r\n");
 			Serial.print("  m <arg> <arg2> : move an actuator\r\n");
 			Serial.print("             <arg> can be one of: \r\n");
 			Serial.print("             arm_l: left_arm \r\n");
@@ -282,6 +296,7 @@ void CommandLineInterface::Task()
 			Serial.print("             cur_id:   Print Traj manager's current point id.\r\n");
 			Serial.print("             last_id:  Print Traj manager's last point id.\r\n");
 			Serial.print("             pid:      Print PID.\r\n");
+			Serial.print("             side:     Print color of the start zone");
 			Serial.print("             graph:    Print A* graph.\r\n");
 			Serial.print("             date      Print the binary creation timestamp.\r\n");
 		}
