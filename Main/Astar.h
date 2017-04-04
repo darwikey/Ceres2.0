@@ -30,7 +30,7 @@ public:
 	struct Node {
 		AStarCoord _pos;
 		AStarCoord _parent;
-		double _cost;
+		float _cost;
 
 		Node(AStarCoord c)
 			: _pos(c), _cost(0) {
@@ -160,7 +160,9 @@ public:
 	void PutObstacle(unsigned x, unsigned y) {
 		PutElement(x, y, Value::OBSTACLE);
 	}
-	void PutObstacle(unsigned x0, unsigned y0, unsigned x1, unsigned y1);
+	void PutObstacleBox(int x0, int y0, int x1, int y1);
+	void PutObstacleBox(float x0, float y0, float x1, float y1);
+	void PutObstacleCircle(float x, float y, float radius);
 };
 
 #endif

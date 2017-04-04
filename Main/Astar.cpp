@@ -4,6 +4,10 @@
 #include "PositionManager.h"
 #include <cmath>
 
+#define OBSTACLE_MARGIN 80.f//120.f
+#define TERRAIN_WIDTH	3000.f
+#define TERRAIN_HEIGHT	2000.f
+
 class DummyCout {};
 class DummyEndl {};
 
@@ -68,29 +72,29 @@ AStar AStar::Instance(Graph::Instance);
 
 void AStarCoord::ToWordPosition(float & _x, float & _y) const
 {
-	_x = (x + 0.5f) * (3000.f / Graph::WIDTH);
-	_y = (y + 0.5f) * (2000.f / Graph::HEIGHT);
+	_x = (x + 0.5f) * (TERRAIN_WIDTH / Graph::WIDTH);
+	_y = (y + 0.5f) * (TERRAIN_HEIGHT / Graph::HEIGHT);
 }
 
 void AStarCoord::FromWordPosition(float _x, float _y)
 {
-	x = _x * (Graph::WIDTH / 3000.f);
-	y = _y * (Graph::HEIGHT / 2000.f);
+	x = _x * (Graph::WIDTH / TERRAIN_WIDTH);
+	y = _y * (Graph::HEIGHT / TERRAIN_HEIGHT);
 }
 
 void AStar::Node::SetParent(const Node & parent)
 {
 	_parent = parent._pos;
-	const double xx = _pos.x - _parent.x;
-	const double yy = _pos.y - _parent.y;
-	const double dist = sqrt(xx*xx + yy*yy);
-	/*double angle = 0;
+	const float xx = _pos.x - _parent.x;
+	const float yy = _pos.y - _parent.y;
+	const float dist = sqrt(xx*xx + yy*yy);
+	/*float angle = 0;
 	if (parent._parent.x != -1 && parent._parent.y != -1) {
-		const double pxx = parent._pos.x - parent._parent.x;
-		const double pyy = parent._pos.y - parent._parent.y;
-		const double pdist = sqrt(pxx*pxx + pyy*pyy);
-		const double scal = xx*pxx + yy*pyy;
-		const double cosa = scal / (dist*pdist);
+		const float pxx = parent._pos.x - parent._parent.x;
+		const float pyy = parent._pos.y - parent._parent.y;
+		const float pdist = sqrt(pxx*pxx + pyy*pyy);
+		const float scal = xx*pxx + yy*pyy;
+		const float cosa = scal / (dist*pdist);
 		angle = fmod(acos(cosa), 3.15 / 2);
 	}*/
 	_cost = parent._cost + dist;// +(100 * angle);
@@ -109,18 +113,48 @@ void Graph::Init()
 			m_Data[x][y].parent = AStarCoord();
 		}
 	}
-	PutObstacle(5, 5);
-	PutObstacle(4, 4);
-	PutObstacle(5, 4);
-	PutObstacle(4, 5);
+	
+	float margin = OBSTACLE_MARGIN;
+	// Start zones
+	PutObstacleBox(0.f, 0.f, 710.f + margin, 382.f + margin);
+	PutObstacleBox(2290.f - margin, 0.f, 3000.f, 382.f + margin);
+	// craters close to start zones
+	PutObstacleCircle(650.f, 540.f, 100.f + margin);
+	PutObstacleCircle(2350.f, 540.f, 100.f + margin);
+	// craters in corner
+	PutObstacleCircle(0, 2000, 520.f + margin);
+	PutObstacleCircle(3000, 2000, 520.f + margin);
+	//things on the side
+	PutObstacleBox(0.f, 700.f - margin, 80.f + margin, 1150.f + margin);
+	PutObstacleBox(2920.f - margin, 700.f - margin, 3000.f, 1150.f + margin);
+	// central construction zone
+	PutObstacleBox(1500 - 68 - margin, 1200.f - margin, 1500.f + 68 + margin, 2000.f);
 
-	PutObstacle(5, 3);
-	PutObstacle(4, 3);
+	{
+		int l = 800.f / (TERRAIN_WIDTH / Graph::WIDTH);
+		AStarCoord c0;
+		c0.FromWordPosition(1500.f, 2000.f);
+		AStarCoord c1=c0, c2=c0;
+		for (int  i = 0; i < l; i++)
+		{
+			c1.x--; c1.y--;
+			c2.x++; c2.y--;
 
-	PutObstacle(3, 4);
-	PutObstacle(3, 5);
-	PutObstacle(2, 4);
-	PutObstacle(2, 5);
+			int l2 = (68.f + margin) / (TERRAIN_WIDTH / Graph::WIDTH);
+			for (int j = -l2; j <= l2; j++)
+			{
+				AStarCoord c3 = c1, c4 = c2;
+				c3.x -= j;
+				c3.y += j;
+				c4.x += j;
+				c4.y += j;
+				PutElement(c3, Value::OBSTACLE);
+				PutElement(c3.x, c3.y+1, Value::OBSTACLE);
+				PutElement(c4.x-1, c4.y, Value::OBSTACLE);
+				PutElement(c4, Value::OBSTACLE);
+			}
+		}
+	}
 }
 
 Graph::InternalNode & Graph::operator[](const AStarCoord & c)
@@ -143,6 +177,7 @@ const Graph::InternalNode & Graph::operator[](const AStarCoord & c) const
 
 void Graph::Print(bool _debug) const
 {
+	Serial.printf("size %d\r\n", sizeof(m_Data));
 	for (int y = 0; y < HEIGHT; y++) {
 		for (int x = 0; x < WIDTH; x++) {
 			auto v = m_Data[x][y].v;
@@ -204,11 +239,37 @@ std::vector<AStar::Node> Graph::GetParents(const AStar::Node & node) const
 	return ret;
 }
 
-void Graph::PutObstacle(unsigned x0, unsigned y0, unsigned x1, unsigned y1)
+void Graph::PutObstacleBox(int x0, int y0, int x1, int y1)
 {
-	for (unsigned x = x0; x <= x1; x++) 
-		for (unsigned y = y0; y <= y1; y++)
+	for (int x = x0; x <= x1; x++)
+		for (int y = y0; y <= y1; y++)
 			PutElement(x, y, Value::OBSTACLE);
+}
+
+void Graph::PutObstacleBox(float x0, float y0, float x1, float y1)
+{
+	AStarCoord c0, c1;
+	c0.FromWordPosition(x0, y0);
+	c1.FromWordPosition(x1, y1);
+	PutObstacleBox(c0.x, c0.y, c1.x, c1.y);
+}
+
+void Graph::PutObstacleCircle(float x, float y, float radius)
+{
+	AStarCoord c0, c1, it;
+	c0.FromWordPosition(x - radius, y - radius);
+	c1.FromWordPosition(x + radius, y + radius);
+	radius *= radius;
+	for (it.x = c0.x; it.x <= c1.x; it.x++)
+	{
+		for (it.y = c0.y; it.y <= c1.y; it.y++)
+		{
+			float x2, y2;
+			it.ToWordPosition(x2, y2);
+			if ((x2 - x) * (x2 - x) + (y2 - y) * (y2 - y) <= radius)
+				PutElement(it.x, it.y, Value::OBSTACLE);
+		}
+	}
 }
 
 struct ClosedList {
