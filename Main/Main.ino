@@ -33,10 +33,6 @@ void loop() {
 	static int clock = 0;
 	//static int step = 0;
 
-	int speed = 0;
-	if (Platform::IsButtonPressed(0))
-		speed = SPEED;
-
 	// Debug
 	if (clock >= 1000)
 	{

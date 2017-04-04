@@ -176,11 +176,8 @@ void CommandLineInterface::Task()
 			}
 		}
 		else if (command == 'p') {
-			if (!strncmp(arg, "x", ARG_LENGTH)) {
-				Serial.printf("Robot x mm: %f\r\n", PositionManager::Instance.GetXMm());
-			}
-			else if (!strncmp(arg, "y", ARG_LENGTH)) {
-				Serial.printf("Robot y mm: %f\r\n", PositionManager::Instance.GetYMm());
+			if (!strncmp(arg, "pos", ARG_LENGTH)) {
+				Serial.printf("Robot pos mm: %f, %f\r\n", PositionManager::Instance.GetXMm(), PositionManager::Instance.GetYMm());
 			}
 			else if (!strncmp(arg, "a", ARG_LENGTH)) {
 				Serial.printf("Robot angle deg: %f\r\n", PositionManager::Instance.GetAngleDeg());
@@ -287,8 +284,7 @@ void CommandLineInterface::Task()
 			Serial.print("                open: open the arm \r\n");
 			Serial.print("  p <arg>:   Print internal value.\r\n");
 			Serial.print("             <arg> can be one of:\r\n");
-			Serial.print("             x:        Print robot's x position.\r\n");
-			Serial.print("             y:        Print robot's y position.\r\n");
+			Serial.print("             pos:      Print robot's position.\r\n");
 			Serial.print("             a:        Print robot's angle.\r\n");
 			Serial.print("             d:        Print robot's distance.\r\n");
 			Serial.print("             enc_l:    Print left encoder's value.\r\n");
