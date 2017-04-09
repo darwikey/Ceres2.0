@@ -1,7 +1,8 @@
 #ifndef _ASTAR_H_
 #define _ASTAR_H_
 
-#include <vector>
+#include "Vector.h"
+#include "Vector2.h"
 
 struct AStarCoord
 {
@@ -13,8 +14,8 @@ struct AStarCoord
 	bool operator!=(const AStarCoord& other) const {
 		return x != other.x || y != other.y;
 	}
-	void ToWordPosition(float &_x, float &_y) const;
-	void FromWordPosition(float _x, float _y);
+	void ToWordPosition(Vector2 &_pos) const;
+	void FromWordPosition(const Vector2 &_pos);
 	int16_t x;
 	int16_t y;
 };
@@ -55,9 +56,9 @@ public:
 		}
 	};
 
-	struct Path : std::vector<Node> {
+	struct Path : Vector<Node> {
 		void Flush(void) {
-			this->resize(0);
+			this->Clear();
 		}
 
 		bool IsFull(void) {
@@ -65,7 +66,7 @@ public:
 		}
 
 		void Push(const Node& e) {
-			this->insert(this->begin(), e);
+			this->Insert(this->Begin(), e);
 		}
 	};
 
@@ -133,8 +134,8 @@ public:
 	}
 
 	bool IsNode(const AStarCoord &c) const;
-	std::vector<AStar::Node> GetNeighbors(const AStar::Node& node) const;
-	std::vector<AStar::Node> GetParents(const AStar::Node& node) const;
+	void GetNeighbors(const AStar::Node& node, Vector<AStar::Node> &neightbors) const;
+	void GetParents(const AStar::Node& node, Vector<AStar::Node> &parents) const;
 
 	void SetParent(AStar::Node& child, const AStar::Node& parent) {
 		child.SetParent(parent);
@@ -161,8 +162,8 @@ public:
 		PutElement(x, y, Value::OBSTACLE);
 	}
 	void PutObstacleBox(int x0, int y0, int x1, int y1);
-	void PutObstacleBox(float x0, float y0, float x1, float y1);
-	void PutObstacleCircle(float x, float y, float radius);
+	void PutObstacleBox(const Vector2 &p0, const Vector2 &p1);
+	void PutObstacleCircle(const Vector2 &center, float radius);
 };
 
 #endif

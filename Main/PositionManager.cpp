@@ -148,9 +148,14 @@ float PositionManager::GetYMm(void) {
 	return m_YMm;
 }
 
-void PositionManager::SetXYMm(float x, float y) {
-	m_XMm = x;
-	m_YMm = y;
+Vector2 PositionManager::GetPosMm()
+{
+	return Vector2(m_XMm, m_YMm);
+}
+
+void PositionManager::SetPosMm(const Vector2 &_pos){
+	m_XMm = _pos.x;
+	m_YMm = _pos.y;
 }
 
 int32_t PositionManager::MmToTicks(float value_mm) {

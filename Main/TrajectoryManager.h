@@ -35,7 +35,7 @@ public:
 	void Pause();
 	void Resume();
 
-	void GotoXY(float x_mm, float y_mm);
+	void GotoXY(const Vector2 &_pos_mm);
 
 	void GotoDistance(float d_mm);
 	void GotoDegreeAngle(float a);
@@ -52,8 +52,7 @@ private:
 
 	struct TrajDest {
 
-		float x;//mm
-		float y;//mm
+		Vector2 pos;//mm
 		float a;//rad
 		OrderType movement;
 	};
@@ -61,7 +60,7 @@ private:
 	bool TrajIsFull();
 	void DecreaseId(uint32_t *id);
 	void AddPoint(TrajDest point, TrajWhen when);
-	void GotoTarget(TrajDest* next_point, float target_x, float target_y);
+	void GotoTarget(const TrajDest* _nextPoint, const Vector2 &_target);
 	void Update();
 
 	TrajDest m_Points[SMOOTH_TRAJ_MAX_NB_POINTS];

@@ -22,6 +22,7 @@ void setup() {
 	ControlSystem::Instance.Start();
 	TrajectoryManager::Instance.Init();
 	Strategy::Instance.Init();
+	Strategy::Instance.SetInitialPosition();
 
 	delay(500);
 	Platform::DisplayNumber(0);
@@ -69,3 +70,8 @@ void loop() {
 	clock += 10;
 }
 
+extern "C" {
+	int _getpid() { return -1; }
+	int _kill(int pid, int sig) { return -1; }
+	int _write() { return -1; }
+}

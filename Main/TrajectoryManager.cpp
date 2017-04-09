@@ -12,7 +12,6 @@ TrajectoryManager TrajectoryManager::Instance;
 
 #define ABS(x) (((x) < 0)? -(x): (x))
 #define SQUARE(x) ((x)*(x))
-#define DISTANCE(x1, y1, x2, y2) (sqrtf(SQUARE((x1-x2)) + SQUARE((y1-y2))))
 #define UNDEFINED_ANGLE (NAN)
 #define IS_UNDEFINED_ANGLE(x) (isnan(x))
 
@@ -74,18 +73,17 @@ void TrajectoryManager::Resume()
 	m_Pause = false;
 }
 
-void TrajectoryManager::GotoXY(float x, float y)
+void TrajectoryManager::GotoXY(const Vector2 &_pos_mm)
 {
 	// if it's the first point, we turn the robot face to the next point
 	if (TrajectoryManager::IsEnded()) {
-		float start_angle = atan2f(-(x - PositionManager::Instance.GetXMm()), y - PositionManager::Instance.GetYMm());
+		float start_angle = atan2f(-(_pos_mm.x - PositionManager::Instance.GetXMm()), _pos_mm.y - PositionManager::Instance.GetYMm());
 		TrajectoryManager::GotoRadianAngle(start_angle);
 	}
 
 	TrajDest dest;
 
-	dest.x = x;
-	dest.y = y;
+	dest.pos = _pos_mm;
 	dest.a = UNDEFINED_ANGLE;
 	dest.movement = COMMON;
 
@@ -94,12 +92,10 @@ void TrajectoryManager::GotoXY(float x, float y)
 
 void TrajectoryManager::GotoDistance(float d) {
 	float angle = PositionManager::Instance.GetAngleRad();
-	float y = d * cos(angle);
-	float x = -d * sin(angle);
+	Vector2 v (d * cos(angle), -d * sin(angle));
 
 	TrajDest dest;
-	dest.x = x + PositionManager::Instance.GetXMm();
-	dest.y = y + PositionManager::Instance.GetYMm();
+	dest.pos = v + PositionManager::Instance.GetPosMm();
 	dest.a = UNDEFINED_ANGLE;
 
 	if (d >= 0.f)
@@ -123,8 +119,7 @@ void TrajectoryManager::GotoRadianAngle(float a)
 {
 	TrajDest dest;
 
-	dest.x = PositionManager::Instance.GetXMm();
-	dest.y = PositionManager::Instance.GetYMm();
+	dest.pos = PositionManager::Instance.GetPosMm();
 	dest.a = a;
 	dest.movement = COMMON;
 
@@ -187,9 +182,9 @@ void TrajectoryManager::Update()
 
 	// reference to the next waypoint
 	TrajDest* next1 = m_Points + m_CurId;
-	float next1_dist = DISTANCE(PositionManager::Instance.GetXMm(), PositionManager::Instance.GetYMm(), next1->x, next1->y);
+	float next1_dist = (PositionManager::Instance.GetPosMm() - next1->pos).Length();
 	// position the robot want to reach
-	float target_x = 0, target_y = 0;
+	Vector2 target;
 
 	// it's a rotation
 	if (!IS_UNDEFINED_ANGLE(next1->a))
@@ -250,8 +245,7 @@ void TrajectoryManager::Update()
 #endif
 		{
 			TRAJ_DEBUG("one more waypoint");
-			target_x = next1->x;
-			target_y = next1->y;
+			target = next1->pos;
 
 			// Waypoint reachs
 			if (next1_dist < SMOOTH_TRAJ_DEFAULT_PRECISION_D_MM)
@@ -261,7 +255,7 @@ void TrajectoryManager::Update()
 		}
 
 		//Serial.printf("pos: %f, %f  target: %f, %f\r\n", PositionManager::Instance.GetXMm(), PositionManager::Instance.GetYMm(), target_x, target_y);
-		GotoTarget(next1, target_x, target_y);
+		GotoTarget(next1, target);
 	}
 }
 
@@ -271,7 +265,7 @@ float WrapAngle(float a)
 	return a - floor(a / M_TWOPI) * M_TWOPI - M_PI;
 }
 
-void TrajectoryManager::GotoTarget(TrajDest* next_point, float target_x, float target_y)
+void TrajectoryManager::GotoTarget(const TrajDest* _nextPoint, const Vector2 &_target)
 {
 	// Compute the angle and distance to send to the control system
 	//float angle_ref, remaining_dist;
@@ -284,8 +278,8 @@ void TrajectoryManager::GotoTarget(TrajDest* next_point, float target_x, float t
 	}
 	else*/
 
-	float AngleRef = atan2f(-(target_x - PositionManager::Instance.GetXMm()), target_y - PositionManager::Instance.GetYMm());
-	float RemainingDist = DISTANCE(PositionManager::Instance.GetXMm(), PositionManager::Instance.GetYMm(), target_x, target_y);
+	float AngleRef = atan2f(-(_target.x - PositionManager::Instance.GetXMm()), _target.y - PositionManager::Instance.GetYMm());
+	float RemainingDist = (PositionManager::Instance.GetPosMm() - _target).Length();
 
 	float DiffAngle = WrapAngle(AngleRef - PositionManager::Instance.GetAngleRad());
 	AngleRef = DiffAngle + PositionManager::Instance.GetAngleRad();
@@ -299,13 +293,13 @@ void TrajectoryManager::GotoTarget(TrajDest* next_point, float target_x, float t
 	//printf("tar x:%d  y:%d  dist:%f  a:%f\r\n", (int)target_x, (int)target_y, (double)next1_dist, (double)angle_ref);
 
 	// go backward
-	if (next_point->movement != COMMON)
+	if (_nextPoint->movement != COMMON)
 	{
 		// just asserv in distance
-		if (next_point->movement == BACKWARD) {
+		if (_nextPoint->movement == BACKWARD) {
 			ControlSystem::Instance.SetDistanceRef(PositionManager::Instance.GetDistanceMm() - RemainingDist);
 		}
-		else if (next_point->movement == FORWARD) {
+		else if (_nextPoint->movement == FORWARD) {
 			ControlSystem::Instance.SetDistanceRef(PositionManager::Instance.GetDistanceMm() + RemainingDist);
 		}
 	}

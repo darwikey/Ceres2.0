@@ -72,20 +72,19 @@ void CommandLineInterface::Task()
 			Serial.printf("Angle: %f\r\n", (double)value);
 		}
 		else if (command == 'c') {
-			double x = atof(arg);
-			double y = atof(arg2);
-			TrajectoryManager::Instance.GotoXY(x, y);
-			Serial.printf("Goto xy: %f  %f\r\n", x, y);
+			Vector2 p(atof(arg), atof(arg2));
+			TrajectoryManager::Instance.GotoXY(p);
+			Serial.printf("Goto xy: %f  %f\r\n", p.x, p.y);
 		}
 		else if (command == '*') {
 			AStarCoord coord;
-			coord.FromWordPosition(atoi(arg), atoi(arg2));
+			coord.FromWordPosition(Vector2(atoi(arg), atoi(arg2)));
 			astar_test(coord);
 		}
 		else if (command == 't') {
-			TrajectoryManager::Instance.GotoXY(0, 500);
-			TrajectoryManager::Instance.GotoXY(500, 500);
-			TrajectoryManager::Instance.GotoXY(500, 0);
+			TrajectoryManager::Instance.GotoXY(Vector2(0, 500));
+			TrajectoryManager::Instance.GotoXY(Vector2(500, 500));
+			TrajectoryManager::Instance.GotoXY(Vector2(500, 0));
 		}
 		else if (command == 'z') {
 			TrajectoryManager::Instance.Reset();
