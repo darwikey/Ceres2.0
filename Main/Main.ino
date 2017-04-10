@@ -33,7 +33,7 @@ void loop() {
 	static int time = 0;
 	static int clock = 0;
 	//static int step = 0;
-
+	
 	// Debug
 	if (clock >= 1000)
 	{
@@ -69,9 +69,10 @@ void loop() {
 	time += 10;
 	clock += 10;
 }
-
+#if 0
 extern "C" {
 	int _getpid() { return -1; }
 	int _kill(int pid, int sig) { return -1; }
 	int _write() { return -1; }
 }
+#endif

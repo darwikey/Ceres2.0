@@ -28,6 +28,8 @@
 #include <cstring>
 #include <new>
 
+#undef assert
+#define assert(x) ((void)0)
 
 /// %Vector template class.
 template <class T> class Vector : public VectorBase
