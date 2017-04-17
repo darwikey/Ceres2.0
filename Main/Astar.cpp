@@ -287,6 +287,7 @@ struct ClosedList {
 			}
 		}
 		m_Graph.PutElement(e._pos, Graph::Value::CLOSED);
+		//Serial.printf("c %d\r\n", m_Data.Size());
 		m_Data.Push(e);
 	}
 
@@ -330,6 +331,7 @@ struct OpenList {
 			}
 		}
 		m_Graph.PutElement(e._pos, Graph::Value::OPEN);
+		//Serial.printf("o %d\r\n", m_Data.Size());
 		m_Data.Push(e);
 	}
 
@@ -434,7 +436,7 @@ AStar::ReturnStatus AStar::FindPath(const Node & source, const Node & destinatio
 	}
 
 	while (!open.isEmpty()) {
-		const Node& current = open.head();
+		const Node current = open.head();
 		open.pop();
 
 		if (!TryInsert(closed, current)) {
