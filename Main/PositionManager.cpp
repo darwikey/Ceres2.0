@@ -148,12 +148,12 @@ float PositionManager::GetYMm(void) {
 	return m_YMm;
 }
 
-Vector2 PositionManager::GetPosMm()
+Float2 PositionManager::GetPosMm()
 {
-	return Vector2(m_XMm, m_YMm);
+	return Float2(m_XMm, m_YMm);
 }
 
-void PositionManager::SetPosMm(const Vector2 &_pos){
+void PositionManager::SetPosMm(const Float2 &_pos){
 	m_XMm = _pos.x;
 	m_YMm = _pos.y;
 }

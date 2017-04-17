@@ -14,8 +14,8 @@ struct AStarCoord
 	bool operator!=(const AStarCoord& other) const {
 		return x != other.x || y != other.y;
 	}
-	void ToWordPosition(Vector2 &_pos) const;
-	void FromWordPosition(const Vector2 &_pos);
+	void ToWordPosition(Float2 &_pos) const;
+	void FromWordPosition(const Float2 &_pos);
 	int16_t x;
 	int16_t y;
 };
@@ -162,8 +162,8 @@ public:
 		PutElement(x, y, Value::OBSTACLE);
 	}
 	void PutObstacleBox(int x0, int y0, int x1, int y1);
-	void PutObstacleBox(const Vector2 &p0, const Vector2 &p1);
-	void PutObstacleCircle(const Vector2 &center, float radius);
+	void PutObstacleBox(const Float2 &p0, const Float2 &p1);
+	void PutObstacleCircle(const Float2 &center, float radius);
 };
 
 #endif

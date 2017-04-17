@@ -34,7 +34,7 @@ public:
 	void PrintSide();
 	void SetSide(Side _side);
 
-	Vector2 GetGameElementPosition(GameElement _module);
+	Float2 GetGameElementPosition(GameElement _module);
 
 private:
 	Side m_Side = Side::BLUE;

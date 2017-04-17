@@ -73,7 +73,7 @@ void TrajectoryManager::Resume()
 	m_Pause = false;
 }
 
-void TrajectoryManager::GotoXY(const Vector2 &_pos_mm)
+void TrajectoryManager::GotoXY(const Float2 &_pos_mm)
 {
 	// if it's the first point, we turn the robot face to the next point
 	if (TrajectoryManager::IsEnded()) {
@@ -92,7 +92,7 @@ void TrajectoryManager::GotoXY(const Vector2 &_pos_mm)
 
 void TrajectoryManager::GotoDistance(float d) {
 	float angle = PositionManager::Instance.GetAngleRad();
-	Vector2 v (d * cos(angle), -d * sin(angle));
+	Float2 v (d * cos(angle), -d * sin(angle));
 
 	TrajDest dest;
 	dest.pos = v + PositionManager::Instance.GetPosMm();
@@ -184,7 +184,7 @@ void TrajectoryManager::Update()
 	TrajDest* next1 = m_Points + m_CurId;
 	float next1_dist = (PositionManager::Instance.GetPosMm() - next1->pos).Length();
 	// position the robot want to reach
-	Vector2 target;
+	Float2 target;
 
 	// it's a rotation
 	if (!IS_UNDEFINED_ANGLE(next1->a))
@@ -265,7 +265,7 @@ float WrapAngle(float a)
 	return a - floor(a / M_TWOPI) * M_TWOPI - M_PI;
 }
 
-void TrajectoryManager::GotoTarget(const TrajDest* _nextPoint, const Vector2 &_target)
+void TrajectoryManager::GotoTarget(const TrajDest* _nextPoint, const Float2 &_target)
 {
 	// Compute the angle and distance to send to the control system
 	//float angle_ref, remaining_dist;

@@ -3,59 +3,59 @@
 
 #include <math.h>
 
-class Vector2
+class Float2
 {
 public:
 	/// Construct a zero vector.
-	Vector2() :
+	Float2() :
 		x(0.0f),
 		y(0.0f)
 	{
 	}
 
 	/// Construct from coordinates.
-	Vector2(float x, float y) :
+	Float2(float x, float y) :
 		x(x),
 		y(y)
 	{
 	}
 
 	/// Construct from a float array.
-	explicit Vector2(const float* data) :
+	explicit Float2(const float* data) :
 		x(data[0]),
 		y(data[1])
 	{
 	}
 
 	/// Test for equality with another vector without epsilon.
-	bool operator ==(const Vector2& rhs) const { return x == rhs.x && y == rhs.y; }
+	bool operator ==(const Float2& rhs) const { return x == rhs.x && y == rhs.y; }
 
 	/// Test for inequality with another vector without epsilon.
-	bool operator !=(const Vector2& rhs) const { return x != rhs.x || y != rhs.y; }
+	bool operator !=(const Float2& rhs) const { return x != rhs.x || y != rhs.y; }
 
 	/// Add a vector.
-	Vector2 operator +(const Vector2& rhs) const { return Vector2(x + rhs.x, y + rhs.y); }
+	Float2 operator +(const Float2& rhs) const { return Float2(x + rhs.x, y + rhs.y); }
 
 	/// Return negation.
-	Vector2 operator -() const { return Vector2(-x, -y); }
+	Float2 operator -() const { return Float2(-x, -y); }
 
 	/// Subtract a vector.
-	Vector2 operator -(const Vector2& rhs) const { return Vector2(x - rhs.x, y - rhs.y); }
+	Float2 operator -(const Float2& rhs) const { return Float2(x - rhs.x, y - rhs.y); }
 
 	/// Multiply with a scalar.
-	Vector2 operator *(float rhs) const { return Vector2(x * rhs, y * rhs); }
+	Float2 operator *(float rhs) const { return Float2(x * rhs, y * rhs); }
 
 	/// Multiply with a vector.
-	Vector2 operator *(const Vector2& rhs) const { return Vector2(x * rhs.x, y * rhs.y); }
+	Float2 operator *(const Float2& rhs) const { return Float2(x * rhs.x, y * rhs.y); }
 
 	/// Divide by a scalar.
-	Vector2 operator /(float rhs) const { return Vector2(x / rhs, y / rhs); }
+	Float2 operator /(float rhs) const { return Float2(x / rhs, y / rhs); }
 
 	/// Divide by a vector.
-	Vector2 operator /(const Vector2& rhs) const { return Vector2(x / rhs.x, y / rhs.y); }
+	Float2 operator /(const Float2& rhs) const { return Float2(x / rhs.x, y / rhs.y); }
 
 	/// Add-assign a vector.
-	Vector2& operator +=(const Vector2& rhs)
+	Float2& operator +=(const Float2& rhs)
 	{
 		x += rhs.x;
 		y += rhs.y;
@@ -63,7 +63,7 @@ public:
 	}
 
 	/// Subtract-assign a vector.
-	Vector2& operator -=(const Vector2& rhs)
+	Float2& operator -=(const Float2& rhs)
 	{
 		x -= rhs.x;
 		y -= rhs.y;
@@ -71,7 +71,7 @@ public:
 	}
 
 	/// Multiply-assign a scalar.
-	Vector2& operator *=(float rhs)
+	Float2& operator *=(float rhs)
 	{
 		x *= rhs;
 		y *= rhs;
@@ -79,7 +79,7 @@ public:
 	}
 
 	/// Multiply-assign a vector.
-	Vector2& operator *=(const Vector2& rhs)
+	Float2& operator *=(const Float2& rhs)
 	{
 		x *= rhs.x;
 		y *= rhs.y;
@@ -87,7 +87,7 @@ public:
 	}
 
 	/// Divide-assign a scalar.
-	Vector2& operator /=(float rhs)
+	Float2& operator /=(float rhs)
 	{
 		float invRhs = 1.0f / rhs;
 		x *= invRhs;
@@ -96,7 +96,7 @@ public:
 	}
 
 	/// Divide-assign a vector.
-	Vector2& operator /=(const Vector2& rhs)
+	Float2& operator /=(const Float2& rhs)
 	{
 		x /= rhs.x;
 		y /= rhs.y;
@@ -122,22 +122,22 @@ public:
 	float LengthSquared() const { return x * x + y * y; }
 
 	/// Calculate dot product.
-	float DotProduct(const Vector2& rhs) const { return x * rhs.x + y * rhs.y; }
+	float DotProduct(const Float2& rhs) const { return x * rhs.x + y * rhs.y; }
 
 	/// Project vector onto axis.
-	float ProjectOntoAxis(const Vector2& axis) const { return DotProduct(axis.Normalized()); }
+	float ProjectOntoAxis(const Float2& axis) const { return DotProduct(axis.Normalized()); }
 
 	/// Returns the angle between this vector and another vector
-	float Angle(const Vector2& rhs) const { return acos(DotProduct(rhs) / (Length() * rhs.Length())); }
+	float Angle(const Float2& rhs) const { return acos(DotProduct(rhs) / (Length() * rhs.Length())); }
 
 	/// Return absolute vector.
-	Vector2 Abs() const { return Vector2(fabs(x), fabs(y)); }
+	Float2 Abs() const { return Float2(fabs(x), fabs(y)); }
 
 	/// Linear interpolation with another vector.
-	Vector2 Lerp(const Vector2& rhs, float t) const { return *this * (1.0f - t) + rhs * t; }
+	Float2 Lerp(const Float2& rhs, float t) const { return *this * (1.0f - t) + rhs * t; }
 
 	/// Return normalized to unit length.
-	Vector2 Normalized() const
+	Float2 Normalized() const
 	{
 		float lenSquared = LengthSquared();
 		if (lenSquared > 0.0f)
@@ -156,7 +156,7 @@ public:
 	float y;
 };
 
-/// Multiply Vector2 with a scalar
-inline Vector2 operator *(float lhs, const Vector2& rhs) { return rhs * lhs; }
+/// Multiply Float2 with a scalar
+inline Float2 operator *(float lhs, const Float2& rhs) { return rhs * lhs; }
 
 #endif

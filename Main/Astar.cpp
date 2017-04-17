@@ -56,7 +56,7 @@ void astar_test(AStarCoord _c)
 	g.Print(false);
 
 	for (const auto& it : path) {
-		Vector2 p;
+		Float2 p;
 		it._pos.ToWordPosition(p);
 		Serial.printf("GotoXY %f,%f\r\n", p.x, p.y);
 		TrajectoryManager::Instance.GotoXY(p);
@@ -71,13 +71,13 @@ void astar_test(AStarCoord _c)
 Graph Graph::Instance;
 AStar AStar::Instance(Graph::Instance);
 
-void AStarCoord::ToWordPosition(Vector2 & _pos) const
+void AStarCoord::ToWordPosition(Float2 & _pos) const
 {
 	_pos.x = (x + 0.5f) * (TERRAIN_WIDTH / Graph::WIDTH);
 	_pos.y = (y + 0.5f) * (TERRAIN_HEIGHT / Graph::HEIGHT);
 }
 
-void AStarCoord::FromWordPosition(const Vector2 &_pos)
+void AStarCoord::FromWordPosition(const Float2 &_pos)
 {
 	x = _pos.x * (Graph::WIDTH / TERRAIN_WIDTH);
 	y = _pos.y * (Graph::HEIGHT / TERRAIN_HEIGHT);
@@ -117,24 +117,24 @@ void Graph::Init()
 	
 	float margin = OBSTACLE_MARGIN;
 	// Start zones
-	PutObstacleBox(Vector2(0.f, 0.f), Vector2(710.f + margin, 382.f + margin));
-	PutObstacleBox(Vector2(2290.f - margin, 0.f), Vector2(3000.f, 382.f + margin));
+	PutObstacleBox(Float2(0.f, 0.f), Float2(710.f + margin, 382.f + margin));
+	PutObstacleBox(Float2(2290.f - margin, 0.f), Float2(3000.f, 382.f + margin));
 	// craters close to start zones
-	PutObstacleCircle(Vector2(650.f, 540.f), 100.f + margin);
-	PutObstacleCircle(Vector2(2350.f, 540.f), 100.f + margin);
+	PutObstacleCircle(Float2(650.f, 540.f), 100.f + margin);
+	PutObstacleCircle(Float2(2350.f, 540.f), 100.f + margin);
 	// craters in corner
-	PutObstacleCircle(Vector2(0, 2000), 520.f + margin);
-	PutObstacleCircle(Vector2(3000, 2000), 520.f + margin);
+	PutObstacleCircle(Float2(0, 2000), 520.f + margin);
+	PutObstacleCircle(Float2(3000, 2000), 520.f + margin);
 	//things on the side
-	PutObstacleBox(Vector2(0.f, 700.f - margin), Vector2(80.f + margin, 1150.f + margin));
-	PutObstacleBox(Vector2(2920.f - margin, 700.f - margin), Vector2(3000.f, 1150.f + margin));
+	PutObstacleBox(Float2(0.f, 700.f - margin), Float2(80.f + margin, 1150.f + margin));
+	PutObstacleBox(Float2(2920.f - margin, 700.f - margin), Float2(3000.f, 1150.f + margin));
 	// central construction zone
-	PutObstacleBox(Vector2(1500 - 68 - margin, 1200.f - margin), Vector2(1500.f + 68 + margin, 2000.f));
+	PutObstacleBox(Float2(1500 - 68 - margin, 1200.f - margin), Float2(1500.f + 68 + margin, 2000.f));
 
 	{
 		int l = 800.f / (TERRAIN_WIDTH / Graph::WIDTH);
 		AStarCoord c0;
-		c0.FromWordPosition(Vector2(1500.f, 2000.f));
+		c0.FromWordPosition(Float2(1500.f, 2000.f));
 		AStarCoord c1=c0, c2=c0;
 		for (int  i = 0; i < l; i++)
 		{
@@ -243,7 +243,7 @@ void Graph::PutObstacleBox(int x0, int y0, int x1, int y1)
 			PutElement(x, y, Value::OBSTACLE);
 }
 
-void Graph::PutObstacleBox(const Vector2 &p0, const Vector2 &p1)
+void Graph::PutObstacleBox(const Float2 &p0, const Float2 &p1)
 {
 	AStarCoord c0, c1;
 	c0.FromWordPosition(p0);
@@ -251,17 +251,17 @@ void Graph::PutObstacleBox(const Vector2 &p0, const Vector2 &p1)
 	PutObstacleBox(c0.x, c0.y, c1.x, c1.y);
 }
 
-void Graph::PutObstacleCircle(const Vector2 &center, float radius)
+void Graph::PutObstacleCircle(const Float2 &center, float radius)
 {
 	AStarCoord c0, c1, it;
-	c0.FromWordPosition(Vector2(center.x - radius, center.y - radius));
-	c1.FromWordPosition(Vector2(center.x + radius, center.y + radius));
+	c0.FromWordPosition(Float2(center.x - radius, center.y - radius));
+	c1.FromWordPosition(Float2(center.x + radius, center.y + radius));
 	radius *= radius;
 	for (it.x = c0.x; it.x <= c1.x; it.x++)
 	{
 		for (it.y = c0.y; it.y <= c1.y; it.y++)
 		{
-			Vector2 p;
+			Float2 p;
 			it.ToWordPosition(p);
 			if ((p - center).LengthSquared() <= radius)
 				PutElement(it.x, it.y, Value::OBSTACLE);

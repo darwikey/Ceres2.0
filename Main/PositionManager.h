@@ -10,7 +10,7 @@
 #define POSITION_MANAGER_H
 
 #include "QuadDecode.h"
-#include "Vector2.h"
+#include "Float2.h"
 
 class PositionManager
 {
@@ -32,8 +32,8 @@ public:
 	void SetAngleDeg(float a);
 	float GetXMm(void);
 	float GetYMm(void);
-	Vector2 GetPosMm();
-	void SetPosMm(const Vector2 &_pos);
+	Float2 GetPosMm();
+	void SetPosMm(const Float2 &_pos);
 
 	int32_t MmToTicks(float value_mm);
 
