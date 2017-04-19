@@ -210,6 +210,9 @@ void CommandLineInterface::Task()
 			else if (!strncmp(arg, "side", ARG_LENGTH)) {
 				Strategy::Instance.PrintSide();
 			}
+			else if (!strncmp(arg, "gp2", ARG_LENGTH)) {
+				Platform::DebugGP2();
+			}
 			else if (!strncmp(arg, "date", ARG_LENGTH)) {
 				extern const char* gCompileDate;
 				extern const char* gCompileTime;
@@ -292,6 +295,7 @@ void CommandLineInterface::Task()
 			Serial.print("             last_id:  Print Traj manager's last point id.\r\n");
 			Serial.print("             pid:      Print PID.\r\n");
 			Serial.print("             side:     Print color of the start zone");
+			Serial.print("             gp2:      Debug gp2");
 			Serial.print("             graph:    Print A* graph.\r\n");
 			Serial.print("             date      Print the binary creation timestamp.\r\n");
 		}

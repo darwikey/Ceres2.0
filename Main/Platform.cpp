@@ -78,6 +78,19 @@ namespace Platform
 		return false;
 	}
 
+	void DebugGP2()
+	{
+		do
+		{
+			for (unsigned i = 0; i < _countof(gp2s); ++i)
+			{
+				Serial.printf("Gp2 %d : %d\r\n", i, analogRead(gp2s[i]));
+			}
+			Serial.printf("occluded %d\r\n\r\n", (int)IsGP2Occluded());
+			delay(500);
+		} while (Serial.available() == 0);
+	}
+
 	void SetServoLED(ServoID id, ServoLED color)
 	{
 		Servo.LED((int)id, (int)color);

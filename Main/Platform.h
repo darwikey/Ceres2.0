@@ -3,8 +3,8 @@
 
 #define _countof(a) (sizeof(a)/sizeof(*(a)))
 
-#define GP2_BLOCK_AT   1000 /*432*/ /*288*/
-#define GP2_UNBLOCK_AT 1000 /*324*/ /*216*/
+#define GP2_BLOCK_AT   432 /*288*/
+#define GP2_UNBLOCK_AT 324 /*216*/
 
 enum class ServoID
 {
@@ -31,7 +31,7 @@ namespace Platform
 	const int leds[] = { 11, 12, 13, 20, 21 };
 	const int buttons[] = { 5, 6, 7 , 8 };
 	const int startPull = 2;
-	const int gp2s[] = { 0, 1, 2, 3 };
+	const int gp2s[] = { 0, 1 };// , 2, 3};
 
 	void Init();
 
@@ -39,6 +39,7 @@ namespace Platform
 	void SetLed(int ledId, bool state);
 	bool IsButtonPressed(int id);
 	bool IsGP2Occluded();
+	void DebugGP2();
 
 	void SetServoLED(ServoID id, ServoLED color);
 	//pos: 0 to 1023
