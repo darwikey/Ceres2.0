@@ -1,7 +1,7 @@
 #ifndef _STRATEGY_H_
 #define _STRATEGY_H_
 
-#include "Vector2.h"
+#include "Float2.h"
 
 #define ROBOT_WIDTH 235.f
 #define ROBOT_CENTER_BACK 55.f // distance between axle and back
