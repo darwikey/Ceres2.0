@@ -24,11 +24,17 @@ namespace Platform
 			pinMode(gp2s[i], INPUT);
 
 		//init servo
+		//SerialUart2.begin(9600);
 		SerialUart2.begin(115200);
-		Servo.begin(SerialUart2);
-		// fast moving servos, so set the joint speed to max!
-		Servo.setJointSpeed(254, 1023);
+		//SerialUart2.begin(1000000);
+		Servo.Begin(SerialUart2);
 
+		//configure Serial2 for servo
+		UART1_C1 |= UART_C1_LOOPS | UART_C1_RSRC;
+		CORE_PIN10_CONFIG |= PORT_PCR_PE | PORT_PCR_PS; // pullup on output pin
+		
+		// slow moving servos
+		Servo.Write((int)ServoID::ALL, XL320::Address::GOAL_SPEED, 200);
 	}
 
 	void DisplayNumber(int n)
@@ -93,29 +99,45 @@ namespace Platform
 
 	void SetServoLED(ServoID id, ServoLED color)
 	{
-		Servo.LED((int)id, (int)color);
+		Servo.Write((int)id, XL320::Address::LED, (int)color);
 	}
 
 	void SetServoPos(ServoID id, int pos)
 	{
-		Servo.moveJoint((int)id, pos);
+		Servo.Write((int)id, XL320::Address::GOAL_POSITION, pos);
 	}
 
 	void SetServoSpeed(ServoID id, int speed)
 	{
-		Servo.setJointSpeed((int)id, speed);
+		Servo.Write((int)id, XL320::Address::GOAL_SPEED, speed);
 	}
 
 	void ForceServoBaudRate()
 	{
+		//SerialUart2.begin(1000000);
 		// 0: 9600, 1:57600, 2:115200, 3:1Mbps
-		Servo.sendPacket((int)ServoID::ALL, XL_BAUD_RATE, 2);
+		Servo.Write((int)ServoID::ALL, XL320::Address::BAUD_RATE, 2);
+		//SerialUart2.begin(115200);
 	}
 
 	void ForceServoId(int id)
 	{
-		Servo.sendPacket((int)ServoID::ALL, XL_ID, id);
+		Servo.Write((int)ServoID::ALL, XL320::Address::ID, id);
 	}
 
+	void SendServoPacket(int id, int address, int value)
+	{
+		Servo.Write(id, (XL320::Address)address, value);
+	}
+
+	void ReadServoPacket(int id, int address)
+	{
+		Serial.printf("value: %d\r\n", Servo.GetValue(id, (XL320::Address)address));
+	}
+
+	void DebugServoRam(int id)
+	{
+		Servo.DebugAllValue(id, Serial);
+	}
 
 }

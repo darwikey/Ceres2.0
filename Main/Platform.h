@@ -50,6 +50,10 @@ namespace Platform
 	void ForceServoBaudRate();
 	// set id of one servo connected, id between 1 and 253 (but not 200)
 	void ForceServoId(int id);
+
+	void SendServoPacket(int id, int address, int value);
+	void ReadServoPacket(int id, int address);
+	void DebugServoRam(int id);
 }
 
 #endif

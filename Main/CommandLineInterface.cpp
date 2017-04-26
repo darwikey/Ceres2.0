@@ -58,7 +58,6 @@ void CommandLineInterface::Task()
 			arg2[j] = m_Buffer[i];
 		}
 
-		m_CurPos = 0;
 		//Serial.printf("commande %c \"%s\" \"%s\"\r\n", command, arg, arg2);
 
 		if (command == 'd') {
@@ -90,6 +89,28 @@ void CommandLineInterface::Task()
 			TrajectoryManager::Instance.Reset();
 			Serial.printf("stop mvt\r\n");
 		}
+		//TODO deplacer dans une vraie commande quand le CLI sera mieux
+		else if (command == 'x') {
+			char arg3[ARG_LENGTH] = { 0 };
+			i++;
+			for (int j = 0;
+				i < m_CurPos && m_Buffer[i] != ' ' && j < ARG_LENGTH - 1;
+				i++, j++)
+			{
+				arg3[j] = m_Buffer[i];
+			}
+			int id = atoi(arg);
+			int adr = atoi(arg2);
+			int val = atoi(arg3);
+			Platform::SendServoPacket(id, adr, val);
+			Serial.printf("packet id:%d adr:%d val:%d\r\n", id, adr, val);
+		}
+		//else if (command == 'r') {
+		//	int id = atoi(arg);
+		//	int adr = atoi(arg2);
+		//	Serial.printf("packet id:%d adr:%d\r\n", id, adr);
+		//	Platform::ReadServoPacket(id, adr);
+		//}
 		else if (command == 's') {
 			double value = atof(arg2);
 			if (!strncmp(arg, "speed_high", ARG_LENGTH)) {
@@ -159,7 +180,7 @@ void CommandLineInterface::Task()
 			else if (!strncmp(arg, "servo_id", ARG_LENGTH)) {
 				int id = atoi(arg2);
 				Platform::ForceServoId(id);
-				Serial.printf("Force all connected servo to id %d\r\n", id);
+				Serial.printf("Force all connected servo to id %d\r\n. Should be the first instruction sent to the servo\r\n", id);
 			}
 			else if (!strncmp(arg, "side", ARG_LENGTH)) {
 				if (arg2[0] == 'b')
@@ -207,6 +228,9 @@ void CommandLineInterface::Task()
 			else if (!strncmp(arg, "graph", ARG_LENGTH)) {
 				Graph::Instance.Print();
 			}
+			else if (!strncmp(arg, "servo_ram", ARG_LENGTH)) {
+				Platform::DebugServoRam(atoi(arg2));
+			}
 			else if (!strncmp(arg, "side", ARG_LENGTH)) {
 				Strategy::Instance.PrintSide();
 			}
@@ -223,20 +247,13 @@ void CommandLineInterface::Task()
 			}
 		}
 		else if (command == 'm') {
-			if (!strncmp(arg, "servo1", ARG_LENGTH)) {
+			if (!strncmp(arg, "s1", ARG_LENGTH)) {
 				Platform::SetServoPos(ServoID::SERVO1, atoi(arg2));
 				Serial.print("Move servo 1\r\n");
-				/*if (!strncmp(arg2, "up", ARG_LENGTH)) {
-					action_raise_lift();
-					Serial.print("Lift up\r\n");
-				}
-				else if (!strncmp(arg2, "down", ARG_LENGTH)) {
-					action_lower_lift();
-					Serial.print("Lift down\r\n");
-				}
-				else {
-					Serial.print("Invalid argument '%s'.\r\n", arg2);
-				}*/
+			}
+			else if (!strncmp(arg, "s2", ARG_LENGTH)) {
+				Platform::SetServoPos(ServoID::SERVO2, atoi(arg2));
+				Serial.print("Move servo 2\r\n");
 			}
 			/*else if (!strncmp(arg, "grip", ARG_LENGTH)) {
 				ausbeeSetAngleServo(&servo_grip, atoi(arg2));
@@ -276,6 +293,8 @@ void CommandLineInterface::Task()
 			Serial.print("             speed_a :     set max speed for angle.\r\n");
 			Serial.print("             acc_d :       set max acceleration for distance.\r\n");
 			Serial.print("             acc_a :       set max acceleration for angle.\r\n");
+			Serial.print("             servo_baudrate set servo baudrate.\r\n");
+			Serial.print("             servo_id <int> set servo id.\r\n");
 			Serial.print("             side <b|y> :  set color of the start zone\r\n");
 			Serial.print("  m <arg> <arg2> : move an actuator\r\n");
 			Serial.print("             <arg> can be one of: \r\n");
@@ -297,6 +316,7 @@ void CommandLineInterface::Task()
 			Serial.print("             side:     Print color of the start zone");
 			Serial.print("             gp2:      Debug gp2");
 			Serial.print("             graph:    Print A* graph.\r\n");
+			Serial.print("             servo_ram <int>: Print all servo registers.\r\n");
 			Serial.print("             date      Print the binary creation timestamp.\r\n");
 		}
 		else {

@@ -19,221 +19,203 @@
 
 #include "Arduino.h"
 #include "XL320.h"
-#include <stdlib.h>
-#include <stdarg.h>
 
- // Macro for the selection of the Serial Port
-#define sendData(args)  (this->stream->write(args))    // Write Over Serial
-#define readData()		(this->stream->read())	
 
 #define SERVO_TIME_DELAY 12000
 
 	///////////////// utility for value ///////////////////////////
-#define DXL_LOBYTE(w)           ((unsigned char)(((unsigned long)(w)) & 0xff))
-#define DXL_HIBYTE(w)           ((unsigned char)((((unsigned long)(w)) >> 8) & 0xff))
+#define DXL_LOBYTE(w)           ((uint8_t)(((unsigned long)(w)) & 0xff))
+#define DXL_HIBYTE(w)           ((uint8_t)((((unsigned long)(w)) >> 8) & 0xff))
 
-XL320::XL320() {
-
-}
-
-XL320::~XL320() {
-}
-
-void XL320::begin(Stream &stream)
+void enableTX()
 {
-	this->stream = &stream;
+	uint8_t c;
+	c = UART1_C3;
+	c |= UART_C3_TXDIR;
+	UART1_C3 = c;
 }
 
-void XL320::moveJoint(int id, int value) {
-	int Address = XL_GOAL_POSITION_L;
-
-	sendPacket(id, Address, value);
-	this->stream->flush();
-
-	nDelay(SERVO_TIME_DELAY);
+void enableRX()
+{
+	uint8_t c;
+	c = UART1_C3;
+	c &= ~UART_C3_TXDIR;
+	UART1_C3 = c;
 }
 
-void XL320::setJointSpeed(int id, int value) {
-	int Address = XL_GOAL_SPEED_L;
-	sendPacket(id, Address, value);
-	this->stream->flush();
-
-	nDelay(SERVO_TIME_DELAY);
-
-}
-
-void XL320::LED(int id, int color) {
-	int Address = XL_LED;
-
-	sendPacket(id, Address, color);
-	this->stream->flush();
-
-	nDelay(SERVO_TIME_DELAY);
-}
-
-void XL320::setJointTorque(int id, int value) {
-	int Address = XL_GOAL_TORQUE;
-	sendPacket(id, Address, value);
-	this->stream->flush();
-	nDelay(SERVO_TIME_DELAY);
-
-}
-
-void XL320::TorqueON(int id) {
-
-	int Address = XL_TORQUE_ENABLE;
-	int value = 1;
-
-	sendPacket(id, Address, value);
-	this->stream->flush();
-	nDelay(SERVO_TIME_DELAY);
-}
-
-void XL320::TorqueOFF(int id) {
-
-	int Address = XL_TORQUE_ENABLE;
-	int value = 0;
-
-	sendPacket(id, Address, value);
-	this->stream->flush();
-	nDelay(SERVO_TIME_DELAY);
+void XL320::Begin(Stream &stream)
+{
+	this->m_Stream = &stream;
 }
 
 
-void XL320::quickTest() {
-
-	int position_tmp = 0;
-
-	for (int id = 1; id < 6; id++) {
-		sendPacket(id, XL_LED, random(1, 7));
-		nDelay(SERVO_TIME_DELAY);
-		this->stream->flush();
-		sendPacket(id, XL_GOAL_SPEED_L, 200);
-		nDelay(SERVO_TIME_DELAY);
-		this->stream->flush();
-	}
-
-	for (int id = 1; id < 6; id++) {
-
-		position_tmp = random(0, 512);
-
-		if (id != 3) {
-			sendPacket(id, XL_GOAL_POSITION_L, position_tmp);
-			delay(1000);
-			this->stream->flush();
-		}
-
-		else {
-			sendPacket(3, XL_GOAL_POSITION_L, 512 - position_tmp);
-			delay(1000);
-			this->stream->flush();
-		}
-	}
-
-	for (int id = 1; id < 6; id++) {
-		sendPacket(id, XL_LED, 2);
-		nDelay(SERVO_TIME_DELAY);
-		this->stream->flush();
-		sendPacket(id, XL_GOAL_SPEED_L, 1023);
-		nDelay(SERVO_TIME_DELAY);
-		this->stream->flush();
-	}
-
-	for (int id = 1; id < 6; id++) {
-		sendPacket(id, XL_LED, 0);
-		nDelay(SERVO_TIME_DELAY);
-		this->stream->flush();
-	}
+void XL320::QuickTest() {
 
 }
 
-int XL320::getSpoonLoad() {
-	int spoon = RXsendPacket(5, XL_PRESENT_LOAD);
-	this->stream->flush();
-	return spoon;
-}
-
-int XL320::getJointPosition(int id) {
-	unsigned char buffer[255];
-	RXsendPacket(id, XL_PRESENT_POSITION, 2);
-	this->stream->flush();
-	if (this->readPacket(buffer, 255) > 0) {
-		Packet p(buffer, 255);
-		if (p.isValid() && p.getParameterCount() >= 3) {
-			return (p.getParameter(1)) | (p.getParameter(2) << 8);
-		}
-		else {
-			return -1;
-		}
-	}
-	return -2;
-}
-
-int XL320::getJointSpeed(int id) {
-	int speed = RXsendPacket(id, XL_PRESENT_SPEED);
-	this->stream->flush();
-	nDelay(SERVO_TIME_DELAY);
-	return speed;
-}
-
-int XL320::getJointLoad(int id) {
-	int load = RXsendPacket(id, XL_PRESENT_LOAD);
-	this->stream->flush();
-	nDelay(SERVO_TIME_DELAY);
-	return load;
-}
-
-int XL320::getJointTemperature(int id) {
-	int temp = RXsendPacket(id, XL_PRESENT_TEMPERATURE);
-	this->stream->flush();
-	nDelay(SERVO_TIME_DELAY);
-	return temp;
-}
-
-int XL320::isJointMoving(int id) {
-	int motion = RXsendPacket(id, XL_MOVING);
-	this->stream->flush();
-	nDelay(SERVO_TIME_DELAY);
-	return motion;
-}
-
-int XL320::sendPacket(int id, int Address, int value) {
+int XL320::Write(int id, Address address, int value) {
 
 	/*Dynamixel 2.0 communication protocol
-	  used by Dynamixel XL-320 and Dynamixel PRO only.
+	used by Dynamixel XL-320 and Dynamixel PRO only.
 	*/
 
 	// technically i think we need 14bytes for this packet 
 
 	const int bufsize = 16;
+	uint8_t txbuffer[bufsize] = { 0 };
+	uint8_t param[2];
+	int paramSize = XL320::GetAddressSize(address);
+	if (paramSize == 1)
+	{
+		param[0] = value;
+	}
+	else // addresse size == 2
+	{
+		param[0] = DXL_LOBYTE(value);
+		param[1] = DXL_HIBYTE(value);
+	}
 
-	byte txbuffer[bufsize];
+	Packet p(txbuffer, bufsize, id, DXL_INST_WRITE, address, paramSize, param);
 
-	Packet p(txbuffer, bufsize, id, 0x03, 4,
-		DXL_LOBYTE(Address),
-		DXL_HIBYTE(Address),
-		DXL_LOBYTE(value),
-		DXL_HIBYTE(value));
+	//debug
+	//Serial.println();
+	//for (int i = 0; i < bufsize; i++)
+	//{
+	//	Serial.print((int)p.data[i], HEX);
+	//	Serial.print(',');
+	//}
+	//Serial.println();
 
+	enableTX();
+	m_Stream->write(txbuffer, p.getSize());
 
-	int size = p.getSize();
-	stream->write(txbuffer, size);
-
-	//stream->write(txbuffer,bufsize);
+	Flush();
+	
+	NDelay(SERVO_TIME_DELAY);
 
 	return bufsize;
 }
 
-void XL320::nDelay(uint32_t nTime) {
+int XL320::SendReadPacket(int id, Address address, uint16_t requestedSize) {
+
+	/*Dynamixel 2.0 communication protocol
+	used by Dynamixel XL-320 and Dynamixel PRO only.
+	*/
+
+	const int bufsize = 16;
+
+	byte txbuffer[bufsize];
+
+	Packet p(txbuffer, bufsize, id, DXL_INST_READ, address, 2, (uint8_t*)&requestedSize);
+
+	enableTX();
+	m_Stream->write(txbuffer, p.getSize());
+
+	Flush();
+
+	return p.getSize();
+}
+
+int XL320::GetValue(int id, Address address)
+{
+	while (this->m_Stream->available() > 0) {
+		this->m_Stream->read();
+	}
+
+	int size = XL320::GetAddressSize(address);
+	SendReadPacket(id, address, size);
+
+	enableRX();
+
+	uint8_t buffer[255] = { 0 };
+	if (this->ReadPacket(buffer, 255) > 0) 
+	{
+		Packet p(buffer, 255);
+		
+		//p.debugToStream(Serial);
+
+		if (!p.isValid())
+			return -1;
+
+		if (size == 1)
+		{
+			return *p.getParameters();
+		}
+		else// size == 2
+		{
+			return *((uint16_t*)p.getParameters());
+		}
+	}
+	return -2;
+}
+
+void XL320::DebugAllValue(int id, Stream & stream)
+{
+	stream.printf("MODEL_NUMBER: %d\r\n", GetValue(id, Address::MODEL_NUMBER));
+	stream.printf("VERSION: %d\r\n", GetValue(id, Address::VERSION));
+	stream.printf("ID: %d\r\n", GetValue(id, Address::ID));
+	stream.printf("BAUD_RATE: %d\r\n", GetValue(id, Address::BAUD_RATE));
+	stream.printf("RETURN_DELAY_TIME: %d\r\n", GetValue(id, Address::RETURN_DELAY_TIME));
+	stream.printf("CW_ANGLE_LIMIT: %d\r\n", GetValue(id, Address::CW_ANGLE_LIMIT));
+	stream.printf("CCW_ANGLE_LIMIT: %d\r\n", GetValue(id, Address::CCW_ANGLE_LIMIT));
+	stream.printf("CONTROL_MODE: %d\r\n", GetValue(id, Address::CONTROL_MODE));
+	stream.printf("LIMIT_TEMPERATURE: %d\r\n", GetValue(id, Address::LIMIT_TEMPERATURE));
+	stream.printf("LOWER_LIMIT_VOLTAGE: %d\r\n", GetValue(id, Address::LOWER_LIMIT_VOLTAGE));
+	stream.printf("UPPPER_LIMIT_VOLTAGE: %d\r\n", GetValue(id, Address::UPPPER_LIMIT_VOLTAGE));
+	stream.printf("MAX_TORQUE: %d\r\n", GetValue(id, Address::MAX_TORQUE));
+	stream.printf("RETURN_LEVEL: %d\r\n", GetValue(id, Address::RETURN_LEVEL));
+	stream.printf("ALARM_SHUTDOWN: %d\r\n", GetValue(id, Address::ALARM_SHUTDOWN));
+	stream.printf("TORQUE_ENABLE: %d\r\n", GetValue(id, Address::TORQUE_ENABLE));
+	stream.printf("LED: %d\r\n", GetValue(id, Address::LED));
+	stream.printf("D_GAIN: %d\r\n", GetValue(id, Address::D_GAIN));
+	stream.printf("I_GAIN: %d\r\n", GetValue(id, Address::I_GAIN));
+	stream.printf("P_GAIN: %d\r\n", GetValue(id, Address::P_GAIN));
+	stream.printf("GOAL_POSITION: %d\r\n", GetValue(id, Address::GOAL_POSITION));
+	stream.printf("GOAL_SPEED: %d\r\n", GetValue(id, Address::GOAL_SPEED));
+	stream.printf("GOAL_TORQUE: %d\r\n", GetValue(id, Address::GOAL_TORQUE));
+	stream.printf("PRESENT_POSITION: %d\r\n", GetValue(id, Address::PRESENT_POSITION));
+	stream.printf("PRESENT_SPEED: %d\r\n", GetValue(id, Address::PRESENT_SPEED));
+	stream.printf("PRESENT_LOAD: %d\r\n", GetValue(id, Address::PRESENT_LOAD));
+	stream.printf("PRESENT_VOLTAGE: %d\r\n", GetValue(id, Address::PRESENT_VOLTAGE));
+	stream.printf("PRESENT_TEMPERATURE: %d\r\n", GetValue(id, Address::PRESENT_TEMPERATURE));
+	stream.printf("REGISTERED_INSTRUCTION: %d\r\n", GetValue(id, Address::REGISTERED_INSTRUCTION));
+	stream.printf("MOVING: %d\r\n", GetValue(id, Address::MOVING));
+	stream.printf("HARDWARE_ERROR: %d\r\n", GetValue(id, Address::HARDWARE_ERROR));
+	stream.printf("PUNCH: %d\r\n", GetValue(id, Address::PUNCH));
+
+}
+
+uint8_t XL320::GetAddressSize(Address address)
+{
+	switch (address)
+	{
+	case Address::MODEL_NUMBER:
+	case Address::CW_ANGLE_LIMIT:
+	case Address::CCW_ANGLE_LIMIT:
+	case Address::MAX_TORQUE:
+	case Address::GOAL_POSITION:
+	case Address::GOAL_SPEED:
+	case Address::GOAL_TORQUE:
+	case Address::PRESENT_POSITION:
+	case Address::PRESENT_SPEED:
+	case Address::PRESENT_LOAD:
+	case Address::PUNCH:
+		return 2;
+	default:
+		return 1;
+	}
+}
+
+void XL320::NDelay(uint32_t nTime) {
 	/*
-	uint32_t max;
+	volatile uint32_t max;
 	for( max=0; max < nTime; max++){
 
 	}
 	*/
 }
 
-uint16_t XL320::update_crc(uint16_t crc_accum, uint8_t *data_blk_ptr, uint16_t data_blk_size)
+uint16_t XL320::UpdateCrc(uint16_t crc_accum, uint8_t *data_blk_ptr, uint16_t data_blk_size)
 {
 	static const uint16_t crc_table[256] = { 0x0000,
 		0x8005, 0x800F, 0x000A, 0x801B, 0x001E, 0x0014, 0x8011,
@@ -283,49 +265,21 @@ uint16_t XL320::update_crc(uint16_t crc_accum, uint8_t *data_blk_ptr, uint16_t d
 	return crc_accum;
 }
 
-void XL320::flush() {
-	this->stream->flush();
-}
-
-int XL320::RXsendPacket(int id, int Address) {
-	return this->RXsendPacket(id, Address, 2);
-}
-
-int XL320::RXsendPacket(int id, int Address, int size) {
-
-	/*Dynamixel 2.0 communication protocol
-	  used by Dynamixel XL-320 and Dynamixel PRO only.
-	*/
-
-	const int bufsize = 16;
-
-	byte txbuffer[bufsize];
-
-	Packet p(txbuffer, bufsize, id, 0x02, 4,
-		DXL_LOBYTE(Address),
-		DXL_HIBYTE(Address),
-		DXL_LOBYTE(size),
-		DXL_HIBYTE(size));
-
-
-	stream->write(txbuffer, p.getSize());
-
-	//stream->write(txbuffer,bufsize);
-
-	return p.getSize();
+void XL320::Flush() {
+	this->m_Stream->flush();
 }
 
 // from http://stackoverflow.com/a/133363/195061
 
 #define FSM
-#define STATE(x)        s_##x : if(!stream->readBytes(&BUFFER[I++],1)) goto sx_timeout ; if(I>=SIZE) goto sx_overflow; sn_##x :
+#define STATE(x)        s_##x : if(!m_Stream->readBytes(&BUFFER[I++],1)) goto sx_timeout ; if(I>=SIZE) goto sx_overflow; sn_##x :
 #define THISBYTE        (BUFFER[I-1])
 #define NEXTSTATE(x)    goto s_##x
 #define NEXTSTATE_NR(x) goto sn_##x
 #define LOVERFLOW       sx_overflow :
 #define TIMEOUT         sx_timeout :
 
-int XL320::readPacket(unsigned char *BUFFER, int SIZE) {
+int XL320::ReadPacket(uint8_t *BUFFER, int SIZE) {
 	int I = 0;
 
 	int length = 0;
@@ -393,26 +347,27 @@ int XL320::readPacket(unsigned char *BUFFER, int SIZE) {
 
 
 XL320::Packet::Packet(
-	unsigned char *data,
+	uint8_t *data,
 	size_t data_size,
-	unsigned char id,
-	unsigned char instruction,
-	int parameter_data_size,
-	...) {
+	uint8_t id,
+	DynamixelIntruction instruction,
+	Address address,
+	int paramSize, 
+	uint8_t *param) {
 
 
 	// [ff][ff][fd][00][id][len1][len2] { [instr][params(parameter_data_size)][crc1][crc2] }
-	unsigned int length = 3 + parameter_data_size;
+	unsigned int length = 5 + paramSize;
 	if (!data) {
 		// [ff][ff][fd][00][id][len1][len2] { [data(length)] }
-		this->data_size = 7 + length;
-		this->data = (unsigned char*)malloc(data_size);
-		this->freeData = true;
+		this->dataSize = 7 + length;
+		this->data = (uint8_t*)malloc(dataSize);
+		this->m_FreeData = true;
 	}
 	else {
 		this->data = data;
-		this->data_size = data_size;
-		this->freeData = false;
+		this->dataSize = data_size;
+		this->m_FreeData = false;
 	}
 	this->data[0] = 0xFF;
 	this->data[1] = 0xFF;
@@ -422,33 +377,35 @@ XL320::Packet::Packet(
 	this->data[5] = length & 0xff;
 	this->data[6] = (length >> 8) & 0xff;
 	this->data[7] = instruction;
-	va_list args;
-	va_start(args, parameter_data_size);
-	for (int i = 0; i < parameter_data_size; i++) {
-		unsigned char arg = va_arg(args, int);
-		this->data[8 + i] = arg;
-	}
-	unsigned short crc = update_crc(0, this->data, this->getSize() - 2);
-	this->data[8 + parameter_data_size] = crc & 0xff;
-	this->data[9 + parameter_data_size] = (crc >> 8) & 0xff;
-	va_end(args);
+	this->data[8] = DXL_LOBYTE(address);
+	this->data[9] = DXL_HIBYTE(address);
+	memcpy(&this->data[10], param, paramSize);
+	unsigned short crc = UpdateCrc(0, this->data, this->getSize() - 2);
+	this->data[length + 5] = crc & 0xff;
+	this->data[length + 6] = (crc >> 8) & 0xff;
 }
 
-XL320::Packet::Packet(unsigned char *data, size_t size) {
+XL320::Packet::Packet(uint8_t *data, size_t size) {
 	this->data = data;
-	this->data_size = size;
-	this->freeData = false;
+	this->dataSize = size;
+	this->m_FreeData = false;
 }
 
 
 XL320::Packet::~Packet() {
-	if (this->freeData == true) {
+	if (this->m_FreeData == true) {
 		free(this->data);
 	}
 }
 
-void XL320::Packet::toStream(Stream &stream) {
-	stream.print("id: ");
+void XL320::Packet::debugToStream(Stream &stream) {
+	stream.println("raw:");
+	for (int i = 0; i < 10 + this->getLength(); i++)
+	{
+		stream.print((int)data[i], HEX);
+		stream.print(',');
+	}
+	stream.print("\r\nid: ");
 	stream.println(this->getId(), DEC);
 	stream.print("length: ");
 	stream.println(this->getLength(), DEC);
@@ -457,9 +414,9 @@ void XL320::Packet::toStream(Stream &stream) {
 	stream.print("parameter count: ");
 	stream.println(this->getParameterCount(), DEC);
 	for (int i = 0; i < this->getParameterCount(); i++) {
-		stream.print(this->getParameter(i), HEX);
+		stream.print((int)this->getParameters()[i], HEX);
 		if (i < this->getParameterCount() - 1) {
-			stream.print(",");
+			stream.print(',');
 		}
 	}
 	stream.println();
@@ -467,7 +424,7 @@ void XL320::Packet::toStream(Stream &stream) {
 	stream.println(this->isValid() ? "yes" : "no");
 }
 
-unsigned char XL320::Packet::getId() {
+uint8_t XL320::Packet::getId() {
 	return data[4];
 }
 
@@ -480,19 +437,19 @@ int XL320::Packet::getSize() {
 }
 
 int XL320::Packet::getParameterCount() {
-	return getLength() - 3;
+	return getLength() - 4;
 }
 
-unsigned char XL320::Packet::getInstruction() {
+uint8_t XL320::Packet::getInstruction() {
 	return data[7];
 }
 
-unsigned char XL320::Packet::getParameter(int n) {
-	return data[8 + n];
+uint8_t* XL320::Packet::getParameters() {
+	return &data[9];
 }
 
 bool XL320::Packet::isValid() {
 	int length = getLength();
 	unsigned short storedChecksum = data[length + 5] + (data[length + 6] << 8);
-	return storedChecksum == update_crc(0, data, length + 5);
+	return storedChecksum == UpdateCrc(0, data, length + 5);
 }
