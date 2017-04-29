@@ -6,6 +6,7 @@
 #include "CommandLineInterface.h"
 #include "Platform.h"
 #include "Strategy.h"
+#include "FrequencyTimer.h"
 
 #define SPEED 125
 
@@ -26,6 +27,16 @@ void setup() {
 
 	delay(500);
 	Platform::DisplayNumber(0);
+	FrequencyTimer::setPeriod(500000);
+	FrequencyTimer::setOnOverflow(asservLoop);
+	FrequencyTimer::enable();
+}
+
+void asservLoop()
+{
+	static int time = 0;
+	Platform::SetLed(1, (++time) & 1);
+
 }
 
 void loop() {
@@ -69,10 +80,4 @@ void loop() {
 	time += 10;
 	clock += 10;
 }
-#if 0
-extern "C" {
-	int _getpid() { return -1; }
-	int _kill(int pid, int sig) { return -1; }
-	int _write() { return -1; }
-}
-#endif
+
