@@ -118,6 +118,7 @@ int XL320::SendReadPacket(int id, Address address, uint16_t requestedSize) {
 
 int XL320::GetValue(int id, Address address)
 {
+	delay(10);
 	while (this->m_Stream->available() > 0) {
 		this->m_Stream->read();
 	}
