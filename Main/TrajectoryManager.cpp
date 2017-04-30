@@ -92,18 +92,18 @@ void TrajectoryManager::GotoXY(const Float2 &_pos_mm)
 
 void TrajectoryManager::GotoDistance(float d) {
 	float angle = PositionManager::Instance.GetAngleRad();
-	Float2 v (d * cos(angle), -d * sin(angle));
+	//Float2 v (d * cos(angle), -d * sin(angle));
+	Float2 v(-d * sin(angle), d * cos(angle));
 
 	TrajDest dest;
 	dest.pos = v + PositionManager::Instance.GetPosMm();
 	dest.a = UNDEFINED_ANGLE;
+	//Serial.printf("x %f, y %f\r\n", dest.pos.x, dest.pos.y);
 
 	if (d >= 0.f)
 		dest.movement = FORWARD;
 	else
 		dest.movement = BACKWARD;
-
-	//TrajectoryManager::smooth_traj_goto_xy_mm(dest.x, dest.y);
 
 	AddPoint(dest, END);
 }
@@ -281,16 +281,7 @@ void TrajectoryManager::GotoTarget(const TrajDest* _nextPoint, const Float2 &_ta
 	float AngleRef = atan2f(-(_target.x - PositionManager::Instance.GetXMm()), _target.y - PositionManager::Instance.GetYMm());
 	float RemainingDist = (PositionManager::Instance.GetPosMm() - _target).Length();
 
-	float DiffAngle = WrapAngle(AngleRef - PositionManager::Instance.GetAngleRad());
-	AngleRef = DiffAngle + PositionManager::Instance.GetAngleRad();
-
-	// only apply a rotation if the difference of angle is too important
-	if (fabs(AngleRef - PositionManager::Instance.GetAngleRad()) > 0.5f)
-	{
-		RemainingDist = 0.f;
-	}
-
-	//printf("tar x:%d  y:%d  dist:%f  a:%f\r\n", (int)target_x, (int)target_y, (double)next1_dist, (double)angle_ref);
+	//printf("tar x:%d  y:%d  dist:%f  a:%f\r\n", (int)_target.x, (int)_target.y, (double)_nextPoint->, (double)angle_ref);
 
 	// go backward
 	if (_nextPoint->movement != COMMON)
@@ -305,6 +296,15 @@ void TrajectoryManager::GotoTarget(const TrajDest* _nextPoint, const Float2 &_ta
 	}
 	else
 	{
+		float DiffAngle = WrapAngle(AngleRef - PositionManager::Instance.GetAngleRad());
+		AngleRef = DiffAngle + PositionManager::Instance.GetAngleRad();
+
+		// only apply a rotation if the difference of angle is too important
+		if (fabs(AngleRef - PositionManager::Instance.GetAngleRad()) > 0.5f)
+		{
+			RemainingDist = 0.f;
+		}
+
 		ControlSystem::Instance.SetDistanceRef(PositionManager::Instance.GetDistanceMm() + RemainingDist);
 		ControlSystem::Instance.SetRadAngleRef(AngleRef);
 	}
