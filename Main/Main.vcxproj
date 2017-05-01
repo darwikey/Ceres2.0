@@ -102,7 +102,7 @@
     <ClInclude Include="DiffFilter.h">
       <FileType>CppCode</FileType>
     </ClInclude>
-    <ClInclude Include="FrequencyTimer.h" />
+    <ClInclude Include="Scheduler.h" />
     <ClInclude Include="MotorManager.h">
       <FileType>CppCode</FileType>
     </ClInclude>
@@ -135,7 +135,7 @@
     <ClCompile Include="ControlSystem.cpp" />
     <ClCompile Include="FilteredController.cpp" />
     <ClCompile Include="DiffFilter.cpp" />
-    <ClCompile Include="FrequencyTimer.cpp" />
+    <ClCompile Include="Scheduler.cpp" />
     <ClCompile Include="MotorManager.cpp" />
     <ClCompile Include="PIDController.cpp" />
     <ClCompile Include="Platform.cpp" />

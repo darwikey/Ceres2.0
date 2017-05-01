@@ -75,7 +75,7 @@
     <ClInclude Include="Float2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FrequencyTimer.h">
+    <ClInclude Include="Scheduler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -125,7 +125,7 @@
     <ClCompile Include="VectorBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FrequencyTimer.cpp">
+    <ClCompile Include="Scheduler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

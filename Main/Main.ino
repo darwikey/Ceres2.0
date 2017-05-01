@@ -6,7 +6,7 @@
 #include "CommandLineInterface.h"
 #include "Platform.h"
 #include "Strategy.h"
-#include "FrequencyTimer.h"
+#include "Scheduler.h"
 
 #define SPEED 125
 
@@ -27,16 +27,17 @@ void setup() {
 
 	delay(500);
 	Platform::DisplayNumber(0);
-	FrequencyTimer::setPeriod(500000);
-	FrequencyTimer::setOnOverflow(asservLoop);
-	FrequencyTimer::enable();
+	Scheduler::setPeriod(10000);//10ms == CONTROL_SYSTEM_PERIOD_S
+	Scheduler::setOnOverflow(asservLoop);
+	Scheduler::enable();
 }
 
 void asservLoop()
 {
 	static int time = 0;
-	Platform::SetLed(1, (++time) & 1);
+	Platform::SetLed(1, ((++time) & 0x10) != 0);
 
+	ControlSystem::Instance.Task();
 }
 
 void loop() {
@@ -64,7 +65,7 @@ void loop() {
 		led++;
 	}
 	Side side = Strategy::Instance.GetSide();
-	Platform::SetLed(0, (time & 0x7FF) > 512);
+	Platform::SetLed(0, (time & 0x200) != 0);
 	Platform::SetLed(3, side == Side::BLUE);
 	Platform::SetLed(4, side == Side::YELLOW);
 
@@ -72,7 +73,6 @@ void loop() {
 
 	//updateMotors(speed);
 	//updateAngleSpeed(0, speed);
-	ControlSystem::Instance.Task();
 	TrajectoryManager::Instance.Task();
 
 	

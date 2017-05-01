@@ -27,143 +27,144 @@
 */
 
 
-#include "FrequencyTimer.h"
+#include "Scheduler.h"
+#include "WProgram.h"
 
 
-void (*FrequencyTimer::onOverflow)() = 0;
-uint8_t FrequencyTimer::enabled = 0;
+void (*Scheduler::onOverflow)() = 0;
+bool Scheduler::enabled = 0;
 
 
 #if defined(__arm__) && defined(TEENSYDUINO)
 
-void FrequencyTimer::setPeriod(unsigned long period)
+void Scheduler::setPeriod(unsigned long usPeriod)
 {
 	uint8_t bdiv, cdiv=0;
 
-	if (period == 0) period = 1;
-	period *= (F_BUS / 1000000);
-	if (period < 65535*16) {
+	if (usPeriod == 0) usPeriod = 1;
+	usPeriod *= (F_BUS / 1000000);
+	if (usPeriod < 65535*16) {
 		bdiv = 0;
-	} else if (period < 65535*2*16) {
+	} else if (usPeriod < 65535*2*16) {
 		bdiv = 1;
-	} else if (period < 65535*3*16) {
+	} else if (usPeriod < 65535*3*16) {
 		bdiv = 2;
-	} else if (period < 65535*4*16) {
+	} else if (usPeriod < 65535*4*16) {
 		bdiv = 3;
-	} else if (period < 65535*5*16) {
+	} else if (usPeriod < 65535*5*16) {
 		bdiv = 4;
-	} else if (period < 65535*6*16) {
+	} else if (usPeriod < 65535*6*16) {
 		bdiv = 5;
-	} else if (period < 65535*7*16) {
+	} else if (usPeriod < 65535*7*16) {
 		bdiv = 6;
-	} else if (period < 65535*8*16) {
+	} else if (usPeriod < 65535*8*16) {
 		bdiv = 7;
-	} else if (period < 65535*9*16) {
+	} else if (usPeriod < 65535*9*16) {
 		bdiv = 8;
-	} else if (period < 65535*10*16) {
+	} else if (usPeriod < 65535*10*16) {
 		bdiv = 9;
-	} else if (period < 65535*11*16) {
+	} else if (usPeriod < 65535*11*16) {
 		bdiv = 10;
-	} else if (period < 65535*12*16) {
+	} else if (usPeriod < 65535*12*16) {
 		bdiv = 11;
-	} else if (period < 65535*13*16) {
+	} else if (usPeriod < 65535*13*16) {
 		bdiv = 12;
-	} else if (period < 65535*14*16) {
+	} else if (usPeriod < 65535*14*16) {
 		bdiv = 13;
-	} else if (period < 65535*15*16) {
+	} else if (usPeriod < 65535*15*16) {
 		bdiv = 14;
-	} else if (period < 65535*16*16) {
+	} else if (usPeriod < 65535*16*16) {
 		bdiv = 15;
-	} else if (period < 65535*18*16) {
+	} else if (usPeriod < 65535*18*16) {
 		bdiv = 8;
 		cdiv = 1;
-	} else if (period < 65535*20*16) {
+	} else if (usPeriod < 65535*20*16) {
 		bdiv = 9;
 		cdiv = 1;
-	} else if (period < 65535*22*16) {
+	} else if (usPeriod < 65535*22*16) {
 		bdiv = 10;
 		cdiv = 1;
-	} else if (period < 65535*24*16) {
+	} else if (usPeriod < 65535*24*16) {
 		bdiv = 11;
 		cdiv = 1;
-	} else if (period < 65535*26*16) {
+	} else if (usPeriod < 65535*26*16) {
 		bdiv = 12;
 		cdiv = 1;
-	} else if (period < 65535*28*16) {
+	} else if (usPeriod < 65535*28*16) {
 		bdiv = 13;
 		cdiv = 1;
-	} else if (period < 65535*30*16) {
+	} else if (usPeriod < 65535*30*16) {
 		bdiv = 14;
 		cdiv = 1;
-	} else if (period < 65535*32*16) {
+	} else if (usPeriod < 65535*32*16) {
 		bdiv = 15;
 		cdiv = 1;
-	} else if (period < 65535*36*16) {
+	} else if (usPeriod < 65535*36*16) {
 		bdiv = 8;
 		cdiv = 2;
-	} else if (period < 65535*40*16) {
+	} else if (usPeriod < 65535*40*16) {
 		bdiv = 9;
 		cdiv = 2;
-	} else if (period < 65535*44*16) {
+	} else if (usPeriod < 65535*44*16) {
 		bdiv = 10;
 		cdiv = 2;
-	} else if (period < 65535*48*16) {
+	} else if (usPeriod < 65535*48*16) {
 		bdiv = 11;
 		cdiv = 2;
-	} else if (period < 65535*52*16) {
+	} else if (usPeriod < 65535*52*16) {
 		bdiv = 12;
 		cdiv = 2;
-	} else if (period < 65535*56*16) {
+	} else if (usPeriod < 65535*56*16) {
 		bdiv = 13;
 		cdiv = 2;
-	} else if (period < 65535*60*16) {
+	} else if (usPeriod < 65535*60*16) {
 		bdiv = 14;
 		cdiv = 2;
-	} else if (period < 65535*64*16) {
+	} else if (usPeriod < 65535*64*16) {
 		bdiv = 15;
 		cdiv = 2;
-	} else if (period < 65535*72*16) {
+	} else if (usPeriod < 65535*72*16) {
 		bdiv = 8;
 		cdiv = 3;
-	} else if (period < 65535*80*16) {
+	} else if (usPeriod < 65535*80*16) {
 		bdiv = 9;
 		cdiv = 3;
-	} else if (period < 65535*88*16) {
+	} else if (usPeriod < 65535*88*16) {
 		bdiv = 10;
 		cdiv = 3;
-	} else if (period < 65535*96*16) {
+	} else if (usPeriod < 65535*96*16) {
 		bdiv = 11;
 		cdiv = 3;
-	} else if (period < 65535*104*16) {
+	} else if (usPeriod < 65535*104*16) {
 		bdiv = 12;
 		cdiv = 3;
-	} else if (period < 65535*112*16) {
+	} else if (usPeriod < 65535*112*16) {
 		bdiv = 13;
 		cdiv = 3;
-	} else if (period < 65535*120*16) {
+	} else if (usPeriod < 65535*120*16) {
 		bdiv = 14;
 		cdiv = 3;
 	} else {
 		bdiv = 15;
 		cdiv = 3;
 	}
-	period /= (bdiv + 1);
-	period >>= (cdiv + 4);
-	if (period > 65535) period = 65535;
+	usPeriod /= (bdiv + 1);
+	usPeriod >>= (cdiv + 4);
+	if (usPeriod > 65535) usPeriod = 65535;
 	// high time = (CMD1:CMD2 + 1) ÷ (fCMTCLK ÷ 8)
 	// low time  = CMD3:CMD4 ÷ (fCMTCLK ÷ 8)
 	SIM_SCGC4 |= SIM_SCGC4_CMT;
 	CMT_MSC = 0;
 	CMT_PPS = bdiv;
-	CMT_CMD1 = ((period - 1) >> 8) & 255;
-	CMT_CMD2 = (period - 1) & 255;
-	CMT_CMD3 = (period >> 8) & 255;
-	CMT_CMD4 = period & 255;
+	CMT_CMD1 = ((usPeriod - 1) >> 8) & 255;
+	CMT_CMD2 = (usPeriod - 1) & 255;
+	CMT_CMD3 = (usPeriod >> 8) & 255;
+	CMT_CMD4 = usPeriod & 255;
 	CMT_OC = 0x60;
 	CMT_MSC = (cdiv << 5) | 0x0B; // baseband mode
 }
 
-unsigned long FrequencyTimer::getPeriod()
+unsigned long Scheduler::getPeriod()
 {
 	uint32_t period;
 
@@ -174,39 +175,41 @@ unsigned long FrequencyTimer::getPeriod()
 	return period;
 }
 
-void FrequencyTimer::enable()
+void Scheduler::enable()
 {
-	FrequencyTimer::enabled = 1;
-	CORE_PIN5_CONFIG = PORT_PCR_MUX(2)|PORT_PCR_DSE|PORT_PCR_SRE;
+	NVIC_ENABLE_IRQ(IRQ_CMT);
+	//Scheduler::enabled = 1;
+	//CORE_PIN5_CONFIG = PORT_PCR_MUX(2)|PORT_PCR_DSE|PORT_PCR_SRE;
 }
 
-void FrequencyTimer::disable()
+void Scheduler::disable()
 {
-	FrequencyTimer::enabled = 0;
-	CORE_PIN5_CONFIG = PORT_PCR_MUX(1)|PORT_PCR_DSE|PORT_PCR_SRE;
+	NVIC_DISABLE_IRQ(IRQ_CMT);
+	//Scheduler::enabled = 0;
+	//CORE_PIN5_CONFIG = PORT_PCR_MUX(1)|PORT_PCR_DSE|PORT_PCR_SRE;
 	//digitalWriteFast(5, LOW);
 }
 
-void FrequencyTimer::setOnOverflow( void (*func)() )
+void Scheduler::setOnOverflow( void (*func)() )
 {
 	if (func) {
-		FrequencyTimer::onOverflow = func;
+		Scheduler::onOverflow = func;
 		NVIC_ENABLE_IRQ(IRQ_CMT);
 	} else {
 		NVIC_DISABLE_IRQ(IRQ_CMT);
-		FrequencyTimer::onOverflow = func;
+		Scheduler::onOverflow = func;
 	}
 }
 
 void cmt_isr(void)
 {
-	static uint8_t inHandler = 0;
+	static volatile uint8_t inHandler = 0;
 
 	uint8_t __attribute__((unused)) tmp = CMT_MSC;
 	tmp = CMT_CMD2;
-	if ( !inHandler && FrequencyTimer::onOverflow) {
+	if ( !inHandler && Scheduler::onOverflow) {
 		inHandler = 1;
-		(*FrequencyTimer::onOverflow)();
+		(*Scheduler::onOverflow)();
 		inHandler = 0;
 	}
 }

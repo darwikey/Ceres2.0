@@ -8,6 +8,7 @@
 
 #include "PositionManager.h"
 #include "ControlSystem.h"
+#include "Scheduler.h"
 #include <math.h>
 
 PositionManager PositionManager::Instance;
@@ -50,8 +51,8 @@ void PositionManager::Update()
 	int32_t new_left_enc = -m_Encoder1.calcPosn();
 	int32_t new_right_enc = m_Encoder2.calcPosn();
 
-	int16_t left_enc_diff = m_LeftEncoder - new_left_enc;
-	int16_t right_enc_diff = m_RightEncoder - new_right_enc;
+	int32_t left_enc_diff = m_LeftEncoder - new_left_enc;
+	int32_t right_enc_diff = m_RightEncoder - new_right_enc;
 
 	m_LeftEncoder = new_left_enc;
 	m_RightEncoder = new_right_enc;
@@ -123,15 +124,21 @@ float PositionManager::GetRightEncoder(void) {
 }
 
 float PositionManager::GetDistanceMm(void) {
-	return m_DistanceMm;
+	Scheduler::disable();
+	float r = m_DistanceMm;
+	Scheduler::enable();
+	return r;
 }
 
 float PositionManager::GetAngleRad(void) {
-	return m_AngleRad;
+	Scheduler::disable();
+	float r = m_AngleRad;
+	Scheduler::enable();
+	return r;
 }
 
 float PositionManager::GetAngleDeg(void) {
-	return m_AngleRad * 180.f / M_PI;
+	return GetAngleRad() * 180.f / M_PI;
 }
 
 void PositionManager::SetAngleDeg(float a) {
@@ -141,21 +148,32 @@ void PositionManager::SetAngleDeg(float a) {
 }
 
 float PositionManager::GetXMm(void) {
-	return m_XMm;
+	Scheduler::disable();
+	float r = m_XMm;
+	Scheduler::enable();
+	return r;
 }
 
 float PositionManager::GetYMm(void) {
-	return m_YMm;
+	Scheduler::disable();
+	float r = m_YMm;
+	Scheduler::enable();
+	return r;
 }
 
 Float2 PositionManager::GetPosMm()
 {
-	return Float2(m_XMm, m_YMm);
+	Scheduler::disable();
+	Float2 r(m_XMm, m_YMm);
+	Scheduler::enable();
+	return r;
 }
 
 void PositionManager::SetPosMm(const Float2 &_pos){
+	Scheduler::disable();
 	m_XMm = _pos.x;
 	m_YMm = _pos.y;
+	Scheduler::enable();
 }
 
 int32_t PositionManager::MmToTicks(float value_mm) {

@@ -8,7 +8,7 @@
  */
 
 #include <stdint.h>
-#include <inttypes.h>
+#include "Scheduler.h"
 
 #include "PIDController.h"
 
@@ -131,18 +131,24 @@ void ControlSystem::SetAngleRadDiff(float ref)
 // User functions
 void ControlSystem::SetDistanceRef(float ref)
 {
+	Scheduler::disable();
 	m_csm_distance.SetReference(ref);
+	Scheduler::enable();
 }
 
 void ControlSystem::SetDegAngleRef(float ref_deg)
 {
+	Scheduler::disable();
 	float ref_rad = DEG2RAD(ref_deg);
 	m_csm_angle.SetReference(ref_rad);
+	Scheduler::enable();
 }
 
 void ControlSystem::SetRadAngleRef(float ref_rad)
 {
+	Scheduler::disable();
 	m_csm_angle.SetReference(ref_rad);
+	Scheduler::enable();
 }
 
 void ControlSystem::SetRightMotorRef(int32_t ref)
