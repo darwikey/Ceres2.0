@@ -1,7 +1,7 @@
 #include <WProgram.h>
 #include <EEPROM.h>
 #include "Strategy.h"
-#include "Astar.h"
+#include "Platform.h"
 #include "TrajectoryManager.h"
 #include "PositionManager.h"
 
@@ -79,4 +79,31 @@ Float2 Strategy::GetGameElementPosition(GameElement _module)
 	return Float2();
 }
 
+void Strategy::SetArmState(ArmState _state)
+{
+	switch (_state)
+	{
+	case ArmState::NORMAL:
+		Platform::SetServoPos(ServoID::SERVO1, 825);
+		break;
+	case ArmState::EMPTYING:
+		Platform::SetServoPos(ServoID::SERVO1, 500);
+		break;
+	}
+}
 
+void Strategy::SetGripState(GripState _state)
+{
+	switch (_state)
+	{
+	case GripState::CLOSE:
+		Platform::SetServoPos(ServoID::SERVO2, 300);
+		break;
+	case GripState::NORMAL:
+		Platform::SetServoPos(ServoID::SERVO2, 350);
+		break;
+	case GripState::FULLY_OPEN:
+		Platform::SetServoPos(ServoID::SERVO2, 400);
+		break;
+	}
+}

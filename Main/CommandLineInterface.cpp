@@ -228,7 +228,7 @@ void CommandLineInterface::Task()
 			else if (!strncmp(arg, "graph", ARG_LENGTH)) {
 				Graph::Instance.Print();
 			}
-			else if (!strncmp(arg, "servo_ram", ARG_LENGTH)) {
+			else if (!strncmp(arg, "servo", ARG_LENGTH)) {
 				Platform::DebugServoRam(atoi(arg2));
 			}
 			else if (!strncmp(arg, "side", ARG_LENGTH)) {
@@ -255,14 +255,30 @@ void CommandLineInterface::Task()
 				Platform::SetServoPos(ServoID::SERVO2, atoi(arg2));
 				Serial.print("Move servo 2\r\n");
 			}
-			/*else if (!strncmp(arg, "grip", ARG_LENGTH)) {
-				ausbeeSetAngleServo(&servo_grip, atoi(arg2));
-				Serial.print("command servo.\r\n");
+			else if (!strncmp(arg, "arm", ARG_LENGTH)) {
+				if (!strncmp(arg2, "normal", ARG_LENGTH)) {
+					Strategy::Instance.SetArmState(ArmState::NORMAL);
+					Serial.print("arm normal.\r\n");
+				}
+				else if (!strncmp(arg2, "emptying", ARG_LENGTH)) {
+					Strategy::Instance.SetArmState(ArmState::EMPTYING);
+					Serial.print("arm emptying.\r\n");
+				}
 			}
-			else if (!strncmp(arg, "clapet", ARG_LENGTH)) {
-				ausbeeSetAngleServo(&servo_clapet, atoi(arg2));
-				Serial.print("command servo.\r\n");
-			}*/
+			else if (!strncmp(arg, "grip", ARG_LENGTH)) {
+				if (!strncmp(arg2, "close", ARG_LENGTH)) {
+					Strategy::Instance.SetGripState(GripState::CLOSE);
+					Serial.print("grip close.\r\n");
+				}
+				if (!strncmp(arg2, "normal", ARG_LENGTH)) {
+					Strategy::Instance.SetGripState(GripState::NORMAL);
+					Serial.print("grip normal.\r\n");
+				}
+				else if (!strncmp(arg2, "open", ARG_LENGTH)) {
+					Strategy::Instance.SetGripState(GripState::FULLY_OPEN);
+					Serial.print("grip fully open.\r\n");
+				}
+			}
 			else {
 				Serial.printf("Invalid argument '%s'.\r\n", arg);
 			}
@@ -316,7 +332,7 @@ void CommandLineInterface::Task()
 			Serial.print("             side:     Print color of the start zone");
 			Serial.print("             gp2:      Debug gp2");
 			Serial.print("             graph:    Print A* graph.\r\n");
-			Serial.print("             servo_ram <int>: Print all servo registers.\r\n");
+			Serial.print("             servo <int>: Print all servo registers.\r\n");
 			Serial.print("             date      Print the binary creation timestamp.\r\n");
 		}
 		else {

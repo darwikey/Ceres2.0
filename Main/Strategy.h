@@ -22,6 +22,19 @@ enum class GameElement
 	MODULE6 = 1 << 5,
 };
 
+enum class ArmState
+{
+	NORMAL,
+	EMPTYING
+};
+
+enum class GripState
+{
+	CLOSE,
+	NORMAL,
+	FULLY_OPEN
+};
+
 class Strategy
 {
 public:
@@ -35,6 +48,9 @@ public:
 	void SetSide(Side _side);
 
 	Float2 GetGameElementPosition(GameElement _module);
+
+	void SetArmState(ArmState _state);
+	void SetGripState(GripState _state);
 
 private:
 	Side m_Side = Side::BLUE;
