@@ -5,6 +5,9 @@
 #include "TrajectoryManager.h"
 #include "PositionManager.h"
 
+#define ENABLE_TIMER 0
+#define ENABLE_AVOIDANCE 0
+
 Strategy Strategy::Instance;
 
 Strategy::Strategy()
@@ -21,6 +24,54 @@ void Strategy::Init()
 		m_Side = Side::YELLOW;
 }
 
+void Strategy::Task()
+{
+	if (m_State == State::WAITING_START)
+	{
+#if ENABLE_TIMER
+		if (Platform::IsStartPulled())
+			Start();
+#endif
+		return;
+	}
+
+#if ENABLE_TIMER
+	if (millis() > m_StartTime + 90000)
+	{
+		if (m_State != State::END)
+		{
+			// do funny action
+			m_State = State::END;
+		}
+		TrajectoryManager::Instance.Pause();
+		return;
+	}
+#endif
+
+#if ENABLE_AVOIDANCE
+	if (Platform::IsGP2Occluded())
+	{
+		TrajectoryManager::Instance.Pause();
+		return;
+	}
+	else
+	{
+		TrajectoryManager::Instance.Resume();
+	}
+#endif
+
+
+}
+
+void Strategy::Start()
+{
+	if (m_State == State::WAITING_START)
+	{
+		m_State++;
+		m_StartTime = millis();
+	}
+}
+
 void Strategy::SetInitialPosition()
 {
 	if (m_Side == Side::BLUE)
@@ -33,9 +84,27 @@ void Strategy::SetInitialPosition()
 	}
 }
 
-void Strategy::PrintSide()
+void Strategy::Print()
 {
+	Serial.print("State: ");
+	switch (m_State)
+	{
+	case State::WAITING_START:
+		Serial.print("waiting start\r\n");
+		break;
+	case State::ACTIONS:
+		Serial.print("actions\r\n");
+		break;
+	case State::WAITING_END:
+		Serial.print("waiting end\r\n");
+		break;
+	case State::END:
+		Serial.print("end\r\n");
+		break;
+	};
 	Serial.printf("Side: %s\r\n", m_Side == Side::BLUE ? "Blue" : "Yellow");
+	Serial.printf("Time since start: %ds\r\n", (millis() - m_StartTime) / 1000);
+	Serial.printf("Is trajectory paused: %d\r\n", (int)TrajectoryManager::Instance.IsPaused());
 }
 
 void Strategy::SetSide(Side _side)
@@ -106,4 +175,11 @@ void Strategy::SetGripState(GripState _state)
 		Platform::SetServoPos(ServoID::SERVO2, 400);
 		break;
 	}
+}
+
+Strategy::State operator++(Strategy::State &s, int)
+{
+	if (s != Strategy::State::END)
+		s = (Strategy::State)((int)s + 1);
+	return s;
 }

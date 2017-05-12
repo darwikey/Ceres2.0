@@ -38,14 +38,25 @@ enum class GripState
 class Strategy
 {
 public:
+	enum class State
+	{
+		WAITING_START,
+		ACTIONS,
+		WAITING_END,
+		END
+	};
+	
 	static Strategy Instance;
 	Strategy();
 	void Init();
+	void Task();
+	void Start();
+	
 	void SetInitialPosition();
 
 	Side GetSide() { return m_Side; }
-	void PrintSide();
 	void SetSide(Side _side);
+	void Print();
 
 	Float2 GetGameElementPosition(GameElement _module);
 
@@ -53,8 +64,11 @@ public:
 	void SetGripState(GripState _state);
 
 private:
-	Side m_Side = Side::BLUE;
+	Side		m_Side = Side::BLUE;
+	State		m_State = State::WAITING_START;
+	uint32_t	m_StartTime = 0;
 };
 
+Strategy::State operator++(Strategy::State &s, int);
 
 #endif

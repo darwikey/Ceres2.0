@@ -189,7 +189,10 @@ void CommandLineInterface::Task()
 					Strategy::Instance.SetSide(Side::YELLOW);
 				else
 					Serial.print("incorrect side, must be \'b\' or \'y\'\r\n");
-				Strategy::Instance.PrintSide();
+				Strategy::Instance.Print();
+			}
+			else if (!strncmp(arg, "start", ARG_LENGTH)) {
+				Strategy::Instance.Start();
 			}
 			else {
 				Serial.printf("Invalid argument '%s'.\r\n", arg);
@@ -231,8 +234,8 @@ void CommandLineInterface::Task()
 			else if (!strncmp(arg, "servo", ARG_LENGTH)) {
 				Platform::DebugServoRam(atoi(arg2));
 			}
-			else if (!strncmp(arg, "side", ARG_LENGTH)) {
-				Strategy::Instance.PrintSide();
+			else if (!strncmp(arg, "strategy", ARG_LENGTH)) {
+				Strategy::Instance.Print();
 			}
 			else if (!strncmp(arg, "gp2", ARG_LENGTH)) {
 				Platform::DebugGP2();
@@ -314,11 +317,10 @@ void CommandLineInterface::Task()
 			Serial.print("             side <b|y> :  set color of the start zone\r\n");
 			Serial.print("  m <arg> <arg2> : move an actuator\r\n");
 			Serial.print("             <arg> can be one of: \r\n");
-			Serial.print("             arm_l: left_arm \r\n");
-			Serial.print("             arm_r: right_arm \r\n");
-			Serial.print("                <arg2> can be one of: \r\n");
-			Serial.print("                close: close the arm \r\n");
-			Serial.print("                open: open the arm \r\n");
+			Serial.print("             s1 <int>: set servo1 pos \r\n");
+			Serial.print("             s2 <int>: set servo2 pos \r\n");
+			Serial.print("             arm <arg2>: set arm pos. arg2: normal, emptying\r\n");
+			Serial.print("             grip <arg2>: set grip pos. arg2: close, normal, open\r\n");
 			Serial.print("  p <arg>:   Print internal value.\r\n");
 			Serial.print("             <arg> can be one of:\r\n");
 			Serial.print("             pos:      Print robot's position.\r\n");
@@ -329,8 +331,8 @@ void CommandLineInterface::Task()
 			Serial.print("             cur_id:   Print Traj manager's current point id.\r\n");
 			Serial.print("             last_id:  Print Traj manager's last point id.\r\n");
 			Serial.print("             pid:      Print PID.\r\n");
-			Serial.print("             side:     Print color of the start zone");
-			Serial.print("             gp2:      Debug gp2");
+			Serial.print("             strategy: Print strategy\r\n");
+			Serial.print("             gp2:      Debug gp2\r\n");
 			Serial.print("             graph:    Print A* graph.\r\n");
 			Serial.print("             servo <int>: Print all servo registers.\r\n");
 			Serial.print("             date      Print the binary creation timestamp.\r\n");

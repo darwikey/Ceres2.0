@@ -71,8 +71,8 @@ void loop() {
 
 	CommandLineInterface::Instance.Task();
 
-	//updateMotors(speed);
-	//updateAngleSpeed(0, speed);
+	Strategy::Instance.Task();
+
 	TrajectoryManager::Instance.Task();
 
 	

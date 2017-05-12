@@ -50,6 +50,11 @@ namespace Platform
 			digitalWrite(leds[ledId], state ? HIGH : LOW);
 		}
 	}
+
+	bool IsStartPulled()
+	{
+		return digitalRead(startPull) == HIGH;
+	}
 	
 	bool IsButtonPressed(int id)
 	{
