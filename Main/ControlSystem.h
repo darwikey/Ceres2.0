@@ -31,11 +31,11 @@ public:
 	void Start();
 	void Task();
 
-	void SetDistanceRef(float ref_mm);
-	void SetDegAngleRef(float ref);
-	void SetRadAngleRef(float ref_rad);
-	void SetRightMotorRef(int32_t ref);
-	void SetLeftMotorRef(int32_t ref);
+	void SetDistanceTarget(float ref_mm);
+	void SetDegAngleTarget(float ref);
+	void SetRadAngleTarget(float ref_rad);
+	void SetRightMotorTarget(int32_t ref);
+	void SetMotorTarget(int32_t ref);
 
 	void SetDistanceMaxSpeed(float max_speed);
 	void SetDistanceMaxAcc(float max_acc);
@@ -50,7 +50,10 @@ public:
 	PIDController& GetDistancePID();
 	PIDController& GetAnglePID();
 
+	void Reset();
 	void ResetAngle();
+
+	bool m_Enable = true;
 
 private:
 	void SetMotorsRef(float d_mm, float theta);

@@ -5,6 +5,7 @@
 
 #define ROBOT_WIDTH 235.f
 #define ROBOT_CENTER_BACK 55.f // distance between axle and back
+#define ROBOT_CENTER_FRONT (150.f-ROBOT_CENTER_BACK) // distance between axle and front
 
 enum class Side
 {
@@ -53,6 +54,7 @@ public:
 	void Start();
 	
 	void SetInitialPosition();
+	void PushRobotAgainstWall();
 
 	Side GetSide() { return m_Side; }
 	void SetSide(Side _side);

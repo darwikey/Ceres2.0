@@ -4,6 +4,7 @@
 #include "Platform.h"
 #include "TrajectoryManager.h"
 #include "PositionManager.h"
+#include "MotorManager.h"
 
 #define ENABLE_TIMER 0
 #define ENABLE_AVOIDANCE 0
@@ -74,14 +75,27 @@ void Strategy::Start()
 
 void Strategy::SetInitialPosition()
 {
+	float y = 360.f - ROBOT_CENTER_FRONT;
 	if (m_Side == Side::BLUE)
 	{
-		PositionManager::Instance.SetPosMm(Float2(1070.f - 0.5f * ROBOT_WIDTH, ROBOT_CENTER_BACK));
+		PositionManager::Instance.SetPosMm(Float2(1070.f - 0.5f * ROBOT_WIDTH, y));
 	}
 	else
 	{
-		PositionManager::Instance.SetPosMm(Float2(1930.f + 0.5f * ROBOT_WIDTH, ROBOT_CENTER_BACK));
+		PositionManager::Instance.SetPosMm(Float2(1930.f + 0.5f * ROBOT_WIDTH, y));
 	}
+}
+
+void Strategy::PushRobotAgainstWall()
+{
+	ControlSystem::Instance.m_Enable = false;
+	SendCommandToMotor(RIGHT_MOTOR, -40);
+	SendCommandToMotor(LEFT_MOTOR, -40);
+	delay(1000);
+	SendCommandToMotor(RIGHT_MOTOR, 0);
+	SendCommandToMotor(LEFT_MOTOR, 0);
+	ControlSystem::Instance.Reset();
+	ControlSystem::Instance.m_Enable = true;
 }
 
 void Strategy::Print()

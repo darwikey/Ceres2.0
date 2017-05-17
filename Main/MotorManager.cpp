@@ -38,7 +38,8 @@ void SendCommandToMotor(int m, long long cmd)
   //Serial.printf("%d\r\n", (int)AbsCmd);
   if (AbsCmd < 15)
 	  AbsCmd = 0;
-  analogWrite(motorPWMs[m], (AbsCmd > 255) ? 255 : AbsCmd);
+  long long maxi = 255;
+  analogWrite(motorPWMs[m], (AbsCmd > maxi) ? maxi : AbsCmd);
   digitalWrite(motorDirs[m], (cmd >= 0) ? HIGH : LOW);
 }
 

@@ -56,7 +56,7 @@ class FilteredController
 public:
 	void Init();
 
-	void SetReferenceFilter(float(*reference_filter)(void *, float), void * reference_filter_params);
+	void SetTargetFilter(float(*filter)(void *, float), void * filter_params);
 
 	void SetMeasureFetcher( float(*measure_fetcher)(void));
 
@@ -68,18 +68,18 @@ public:
 
 	float Update();
 
-	float GetReference();
-	float GetFilteredReference();
+	float GetTarget();
+	float GetFilteredTarget();
 	float GetMeasure();
 	float GetFilteredMeasure();
 	float GetError();
 	float GetCommand();
 
-	void SetReference(float ref);
+	void SetTarget(float ref);
 
 private:
-	float(*m_reference_filter)(void *, float);
-	void * m_reference_filter_params;
+	float(*m_target_filter)(void *, float);
+	void * m_target_filter_params;
 
 	float(*m_measure_fetcher)(void);
 
@@ -91,8 +91,8 @@ private:
 
 	void(*m_process_command)(float);
 
-	float m_reference;          /*!< The value we want to reach. */
-	float m_filtered_reference; /*!< The value we think we can reach now. */
+	float m_target;				/*!< The value we want to reach. */
+	float m_filtered_target;	/*!< The value we think we can reach now. */
 	float m_measure;            /*!< Last measured value. */
 	float m_filtered_measure;   /*!< Last measured value filtered. */
 	float m_error;              /*!< Last computed error. */

@@ -21,7 +21,6 @@
 
 ControlSystem ControlSystem::Instance;
 
-
 static float measureDistanceMm()
 {
 	return PositionManager::Instance.GetDistanceMm();
@@ -57,9 +56,9 @@ void ControlSystem::Start()
 	m_csm_distance.Init();
 	m_csm_angle.Init();
 
-	// Set reference filter
-	m_csm_distance.SetReferenceFilter(QuadrampFilter::Evaluate, (void*)&(m_quadramp_distance));
-	m_csm_angle.SetReferenceFilter(QuadrampFilter::Evaluate, (void*)&(m_quadramp_angle));
+	// Set target filter
+	m_csm_distance.SetTargetFilter(QuadrampFilter::Evaluate, (void*)&(m_quadramp_distance));
+	m_csm_angle.SetTargetFilter(QuadrampFilter::Evaluate, (void*)&(m_quadramp_angle));
 
 	// Set measure functions
 	m_csm_distance.SetMeasureFetcher(measureDistanceMm);
@@ -85,6 +84,7 @@ void ControlSystem::Task()
 
 		PositionManager::Instance.Update();
 
+		if (m_Enable)
 		{
 			//platform_led_toggle(PLATFORM_LED1);
 
@@ -110,12 +110,8 @@ void ControlSystem::SetMotorsRef(float d_mm, float theta)
 	int32_t left_motor_ref = PositionManager::Instance.MmToTicks(d_mm - (1.0 * axle_track_mm * theta) / 2);
 
 	//printf("cmd right %d   left %d\r\n", (int)right_motor_ref, (int)left_motor_ref);
-
 	SendCommandToMotor(RIGHT_MOTOR, right_motor_ref);
 	SendCommandToMotor(LEFT_MOTOR, left_motor_ref);
-
-	//SetReference(&(m_csm_right_motor), right_motor_ref);
-	//SetReference(&(m_csm_left_motor), left_motor_ref);
 }
 
 void ControlSystem::SetDistanceMmDiff(float ref)
@@ -129,36 +125,36 @@ void ControlSystem::SetAngleRadDiff(float ref)
 }
 
 // User functions
-void ControlSystem::SetDistanceRef(float ref)
+void ControlSystem::SetDistanceTarget(float ref)
 {
 	Scheduler::disable();
-	m_csm_distance.SetReference(ref);
+	m_csm_distance.SetTarget(ref);
 	Scheduler::enable();
 }
 
-void ControlSystem::SetDegAngleRef(float ref_deg)
+void ControlSystem::SetDegAngleTarget(float ref_deg)
 {
 	Scheduler::disable();
 	float ref_rad = DEG2RAD(ref_deg);
-	m_csm_angle.SetReference(ref_rad);
+	m_csm_angle.SetTarget(ref_rad);
 	Scheduler::enable();
 }
 
-void ControlSystem::SetRadAngleRef(float ref_rad)
+void ControlSystem::SetRadAngleTarget(float ref_rad)
 {
 	Scheduler::disable();
-	m_csm_angle.SetReference(ref_rad);
+	m_csm_angle.SetTarget(ref_rad);
 	Scheduler::enable();
 }
 
-void ControlSystem::SetRightMotorRef(int32_t ref)
+void ControlSystem::SetRightMotorTarget(int32_t ref)
 {
-	m_csm_right_motor.SetReference(ref);
+	m_csm_right_motor.SetTarget(ref);
 }
 
-void ControlSystem::SetLeftMotorRef(int32_t ref)
+void ControlSystem::SetMotorTarget(int32_t ref)
 {
-	m_csm_left_motor.SetReference(ref);
+	m_csm_left_motor.SetTarget(ref);
 }
 
 void ControlSystem::SetDistanceMaxSpeed(float max_speed)
@@ -220,8 +216,15 @@ PIDController& ControlSystem::GetAnglePID()
 	return m_pid_angle;
 }
 
-//TODO prendre en compte les angles != 0
+void ControlSystem::Reset()
+{
+	SetDistanceTarget(PositionManager::Instance.GetDistanceMm());
+	SetRadAngleTarget(PositionManager::Instance.GetAngleRad());
+	m_quadramp_distance.Reset(PositionManager::Instance.GetDistanceMm());
+	m_quadramp_angle.Reset(PositionManager::Instance.GetAngleRad());
+}
+
 void ControlSystem::ResetAngle()
 {
-	m_quadramp_angle.ResetPrevious();
+	m_quadramp_angle.Reset(PositionManager::Instance.GetAngleRad());
 }

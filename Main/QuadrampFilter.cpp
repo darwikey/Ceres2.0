@@ -61,7 +61,6 @@ void QuadrampFilter::Init()
 
 	m_prev_var = 0;
 	m_prev_out = 0;
-	m_prev_in = 0;
 	m_eval_period = 1;
 }
 
@@ -82,11 +81,10 @@ void QuadrampFilter::Set1stOrderVars(float var_1st_ord_pos, float var_1st_ord_ne
 	m_var_1st_ord_neg = var_1st_ord_neg;
 }
 
-void QuadrampFilter::ResetPrevious()
+void QuadrampFilter::Reset(float value)
 {
-	m_prev_in = 0.f;
-	m_prev_out = 0.f;
-	m_prev_var = 0.f;
+	m_prev_out = value;
+	m_prev_var = 0;
 }
 
 /* TODO: handle float equality */
@@ -201,7 +199,6 @@ float QuadrampFilter::Evaluate(void * data, float in)
 	// update prev_out and prev_var
 	q->m_prev_var = prev_var;
 	q->m_prev_out = pos_target;
-	q->m_prev_in = in;
 
 	return pos_target;
 }

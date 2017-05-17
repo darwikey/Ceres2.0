@@ -143,7 +143,7 @@ float PositionManager::GetAngleDeg(void) {
 
 void PositionManager::SetAngleDeg(float a) {
 	m_AngleRad = a * M_PI / 180.f;
-	ControlSystem::Instance.SetRadAngleRef(m_AngleRad);
+	ControlSystem::Instance.SetRadAngleTarget(m_AngleRad);
 	ControlSystem::Instance.ResetAngle();
 }
 

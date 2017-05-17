@@ -136,7 +136,7 @@ public:
 
 	void Set1stOrderVars(float var_1st_ord_pos, float var_1st_ord_neg);
 
-	void ResetPrevious();
+	void Reset(float value);
 
 	static float Evaluate(void *q, float in);
 
@@ -148,7 +148,6 @@ private:
 
 	float m_prev_var; /*!< Previous variation. */
 	float m_prev_out; /*!< Previous ouput value. */
-	float m_prev_in;  /*!< Previous input value. */
 
 	float m_eval_period;
 };

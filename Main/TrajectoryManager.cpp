@@ -27,8 +27,8 @@ void TrajectoryManager::Init()
 
 void TrajectoryManager::Reset()
 {
-	ControlSystem::Instance.SetDistanceRef(PositionManager::Instance.GetDistanceMm());
-	ControlSystem::Instance.SetRadAngleRef(PositionManager::Instance.GetAngleRad());
+	ControlSystem::Instance.SetDistanceTarget(PositionManager::Instance.GetDistanceMm());
+	ControlSystem::Instance.SetRadAngleTarget(PositionManager::Instance.GetAngleRad());
 	m_CurId = m_LastId;
 }
 
@@ -193,7 +193,7 @@ void TrajectoryManager::Update()
 		if (ABS(next1->a - PositionManager::Instance.GetAngleRad()) < SMOOTH_TRAJ_DEFAULT_PRECISION_A_RAD) {
 			NextPoint();
 		}
-		ControlSystem::Instance.SetRadAngleRef(next1->a);
+		ControlSystem::Instance.SetRadAngleTarget(next1->a);
 	}
 	else
 	{
@@ -288,10 +288,10 @@ void TrajectoryManager::GotoTarget(const TrajDest* _nextPoint, const Float2 &_ta
 	{
 		// just asserv in distance
 		if (_nextPoint->movement == BACKWARD) {
-			ControlSystem::Instance.SetDistanceRef(PositionManager::Instance.GetDistanceMm() - RemainingDist);
+			ControlSystem::Instance.SetDistanceTarget(PositionManager::Instance.GetDistanceMm() - RemainingDist);
 		}
 		else if (_nextPoint->movement == FORWARD) {
-			ControlSystem::Instance.SetDistanceRef(PositionManager::Instance.GetDistanceMm() + RemainingDist);
+			ControlSystem::Instance.SetDistanceTarget(PositionManager::Instance.GetDistanceMm() + RemainingDist);
 		}
 	}
 	else
@@ -305,7 +305,7 @@ void TrajectoryManager::GotoTarget(const TrajDest* _nextPoint, const Float2 &_ta
 			RemainingDist = 0.f;
 		}
 
-		ControlSystem::Instance.SetDistanceRef(PositionManager::Instance.GetDistanceMm() + RemainingDist);
-		ControlSystem::Instance.SetRadAngleRef(AngleRef);
+		ControlSystem::Instance.SetDistanceTarget(PositionManager::Instance.GetDistanceMm() + RemainingDist);
+		ControlSystem::Instance.SetRadAngleTarget(AngleRef);
 	}
 }

@@ -28,12 +28,13 @@
  */
 //#include <stdlib.h>
 #include "FilteredController.h"
+#include "WProgram.h"
 
 #define AUSBEE_DEBUG_PRINTF 0
 
 #if AUSBEE_DEBUG_PRINTF == 1
 #include <stdio.h>
-#define debug_printf(args...) do { printf(args); } while(0)
+#define debug_printf(args...) do { static int count = 0; if (!((count++) & 0x7F)) Serial.printf(args); } while(0)
 #else
 #define debug_printf(args,...) ((void)0)
 #endif
@@ -69,8 +70,8 @@ static float safe_filter(float(*f)(void *, float), void *params, float value)
  */
 void FilteredController::Init()
 {
-	m_reference_filter = nullptr;
-	m_reference_filter_params = nullptr;
+	m_target_filter = nullptr;
+	m_target_filter_params = nullptr;
 
 	m_measure_fetcher = nullptr;
 
@@ -82,8 +83,8 @@ void FilteredController::Init()
 
 	m_process_command = nullptr;
 
-	m_reference = 0;
-	m_filtered_reference = 0;
+	m_target = 0;
+	m_filtered_target = 0;
 	m_measure = 0;
 	m_filtered_measure = 0;
 	m_error = 0;
@@ -91,7 +92,7 @@ void FilteredController::Init()
 }
 
 /**
- * @fn void SetReferenceFilter(,
+ * @fn void SetTargetFilter(,
  *         float (*reference_filter)(void *, float),
  *         void * reference_filter_params)
  * @brief Setting a function to filter the reference value used by the
@@ -102,10 +103,10 @@ void FilteredController::Init()
  * @param reference_filter_params Parameters for the function.
  *
  */
-void FilteredController::SetReferenceFilter(float(*reference_filter)(void *, float), void * reference_filter_params)
+void FilteredController::SetTargetFilter(float(*filter)(void *, float), void * filter_params)
 {
-	m_reference_filter = reference_filter;
-	m_reference_filter_params = reference_filter_params;
+	m_target_filter = filter;
+	m_target_filter_params = filter_params;
 }
 
 /**
@@ -183,10 +184,10 @@ void FilteredController::SetProcessCommand(void(*process_command)(float))
   */
 float FilteredController::Update()
 {
-	debug_printf("[csm] Input reference: %d\r\n", (int)m_reference);
+	debug_printf("[csm] Input target: %d\r\n", (int)m_target);
 
-	m_filtered_reference = safe_filter(m_reference_filter, m_reference_filter_params, m_reference);
-	debug_printf("[csm] Filtered Reference: %d\r\n", (int)m_filtered_reference);
+	m_filtered_target = safe_filter(m_target_filter, m_target_filter_params, m_target);
+	debug_printf("[csm] Filtered target: %d\r\n", (int)m_filtered_target);
 
 	m_measure = m_measure_fetcher();
 	debug_printf("[csm] Measure: %d\r\n", (int)m_measure);
@@ -194,11 +195,11 @@ float FilteredController::Update()
 	m_filtered_measure = safe_filter(m_measure_filter, m_measure_filter_params, m_measure);
 	debug_printf("[csm] Filtered Measure: %d\r\n", (int)m_filtered_measure);
 
-	m_error = m_filtered_reference - m_filtered_measure;
+	m_error = m_filtered_target - m_filtered_measure;
 	debug_printf("[csm] Error: %d\r\n", (int)m_error);
 
 	m_command = m_controller(m_controller_params, m_error);
-	debug_printf("[csm] Controller output command: %d\r\n", (int)m_command);
+	debug_printf("[csm] Controller output command: %d\r\n\r\n", (int)m_command);
 
 	m_process_command(m_command);
 
@@ -206,27 +207,27 @@ float FilteredController::Update()
 }
 
 /**
- * @fn float GetReference()
+ * @fn float GetTarget()
  * @brief Getting the reference we want to reach.
  *
  * @return Reference value.
  *
  */
-float FilteredController::GetReference()
+float FilteredController::GetTarget()
 {
-	return m_reference;
+	return m_target;
 }
 
 /**
- * @fn float GetFilteredReference()
+ * @fn float GetFilteredTarget()
  * @brief Getting the filtered reference.
  *
  * @return Filtered reference value.
  *
  */
-float FilteredController::GetFilteredReference()
+float FilteredController::GetFilteredTarget()
 {
-	return m_filtered_reference;
+	return m_filtered_target;
 }
 
 /**
@@ -278,15 +279,15 @@ float FilteredController::GetCommand()
 }
 
 /**
- * @fn void SetReference(float ref)
+ * @fn void SetTarget(float ref)
  * @brief Setting the reference we want to reach.
  *
  * @param ref Reference value.
  *
  */
-void FilteredController::SetReference(float ref)
+void FilteredController::SetTarget(float ref)
 {
-	m_reference = ref;
+	m_target = ref;
 }
 
 /**

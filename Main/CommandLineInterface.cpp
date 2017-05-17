@@ -282,6 +282,9 @@ void CommandLineInterface::Task()
 					Serial.print("grip fully open.\r\n");
 				}
 			}
+			else if (!strncmp(arg, "pushrobot", ARG_LENGTH)) {
+				Strategy::Instance.PushRobotAgainstWall();
+			}
 			else {
 				Serial.printf("Invalid argument '%s'.\r\n", arg);
 			}
@@ -321,6 +324,7 @@ void CommandLineInterface::Task()
 			Serial.print("             s2 <int>: set servo2 pos \r\n");
 			Serial.print("             arm <arg2>: set arm pos. arg2: normal, emptying\r\n");
 			Serial.print("             grip <arg2>: set grip pos. arg2: close, normal, open\r\n");
+			Serial.print("             pushrobot: push robot against wall\r\n");
 			Serial.print("  p <arg>:   Print internal value.\r\n");
 			Serial.print("             <arg> can be one of:\r\n");
 			Serial.print("             pos:      Print robot's position.\r\n");
