@@ -1,6 +1,8 @@
 #ifndef PLATFORM_H
 #define PLATFORM_H
 
+#include "XL320.h"
+
 #define _countof(a) (sizeof(a)/sizeof(*(a)))
 
 #define GP2_BLOCK_AT   432 /*288*/
@@ -52,7 +54,7 @@ namespace Platform
 	// set id of one servo connected, id between 1 and 253 (but not 200)
 	void ForceServoId(int id);
 
-	void SendServoPacket(int id, int address, int value);
+	void SendServoPacket(int id, XL320::Address address, int value);
 	void ReadServoPacket(int id, int address);
 	void DebugServoRam(int id);
 }

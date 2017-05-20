@@ -102,7 +102,7 @@ void CommandLineInterface::Task()
 			int id = atoi(arg);
 			int adr = atoi(arg2);
 			int val = atoi(arg3);
-			Platform::SendServoPacket(id, adr, val);
+			Platform::SendServoPacket(id, (XL320::Address)adr, val);
 			Serial.printf("packet id:%d adr:%d val:%d\r\n", id, adr, val);
 		}
 		//else if (command == 'r') {

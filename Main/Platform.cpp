@@ -1,7 +1,6 @@
 #include "Platform.h"
 #include "WProgram.h"
 #include <SoftwareSerial.h>
-#include "XL320.h"
 
 namespace Platform
 {
@@ -33,8 +32,6 @@ namespace Platform
 		UART1_C1 |= UART_C1_LOOPS | UART_C1_RSRC;
 		CORE_PIN10_CONFIG |= PORT_PCR_PE | PORT_PCR_PS; // pullup on output pin
 		
-		// slow moving servos
-		Servo.Write((int)ServoID::ALL, XL320::Address::GOAL_SPEED, 200);
 	}
 
 	void DisplayNumber(int n)
@@ -130,9 +127,9 @@ namespace Platform
 		Servo.Write((int)ServoID::ALL, XL320::Address::ID, id);
 	}
 
-	void SendServoPacket(int id, int address, int value)
+	void SendServoPacket(int id, XL320::Address address, int value)
 	{
-		Servo.Write(id, (XL320::Address)address, value);
+		Servo.Write(id, address, value);
 	}
 
 	void ReadServoPacket(int id, int address)

@@ -49,6 +49,10 @@ public:
 		MODULE_B2,
 		MODULE_B3,
 		MODULE_B4,
+		MODULE_C1,
+		MODULE_C2,
+		MODULE_C3,
+		MODULE_C4,
 		WAITING_END,
 		END
 	};
@@ -61,6 +65,7 @@ public:
 	
 	void SetInitialPosition();
 	void PushRobotAgainstWall();
+	void RePosAgainstSideBase();
 
 	Side GetSide() { return m_Side; }
 	void SetSide(Side _side);

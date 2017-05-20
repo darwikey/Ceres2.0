@@ -68,8 +68,7 @@ void Strategy::Task()
 	{
 	case State::MODULE_A1:
 		TrajectoryManager::Instance.GotoXY(GetCorrectPos(1200.f, 600.f));
-		TrajectoryManager::Instance.GotoDegreeAngle(GetCorrectAngle(90.f));
-		TrajectoryManager::Instance.GotoDistance(250.f);
+		TrajectoryManager::Instance.GotoXY(GetCorrectPos(1000.f, 600.f));
 		break;
 
 	case State::MODULE_A2:
@@ -81,6 +80,7 @@ void Strategy::Task()
 
 	case State::MODULE_A3:
 		PushRobotAgainstWall();
+		RePosAgainstSideBase();
 		SetGripState(GripState::FULLY_OPEN);
 		TrajectoryManager::Instance.GotoDistance(-100.f);
 		break;
@@ -92,20 +92,45 @@ void Strategy::Task()
 		break;
 	
 	case State::MODULE_B2:
-		TrajectoryManager::Instance.GotoDegreeAngle(GetCorrectAngle(150.f));
-		TrajectoryManager::Instance.GotoDistance(120.f);
+		TrajectoryManager::Instance.GotoXY(GetCorrectPos(200, 600.f));
 		break;
 
 	case State::MODULE_B3:
 		SetGripState(GripState::CLOSE);
 		SetArmState(ArmState::EMPTYING);
 		TrajectoryManager::Instance.GotoDistance(-200.f);
-		TrajectoryManager::Instance.GotoXY(GetCorrectPos(400.f, 910.f));
-		TrajectoryManager::Instance.GotoXY(GetCorrectPos(250.f, 910.f));
+		TrajectoryManager::Instance.GotoXY(GetCorrectPos(400.f, 920.f));
+		TrajectoryManager::Instance.GotoXY(GetCorrectPos(250.f, 920.f));
 		break;
 
 	case State::MODULE_B4:
 		PushRobotAgainstWall();
+		RePosAgainstSideBase();
+		SetGripState(GripState::FULLY_OPEN);
+		TrajectoryManager::Instance.GotoDistance(-700.f);
+		break;
+
+	case State::MODULE_C1:
+		SetGripState(GripState::NORMAL);
+		SetArmState(ArmState::NORMAL);
+		SetGripState(GripState::FULLY_OPEN);
+		TrajectoryManager::Instance.GotoXY(GetCorrectPos(700.f, 1120.f));
+		break;
+
+	case State::MODULE_C2:
+		TrajectoryManager::Instance.GotoXY(GetCorrectPos(500.f, 1120.f));
+		break;
+
+	case State::MODULE_C3:
+		SetGripState(GripState::CLOSE);
+		SetArmState(ArmState::EMPTYING);
+		TrajectoryManager::Instance.GotoXY(GetCorrectPos(250.f, 1035.f));
+		TrajectoryManager::Instance.GotoDegreeAngle(GetCorrectAngle(90.f));
+		break;
+
+	case State::MODULE_C4:
+		PushRobotAgainstWall();
+		RePosAgainstSideBase();
 		SetGripState(GripState::FULLY_OPEN);
 		TrajectoryManager::Instance.GotoDistance(-100.f);
 		break;
@@ -117,7 +142,7 @@ void Strategy::Task()
 	if (m_State < State::WAITING_END)
 	{
 		m_State++;
-		Serial.printf("new state: %d", (int)m_State);
+		Serial.printf("new state: %d\r\n", (int)m_State);
 	}
 }
 
@@ -127,6 +152,8 @@ void Strategy::Start()
 	{
 		m_State++;
 		m_StartTime = millis();
+		// slow moving servos
+		Platform::SendServoPacket((int)ServoID::ALL, XL320::Address::GOAL_SPEED, 200);
 		SetArmState(ArmState::NORMAL);
 		SetGripState(GripState::FULLY_OPEN);
 	}
@@ -155,6 +182,12 @@ void Strategy::PushRobotAgainstWall()
 	SendCommandToMotor(LEFT_MOTOR, 0);
 	ControlSystem::Instance.Reset();
 	ControlSystem::Instance.m_Enable = true;
+}
+
+void Strategy::RePosAgainstSideBase()
+{
+	PositionManager::Instance.SetAngleDeg(-90.f);
+	PositionManager::Instance.SetPosMm(GetCorrectPos(202.f, PositionManager::Instance.GetPosMm().y));
 }
 
 void Strategy::Print()
