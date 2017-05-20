@@ -1,2 +1,31 @@
 blue:
 1000, 600
+650, 800
+
+
+yellow
+arm normal; grip open
+1800, 600
+a -90
+d 250
+grip close; arm emptying
+2225, 790
+2750, 775
+pushrobot
+grip open
+d -100
+grip normal; arm normal; grip open
+a -150
+d 120
+grip close; arm emptying
+d -200
+c 2600 910
+c 2750 910
+pushrobot
+grip open
+d -100
+grip normal; arm normal; grip open
+c 2700 1300
+c 2500 1100
+c 
+grip close; arm emptying

@@ -15,12 +15,12 @@ enum class Side
 
 enum class GameElement
 {
-	MODULE1 = 1 << 0,
-	MODULE2 = 1 << 1,
-	MODULE3 = 1 << 2,
-	MODULE4 = 1 << 3,
-	MODULE5 = 1 << 4,
-	MODULE6 = 1 << 5,
+	MODULE_A = 1 << 0,
+	MODULE_B = 1 << 1,
+	MODULE_C = 1 << 2,
+	MODULE_D = 1 << 3,
+	MODULE_E = 1 << 4,
+	MODULE_F = 1 << 5,
 };
 
 enum class ArmState
@@ -42,7 +42,13 @@ public:
 	enum class State
 	{
 		WAITING_START,
-		ACTIONS,
+		MODULE_A1,
+		MODULE_A2,
+		MODULE_A3,
+		MODULE_B1,
+		MODULE_B2,
+		MODULE_B3,
+		MODULE_B4,
 		WAITING_END,
 		END
 	};
@@ -61,6 +67,8 @@ public:
 	void Print();
 
 	Float2 GetGameElementPosition(GameElement _module);
+	Float2 GetCorrectPos(float x, float y);
+	float GetCorrectAngle(float a);
 
 	void SetArmState(ArmState _state);
 	void SetGripState(GripState _state);

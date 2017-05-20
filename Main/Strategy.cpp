@@ -61,7 +61,64 @@ void Strategy::Task()
 	}
 #endif
 
+	if (!TrajectoryManager::Instance.IsEnded())
+		return;
 
+	switch (m_State)
+	{
+	case State::MODULE_A1:
+		TrajectoryManager::Instance.GotoXY(GetCorrectPos(1200.f, 600.f));
+		TrajectoryManager::Instance.GotoDegreeAngle(GetCorrectAngle(90.f));
+		TrajectoryManager::Instance.GotoDistance(250.f);
+		break;
+
+	case State::MODULE_A2:
+		SetGripState(GripState::CLOSE);
+		SetArmState(ArmState::EMPTYING);
+		TrajectoryManager::Instance.GotoXY(GetCorrectPos(775, 790.f));
+		TrajectoryManager::Instance.GotoXY(GetCorrectPos(250, 775.f));
+		break;
+
+	case State::MODULE_A3:
+		PushRobotAgainstWall();
+		SetGripState(GripState::FULLY_OPEN);
+		TrajectoryManager::Instance.GotoDistance(-100.f);
+		break;
+
+	case State::MODULE_B1:
+		SetGripState(GripState::NORMAL);
+		SetArmState(ArmState::NORMAL);
+		SetGripState(GripState::FULLY_OPEN);
+		break;
+	
+	case State::MODULE_B2:
+		TrajectoryManager::Instance.GotoDegreeAngle(GetCorrectAngle(150.f));
+		TrajectoryManager::Instance.GotoDistance(120.f);
+		break;
+
+	case State::MODULE_B3:
+		SetGripState(GripState::CLOSE);
+		SetArmState(ArmState::EMPTYING);
+		TrajectoryManager::Instance.GotoDistance(-200.f);
+		TrajectoryManager::Instance.GotoXY(GetCorrectPos(400.f, 910.f));
+		TrajectoryManager::Instance.GotoXY(GetCorrectPos(250.f, 910.f));
+		break;
+
+	case State::MODULE_B4:
+		PushRobotAgainstWall();
+		SetGripState(GripState::FULLY_OPEN);
+		TrajectoryManager::Instance.GotoDistance(-100.f);
+		break;
+
+	default:
+		return;
+	}
+
+	if (m_State < State::WAITING_END)
+	{
+		m_State++;
+		Serial.printf("new state: %d", (int)m_State);
+	}
 }
 
 void Strategy::Start()
@@ -70,6 +127,8 @@ void Strategy::Start()
 	{
 		m_State++;
 		m_StartTime = millis();
+		SetArmState(ArmState::NORMAL);
+		SetGripState(GripState::FULLY_OPEN);
 	}
 }
 
@@ -89,8 +148,8 @@ void Strategy::SetInitialPosition()
 void Strategy::PushRobotAgainstWall()
 {
 	ControlSystem::Instance.m_Enable = false;
-	SendCommandToMotor(RIGHT_MOTOR, -40);
-	SendCommandToMotor(LEFT_MOTOR, -40);
+	SendCommandToMotor(RIGHT_MOTOR, -25);
+	SendCommandToMotor(LEFT_MOTOR, -25);
 	delay(1000);
 	SendCommandToMotor(RIGHT_MOTOR, 0);
 	SendCommandToMotor(LEFT_MOTOR, 0);
@@ -106,14 +165,14 @@ void Strategy::Print()
 	case State::WAITING_START:
 		Serial.print("waiting start\r\n");
 		break;
-	case State::ACTIONS:
-		Serial.print("actions\r\n");
-		break;
 	case State::WAITING_END:
 		Serial.print("waiting end\r\n");
 		break;
 	case State::END:
 		Serial.print("end\r\n");
+		break;
+	default:
+		Serial.printf("actions (%d)\r\n", (int)m_State);
 		break;
 	};
 	Serial.printf("Side: %s\r\n", m_Side == Side::BLUE ? "Blue" : "Yellow");
@@ -134,32 +193,48 @@ Float2 Strategy::GetGameElementPosition(GameElement _module)
 {
 	if (m_Side == Side::BLUE)
 	{
-		if (_module == GameElement::MODULE1)
+		if (_module == GameElement::MODULE_A)
 			return Float2(1000.f, 600.f);
-		if (_module == GameElement::MODULE2)
+		if (_module == GameElement::MODULE_B)
 			return Float2(200.f, 600.f);
-		if (_module == GameElement::MODULE3)
+		if (_module == GameElement::MODULE_C)
 			return Float2(500.f, 1100.f);
-		if (_module == GameElement::MODULE4)
+		if (_module == GameElement::MODULE_D)
 			return Float2(900.f, 1400.f);
-		if (_module == GameElement::MODULE5)
+		if (_module == GameElement::MODULE_E)
 			return Float2(800.f, 1850.f);
 	}
 	else
 	{
-		if (_module == GameElement::MODULE1)
+		if (_module == GameElement::MODULE_A)
 			return Float2(2000.f, 600.f);
-		if (_module == GameElement::MODULE2)
+		if (_module == GameElement::MODULE_B)
 			return Float2(2800.f, 600.f);
-		if (_module == GameElement::MODULE3)
+		if (_module == GameElement::MODULE_C)
 			return Float2(2500.f, 1100.f);
-		if (_module == GameElement::MODULE4)
+		if (_module == GameElement::MODULE_D)
 			return Float2(2100.f, 1400.f);
-		if (_module == GameElement::MODULE5)
+		if (_module == GameElement::MODULE_E)
 			return Float2(2200.f, 1850.f);
 	}
 	Serial.println("incorrect game element");
 	return Float2();
+}
+
+Float2 Strategy::GetCorrectPos(float x, float y)
+{
+	if (m_Side == Side::BLUE)
+		return Float2(x, y);
+	else
+		return Float2(3000.f - x, y);
+}
+
+float Strategy::GetCorrectAngle(float a)
+{
+	if (m_Side == Side::BLUE)
+		return a;
+	else
+		return -a;
 }
 
 void Strategy::SetArmState(ArmState _state)
@@ -173,6 +248,7 @@ void Strategy::SetArmState(ArmState _state)
 		Platform::SetServoPos(ServoID::SERVO1, 500);
 		break;
 	}
+	delay(1000);
 }
 
 void Strategy::SetGripState(GripState _state)
@@ -189,6 +265,7 @@ void Strategy::SetGripState(GripState _state)
 		Platform::SetServoPos(ServoID::SERVO2, 400);
 		break;
 	}
+	delay(1000);
 }
 
 Strategy::State operator++(Strategy::State &s, int)

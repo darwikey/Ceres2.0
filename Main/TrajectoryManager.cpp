@@ -180,6 +180,13 @@ void TrajectoryManager::Update()
 		return;
 	}
 
+	if (m_Pause)
+	{
+		ControlSystem::Instance.SetDistanceTarget(PositionManager::Instance.GetDistanceMm());
+		ControlSystem::Instance.SetRadAngleTarget(PositionManager::Instance.GetAngleRad());
+		return;
+	}
+
 	// reference to the next waypoint
 	TrajDest* next1 = m_Points + m_CurId;
 	float next1_dist = (PositionManager::Instance.GetPosMm() - next1->pos).Length();
