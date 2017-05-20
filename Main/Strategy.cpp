@@ -67,7 +67,8 @@ void Strategy::Task()
 	switch (m_State)
 	{
 	case State::MODULE_A1:
-		TrajectoryManager::Instance.GotoXY(GetCorrectPos(1200.f, 600.f));
+		if (m_Side == Side::YELLOW)
+			TrajectoryManager::Instance.GotoXY(GetCorrectPos(1200.f, 600.f));
 		TrajectoryManager::Instance.GotoXY(GetCorrectPos(1000.f, 600.f));
 		break;
 
@@ -107,14 +108,22 @@ void Strategy::Task()
 		PushRobotAgainstWall();
 		RePosAgainstSideBase();
 		SetGripState(GripState::FULLY_OPEN);
-		TrajectoryManager::Instance.GotoDistance(-700.f);
+		if (m_Side == Side::BLUE)
+		{
+			TrajectoryManager::Instance.GotoDistance(-200.f);
+		}
+		else
+		{
+			TrajectoryManager::Instance.GotoDistance(-700.f);
+		}
 		break;
 
 	case State::MODULE_C1:
 		SetGripState(GripState::NORMAL);
 		SetArmState(ArmState::NORMAL);
 		SetGripState(GripState::FULLY_OPEN);
-		TrajectoryManager::Instance.GotoXY(GetCorrectPos(700.f, 1120.f));
+		if (m_Side == Side::YELLOW)
+			TrajectoryManager::Instance.GotoXY(GetCorrectPos(700.f, 1120.f));
 		break;
 
 	case State::MODULE_C2:
@@ -186,7 +195,7 @@ void Strategy::PushRobotAgainstWall()
 
 void Strategy::RePosAgainstSideBase()
 {
-	PositionManager::Instance.SetAngleDeg(-90.f);
+	PositionManager::Instance.SetAngleDeg(GetCorrectAngle(90.f));
 	PositionManager::Instance.SetPosMm(GetCorrectPos(202.f, PositionManager::Instance.GetPosMm().y));
 }
 
