@@ -100,11 +100,17 @@ void Strategy::Task()
 		SetGripState(GripState::CLOSE);
 		SetArmState(ArmState::EMPTYING);
 		TrajectoryManager::Instance.GotoDistance(-200.f);
-		TrajectoryManager::Instance.GotoXY(GetCorrectPos(400.f, 920.f));
-		TrajectoryManager::Instance.GotoXY(GetCorrectPos(250.f, 920.f));
 		break;
 
 	case State::MODULE_B4:
+		TrajectoryManager::Instance.GotoXY(GetCorrectPos(400.f, 920.f));
+		break;
+
+	case State::MODULE_B5:
+		TrajectoryManager::Instance.GotoXY(GetCorrectPos(250.f, 920.f));
+		break;
+
+	case State::MODULE_B6:
 		PushRobotAgainstWall();
 		RePosAgainstSideBase();
 		SetGripState(GripState::FULLY_OPEN);
@@ -184,9 +190,9 @@ void Strategy::SetInitialPosition()
 void Strategy::PushRobotAgainstWall()
 {
 	ControlSystem::Instance.m_Enable = false;
-	MotorManager::Instance.SendCommand(MotorManager::RIGHT, -25);
-	MotorManager::Instance.SendCommand(MotorManager::LEFT, -25);
-	delay(1000);
+	MotorManager::Instance.SendCommand(MotorManager::RIGHT, -30);
+	MotorManager::Instance.SendCommand(MotorManager::LEFT, -30);
+	delay(1500);
 	MotorManager::Instance.SendCommand(MotorManager::RIGHT, 0);
 	MotorManager::Instance.SendCommand(MotorManager::LEFT, 0);
 	ControlSystem::Instance.Reset();
@@ -298,7 +304,7 @@ void Strategy::SetGripState(GripState _state)
 	switch (_state)
 	{
 	case GripState::CLOSE:
-		Platform::SetServoPos(ServoID::SERVO2, 300);
+		Platform::SetServoPos(ServoID::SERVO2, 330);
 		break;
 	case GripState::NORMAL:
 		Platform::SetServoPos(ServoID::SERVO2, 350);
