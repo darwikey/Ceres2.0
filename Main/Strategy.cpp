@@ -184,11 +184,11 @@ void Strategy::SetInitialPosition()
 void Strategy::PushRobotAgainstWall()
 {
 	ControlSystem::Instance.m_Enable = false;
-	SendCommandToMotor(RIGHT_MOTOR, -25);
-	SendCommandToMotor(LEFT_MOTOR, -25);
+	MotorManager::Instance.SendCommand(MotorManager::RIGHT, -25);
+	MotorManager::Instance.SendCommand(MotorManager::LEFT, -25);
 	delay(1000);
-	SendCommandToMotor(RIGHT_MOTOR, 0);
-	SendCommandToMotor(LEFT_MOTOR, 0);
+	MotorManager::Instance.SendCommand(MotorManager::RIGHT, 0);
+	MotorManager::Instance.SendCommand(MotorManager::LEFT, 0);
 	ControlSystem::Instance.Reset();
 	ControlSystem::Instance.m_Enable = true;
 }

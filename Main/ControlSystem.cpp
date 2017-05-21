@@ -7,14 +7,12 @@
  *          Implementation file.
  */
 
-#include <stdint.h>
 #include "Scheduler.h"
-
 #include "PIDController.h"
-
 #include "MotorManager.h"
 #include "ControlSystem.h"
 #include "PositionManager.h"
+#include "WProgram.h"
 
 //#define PI 3.1415926535
 #define DEG2RAD(a) ((a) * PI / 180.0)
@@ -109,9 +107,29 @@ void ControlSystem::SetMotorsRef(float d_mm, float theta)
 	int32_t right_motor_ref = PositionManager::Instance.MmToTicks(d_mm + (1.0 * axle_track_mm * theta) / 2);
 	int32_t left_motor_ref = PositionManager::Instance.MmToTicks(d_mm - (1.0 * axle_track_mm * theta) / 2);
 
+	if (abs(right_motor_ref) > 50 || abs(left_motor_ref) > 50)
+		m_MotorCounter++;
+	else
+		m_MotorCounter = 0;
+
+	// if the robot has changed its position
+	if ((m_LastPosition - PositionManager::Instance.GetPosMm()).LengthSquared() > 20.f * 20.f)
+	{
+		m_LastPosition = PositionManager::Instance.GetPosMm();
+		m_MotorCounter = 0;
+	}
+
+	// Ouch, the robot want to move and he cant !
+	if (m_MotorCounter > 200)
+	{
+		MotorManager::Instance.Enabled = false;
+		Serial.print("Alert: the robot want to move and he can't, shutdown motors\r\n");
+		m_MotorCounter = 0;
+	}
+
 	//printf("cmd right %d   left %d\r\n", (int)right_motor_ref, (int)left_motor_ref);
-	SendCommandToMotor(RIGHT_MOTOR, right_motor_ref);
-	SendCommandToMotor(LEFT_MOTOR, left_motor_ref);
+	MotorManager::Instance.SendCommand(MotorManager::RIGHT, right_motor_ref);
+	MotorManager::Instance.SendCommand(MotorManager::LEFT, left_motor_ref);
 }
 
 void ControlSystem::SetDistanceMmDiff(float ref)

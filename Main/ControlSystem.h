@@ -14,6 +14,7 @@
 #include "PIDController.h"
 #include "DiffFilter.h"
 #include "QuadrampFilter.h"
+#include "Float2.h"
 
 #define CONTROL_SYSTEM_PERIOD_S 0.01 // in s
 
@@ -78,6 +79,9 @@ private:
 
 	float m_distance_mm_diff;
 	float m_angle_rad_diff;
+
+	uint32_t m_MotorCounter = 0;
+	Float2 m_LastPosition;
 };
 
 

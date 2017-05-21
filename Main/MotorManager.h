@@ -1,13 +1,21 @@
 #ifndef MOTOR_MANAGER_H
 #define MOTOR_MANAGER_H
 
-#define RIGHT_MOTOR 1
-#define LEFT_MOTOR  0
-#define NB_MOTORS 2
+class MotorManager
+{
+public:
+	enum MotorId
+	{
+		LEFT,
+		RIGHT
+	};
 
-void InitMotors();
-void SendCommandToMotor(int m, long long cmd);
+	static MotorManager Instance;
+	void Init();
+	void SendCommand(MotorId m, int32_t cmd);
 
+	bool Enabled = true;
+};
 
 #endif
 

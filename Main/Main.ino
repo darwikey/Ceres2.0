@@ -17,7 +17,7 @@ void setup() {
 	Platform::Init();
 	Platform::DisplayNumber(0x1F);
 
-	InitMotors();
+	MotorManager::Instance.Init();
 
 	PositionManager::Instance.Init(21638, 127.2);// 125.5);
 	ControlSystem::Instance.Start();
