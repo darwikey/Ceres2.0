@@ -56,6 +56,15 @@ uint32_t TrajectoryManager::GetLastId()
 	return m_LastId;
 }
 
+bool TrajectoryManager::IsForwardMovement()
+{
+	if (m_CurId != m_LastId)
+	{
+		return m_Points[m_CurId].movement != BACKWARD;
+	}
+	return true;
+}
+
 /******************** Movement functions ********************/
 
 bool TrajectoryManager::IsPaused()

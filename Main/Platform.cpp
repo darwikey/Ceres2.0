@@ -4,6 +4,8 @@
 
 namespace Platform
 {
+	static_assert(_countof(gp2Pins) == _countof(gp2IsFront), "gp2");
+
 	// Set the SoftwareSerial RX & TX pins
 	SoftwareSerial SerialUart2(9, 10); // (RX, TX)
 
@@ -19,8 +21,8 @@ namespace Platform
 
 		pinMode(startPull, INPUT);
 
-		for (unsigned i = 0; i < _countof(gp2s); ++i)
-			pinMode(gp2s[i], INPUT);
+		for (unsigned i = 0; i < _countof(gp2Pins); ++i)
+			pinMode(gp2Pins[i], INPUT);
 
 		//init servo
 		//SerialUart2.begin(9600);
@@ -58,28 +60,31 @@ namespace Platform
 		return digitalRead(buttons[id]) == LOW;
 	}
 
-	bool IsGP2Occluded()
+	bool IsGP2Occluded(bool isFront)
 	{
 		static bool lastBlocked = false;
-		int gp2Sum = 0;
+		int gp2Sum = 0, occluded = 0;
 
-		for (unsigned i = 0; i < _countof(gp2s); ++i)
+		for (unsigned i = 0; i < _countof(gp2Pins); ++i)
 		{
+			if (gp2IsFront[i] != isFront)
+				continue;
+
 			if (lastBlocked) {
-				if (analogRead(gp2s[i]) <= GP2_UNBLOCK_AT)
-					++gp2Sum;
+				if (analogRead(gp2Pins[i]) <= GP2_UNBLOCK_AT)
+					++occluded;
 			}
 			else {
-				if (analogRead(gp2s[i]) >= GP2_BLOCK_AT)
-					++gp2Sum;
+				if (analogRead(gp2Pins[i]) >= GP2_BLOCK_AT)
+					++occluded;
 			}
 		}
 
-		if (lastBlocked && gp2Sum < (int)_countof(gp2s))
+		if (lastBlocked && occluded < gp2Sum)
 			return true;
-		else if (lastBlocked && gp2Sum == _countof(gp2s))
+		else if (lastBlocked && occluded == gp2Sum)
 			lastBlocked = false;
-		else if (!lastBlocked && gp2Sum > 0) {
+		else if (!lastBlocked && occluded > 0) {
 			lastBlocked = true;
 			return true;
 		}
@@ -90,11 +95,12 @@ namespace Platform
 	{
 		do
 		{
-			for (unsigned i = 0; i < _countof(gp2s); ++i)
+			for (unsigned i = 0; i < _countof(gp2Pins); ++i)
 			{
-				Serial.printf("Gp2 %d : %d\r\n", i, analogRead(gp2s[i]));
+				Serial.printf("Gp2 %d : %d\r\n", i, analogRead(gp2Pins[i]));
 			}
-			Serial.printf("occluded %d\r\n\r\n", (int)IsGP2Occluded());
+			Serial.printf("front occluded %d\r\n", (int)IsGP2Occluded(true));
+			Serial.printf("back occluded %d\r\n\r\n", (int)IsGP2Occluded(false));
 			delay(500);
 		} while (Serial.available() == 0);
 	}

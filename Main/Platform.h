@@ -33,7 +33,8 @@ namespace Platform
 	const int leds[] = { 11, 12, 13, 20, 21 };
 	const int buttons[] = { 5, 6, 7 , 8 };
 	const int startPull = 2;
-	const int gp2s[] = { 0, 1 };// , 2, 3};
+	const int gp2Pins[] = { 0, 2, 3 };// {0, 1, 2, 3};
+	const bool gp2IsFront[] = { false, true, true };
 
 	void Init();
 
@@ -41,7 +42,7 @@ namespace Platform
 	void SetLed(int ledId, bool state);
 	bool IsStartPulled();
 	bool IsButtonPressed(int id);
-	bool IsGP2Occluded();
+	bool IsGP2Occluded(bool isFront);
 	void DebugGP2();
 
 	void SetServoLED(ServoID id, ServoLED color);

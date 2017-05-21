@@ -7,7 +7,7 @@
 #include "MotorManager.h"
 
 #define ENABLE_TIMER 0
-#define ENABLE_AVOIDANCE 0
+#define ENABLE_AVOIDANCE 1
 
 Strategy Strategy::Instance;
 
@@ -50,7 +50,7 @@ void Strategy::Task()
 #endif
 
 #if ENABLE_AVOIDANCE
-	if (Platform::IsGP2Occluded())
+	if (Platform::IsGP2Occluded(TrajectoryManager::Instance.IsForwardMovement()))
 	{
 		TrajectoryManager::Instance.Pause();
 		return;

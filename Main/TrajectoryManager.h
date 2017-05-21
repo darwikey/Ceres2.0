@@ -30,6 +30,7 @@ public:
 
 	uint32_t GetCurId();
 	uint32_t GetLastId();
+	bool IsForwardMovement();
 
 	bool IsPaused();
 	void Pause();
