@@ -62,32 +62,33 @@ namespace Platform
 
 	bool IsGP2Occluded(bool isFront)
 	{
-		static bool lastBlocked = false;
-		int gp2Sum = 0, occluded = 0;
+		//static bool lastBlocked = false;
+		//int gp2Sum = 0, occluded = 0;
 
 		for (unsigned i = 0; i < _countof(gp2Pins); ++i)
 		{
 			if (gp2IsFront[i] != isFront)
 				continue;
-
-			if (lastBlocked) {
+			if (analogRead(gp2Pins[i]) > GP2_BLOCK_AT)
+				return true;
+			/*if (lastBlocked) {
 				if (analogRead(gp2Pins[i]) <= GP2_UNBLOCK_AT)
 					++occluded;
 			}
 			else {
 				if (analogRead(gp2Pins[i]) >= GP2_BLOCK_AT)
 					++occluded;
-			}
+			}*/
 		}
 
-		if (lastBlocked && occluded < gp2Sum)
+		/*if (lastBlocked && occluded < gp2Sum)
 			return true;
 		else if (lastBlocked && occluded == gp2Sum)
 			lastBlocked = false;
 		else if (!lastBlocked && occluded > 0) {
 			lastBlocked = true;
 			return true;
-		}
+		}*/
 		return false;
 	}
 
