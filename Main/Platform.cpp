@@ -106,6 +106,19 @@ namespace Platform
 		} while (Serial.available() == 0);
 	}
 
+	void DebugButtons()
+	{
+		do
+		{
+			for (unsigned i = 0; i < _countof(buttons); ++i)
+			{
+				Serial.printf("button %d : %d\r\n", i, (int)IsButtonPressed(i));
+			}
+			Serial.println();
+			delay(500);
+		} while (Serial.available() == 0);
+	}
+
 	void SetServoLED(ServoID id, ServoLED color)
 	{
 		Servo.Write((int)id, XL320::Address::LED, (int)color);

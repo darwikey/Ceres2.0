@@ -6,7 +6,7 @@
 #include "PositionManager.h"
 #include "MotorManager.h"
 
-#define ENABLE_TIMER 0
+#define ENABLE_TIMER 1
 #define ENABLE_AVOIDANCE 1
 
 Strategy Strategy::Instance;
@@ -19,7 +19,8 @@ void Strategy::Init()
 {
 	eeprom_initialize();
 	eeprom_busy_wait();
-	if (eeprom_read_byte(0) == (uint8_t)Side::BLUE)
+	//if (eeprom_read_byte(0) == (uint8_t)Side::BLUE)
+	if (Platform::IsButtonPressed(1))
 		m_Side = Side::BLUE;
 	else
 		m_Side = Side::YELLOW;
@@ -45,6 +46,7 @@ void Strategy::Task()
 			m_State = State::END;
 		}
 		TrajectoryManager::Instance.Pause();
+		MotorManager::Instance.Enabled = false;
 		return;
 	}
 #endif

@@ -44,6 +44,7 @@ namespace Platform
 	bool IsButtonPressed(int id);
 	bool IsGP2Occluded(bool isFront);
 	void DebugGP2();
+	void DebugButtons();
 
 	void SetServoLED(ServoID id, ServoLED color);
 	//pos: 0 to 1023

@@ -240,6 +240,9 @@ void CommandLineInterface::Task()
 			else if (!strncmp(arg, "gp2", ARG_LENGTH)) {
 				Platform::DebugGP2();
 			}
+			else if (!strncmp(arg, "buttons", ARG_LENGTH)) {
+				Platform::DebugButtons();
+			}
 			else if (!strncmp(arg, "date", ARG_LENGTH)) {
 				extern const char* gCompileDate;
 				extern const char* gCompileTime;
@@ -337,6 +340,7 @@ void CommandLineInterface::Task()
 			Serial.print("             pid:      Print PID.\r\n");
 			Serial.print("             strategy: Print strategy\r\n");
 			Serial.print("             gp2:      Debug gp2\r\n");
+			Serial.print("             buttons:  Debug buttons\r\n");
 			Serial.print("             graph:    Print A* graph.\r\n");
 			Serial.print("             servo <int>: Print all servo registers.\r\n");
 			Serial.print("             date      Print the binary creation timestamp.\r\n");
