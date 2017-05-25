@@ -37,6 +37,7 @@ namespace Platform
 	const bool gp2IsFront[] = { false, true, true };
 
 	void Init();
+	void InitServo();
 
 	void DisplayNumber(int n);
 	void SetLed(int ledId, bool state);

@@ -6,6 +6,7 @@
 #include "PositionManager.h"
 #include "MotorManager.h"
 
+#define ENABLE_POSITIONNING 1
 #define ENABLE_TIMER 1
 #define ENABLE_AVOIDANCE 1
 
@@ -17,6 +18,11 @@ Strategy::Strategy()
 
 void Strategy::Init()
 {
+#if ENABLE_POSITIONNING
+	m_State = State::POSITIONING;
+#else
+	m_State = State::WAITING_START;
+#endif
 	eeprom_initialize();
 	eeprom_busy_wait();
 	//if (eeprom_read_byte(0) == (uint8_t)Side::BLUE)
@@ -28,6 +34,22 @@ void Strategy::Init()
 
 void Strategy::Task()
 {
+#if ENABLE_POSITIONNING
+	if (m_State == State::POSITIONING)
+	{
+		if (Platform::IsStartPulled())
+		{
+			TrajectoryManager::Instance.GotoXY(Float2(PositionManager::Instance.GetXMm(), 360.f - ROBOT_CENTER_FRONT - 30.f));
+			m_State++;
+		}
+	}
+	if (m_State == State::POSITIONING2 && !Platform::IsStartPulled())
+	{
+		delay(500);
+		m_State++;
+	}
+#endif
+
 	if (m_State == State::WAITING_START)
 	{
 #if ENABLE_TIMER
@@ -42,7 +64,8 @@ void Strategy::Task()
 	{
 		if (m_State != State::END)
 		{
-			// do funny action
+			SetFunnyState(FunnyState::EJECT);
+
 			m_State = State::END;
 		}
 		TrajectoryManager::Instance.Pause();
@@ -68,6 +91,10 @@ void Strategy::Task()
 
 	switch (m_State)
 	{
+	case State::MODULE_A0:
+		TrajectoryManager::Instance.GotoDistance(50.f);
+		break;
+
 	case State::MODULE_A1:
 		if (m_Side == Side::YELLOW)
 			TrajectoryManager::Instance.GotoXY(GetCorrectPos(1200.f, 600.f));
@@ -169,8 +196,7 @@ void Strategy::Start()
 	{
 		m_State++;
 		m_StartTime = millis();
-		// slow moving servos
-		Platform::SendServoPacket((int)ServoID::ALL, XL320::Address::GOAL_SPEED, 200);
+		Platform::InitServo();
 		SetArmState(ArmState::NORMAL);
 		SetGripState(GripState::FULLY_OPEN);
 	}
@@ -178,7 +204,7 @@ void Strategy::Start()
 
 void Strategy::SetInitialPosition()
 {
-	float y = 360.f - ROBOT_CENTER_FRONT;
+	float y = ROBOT_CENTER_BACK;//360.f - ROBOT_CENTER_FRONT
 	if (m_Side == Side::BLUE)
 	{
 		PositionManager::Instance.SetPosMm(Float2(1070.f - 0.5f * ROBOT_WIDTH, y));
@@ -316,6 +342,20 @@ void Strategy::SetGripState(GripState _state)
 		break;
 	}
 	delay(1000);
+}
+
+void Strategy::SetFunnyState(FunnyState _state)
+{
+	switch (_state)
+	{
+		case FunnyState::NORMAL:
+			Platform::SetServoPos(ServoID::SERVO3, 250);
+			break;
+
+		case FunnyState::EJECT:
+			Platform::SetServoPos(ServoID::SERVO3, 0);
+			break;
+	}
 }
 
 Strategy::State operator++(Strategy::State &s, int)

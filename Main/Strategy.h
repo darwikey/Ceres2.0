@@ -36,12 +36,21 @@ enum class GripState
 	FULLY_OPEN
 };
 
+enum class FunnyState
+{
+	NORMAL,
+	EJECT
+};
+
 class Strategy
 {
 public:
 	enum class State
 	{
+		POSITIONING,
+		POSITIONING2,
 		WAITING_START,
+		MODULE_A0,
 		MODULE_A1,
 		MODULE_A2,
 		MODULE_A3,
@@ -79,10 +88,11 @@ public:
 
 	void SetArmState(ArmState _state);
 	void SetGripState(GripState _state);
+	void SetFunnyState(FunnyState _state);
 
 private:
 	Side		m_Side = Side::BLUE;
-	State		m_State = State::WAITING_START;
+	State		m_State = (State)0;
 	uint32_t	m_StartTime = 0;
 };
 

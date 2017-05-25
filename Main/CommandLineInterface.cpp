@@ -253,6 +253,8 @@ void CommandLineInterface::Task()
 			}
 		}
 		else if (command == 'm') {
+			Platform::InitServo();
+
 			if (!strncmp(arg, "s1", ARG_LENGTH)) {
 				Platform::SetServoPos(ServoID::SERVO1, atoi(arg2));
 				Serial.print("Move servo 1\r\n");
@@ -260,6 +262,10 @@ void CommandLineInterface::Task()
 			else if (!strncmp(arg, "s2", ARG_LENGTH)) {
 				Platform::SetServoPos(ServoID::SERVO2, atoi(arg2));
 				Serial.print("Move servo 2\r\n");
+			}
+			else if (!strncmp(arg, "s3", ARG_LENGTH)) {
+				Platform::SetServoPos(ServoID::SERVO3, atoi(arg2));
+				Serial.print("Move servo 3\r\n");
 			}
 			else if (!strncmp(arg, "arm", ARG_LENGTH)) {
 				if (!strncmp(arg2, "normal", ARG_LENGTH)) {
