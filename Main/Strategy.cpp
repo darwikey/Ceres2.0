@@ -6,10 +6,6 @@
 #include "PositionManager.h"
 #include "MotorManager.h"
 
-#define ENABLE_POSITIONNING 1
-#define ENABLE_TIMER 1
-#define ENABLE_AVOIDANCE 1
-
 Strategy Strategy::Instance;
 
 Strategy::Strategy()
@@ -62,7 +58,7 @@ void Strategy::Task()
 #if ENABLE_TIMER
 	if (millis() > m_StartTime + 90000)
 	{
-		if (m_State != State::END)
+		if (m_State != State::END && (millis() > m_StartTime + 91000))
 		{
 			SetFunnyState(FunnyState::EJECT);
 
@@ -168,7 +164,10 @@ void Strategy::Task()
 	case State::MODULE_C3:
 		SetGripState(GripState::CLOSE);
 		SetArmState(ArmState::EMPTYING);
-		TrajectoryManager::Instance.GotoXY(GetCorrectPos(250.f, 1035.f));
+		if (m_Side == Side::YELLOW)
+			TrajectoryManager::Instance.GotoXY(GetCorrectPos(250.f, 1035.f));
+		else
+			TrajectoryManager::Instance.GotoXY(GetCorrectPos(250.f, 1045.f));
 		TrajectoryManager::Instance.GotoDegreeAngle(GetCorrectAngle(90.f));
 		break;
 
@@ -176,9 +175,29 @@ void Strategy::Task()
 		PushRobotAgainstWall();
 		RePosAgainstSideBase();
 		SetGripState(GripState::FULLY_OPEN);
-		TrajectoryManager::Instance.GotoDistance(-100.f);
+		TrajectoryManager::Instance.GotoDistance(-200.f);
 		break;
 
+#if ENABLE_EXTRA
+	case State::MODULE_E1:
+		SetGripState(GripState::NORMAL);
+		SetArmState(ArmState::NORMAL);
+		SetGripState(GripState::FULLY_OPEN);
+		TrajectoryManager::Instance.GotoXY(GetCorrectPos(800.f, 1850.f));
+		break;
+
+	case State::MODULE_E2:
+		SetGripState(GripState::CLOSE);
+		SetArmState(ArmState::EMPTYING);
+		TrajectoryManager::Instance.GotoDistance(-100.f);
+		TrajectoryManager::Instance.GotoDegreeAngle(GetCorrectAngle(-135.f));
+		break;
+
+	case State::MODULE_E3:
+		PushRobotAgainstWall(3000);
+		SetGripState(GripState::FULLY_OPEN);
+		break;
+#endif
 	default:
 		return;
 	}
@@ -215,12 +234,12 @@ void Strategy::SetInitialPosition()
 	}
 }
 
-void Strategy::PushRobotAgainstWall()
+void Strategy::PushRobotAgainstWall(uint32_t duration_ms)
 {
 	ControlSystem::Instance.m_Enable = false;
 	MotorManager::Instance.SendCommand(MotorManager::RIGHT, -30);
 	MotorManager::Instance.SendCommand(MotorManager::LEFT, -30);
-	delay(1500);
+	delay(duration_ms);
 	MotorManager::Instance.SendCommand(MotorManager::RIGHT, 0);
 	MotorManager::Instance.SendCommand(MotorManager::LEFT, 0);
 	ControlSystem::Instance.Reset();
@@ -341,7 +360,7 @@ void Strategy::SetGripState(GripState _state)
 		Platform::SetServoPos(ServoID::SERVO2, 400);
 		break;
 	}
-	delay(1000);
+	delay(500);
 }
 
 void Strategy::SetFunnyState(FunnyState _state)

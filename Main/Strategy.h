@@ -3,6 +3,11 @@
 
 #include "Float2.h"
 
+#define ENABLE_POSITIONNING 1
+#define ENABLE_TIMER 1
+#define ENABLE_AVOIDANCE 1
+#define ENABLE_EXTRA 1
+
 #define ROBOT_WIDTH 235.f
 #define ROBOT_CENTER_BACK 55.f // distance between axle and back
 #define ROBOT_CENTER_FRONT (150.f-ROBOT_CENTER_BACK) // distance between axle and front
@@ -64,6 +69,11 @@ public:
 		MODULE_C2,
 		MODULE_C3,
 		MODULE_C4,
+#if ENABLE_EXTRA
+		MODULE_E1,
+		MODULE_E2,
+		MODULE_E3,
+#endif
 		WAITING_END,
 		END
 	};
@@ -75,7 +85,7 @@ public:
 	void Start();
 	
 	void SetInitialPosition();
-	void PushRobotAgainstWall();
+	void PushRobotAgainstWall(uint32_t duration_ms = 1500);
 	void RePosAgainstSideBase();
 
 	Side GetSide() { return m_Side; }

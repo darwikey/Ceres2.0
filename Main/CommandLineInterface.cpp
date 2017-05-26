@@ -9,6 +9,7 @@
 #include "Platform.h"
 #include "Astar.h"
 #include "Strategy.h"
+#include "MotorManager.h"
 
 CommandLineInterface CommandLineInterface::Instance;
 
@@ -294,6 +295,9 @@ void CommandLineInterface::Task()
 			else if (!strncmp(arg, "pushrobot", ARG_LENGTH)) {
 				Strategy::Instance.PushRobotAgainstWall();
 			}
+			else if (!strncmp(arg, "disable_motor", ARG_LENGTH)) {
+				MotorManager::Instance.Enabled = false;
+			}
 			else {
 				Serial.printf("Invalid argument '%s'.\r\n", arg);
 			}
@@ -334,6 +338,7 @@ void CommandLineInterface::Task()
 			Serial.print("             arm <arg2>: set arm pos. arg2: normal, emptying\r\n");
 			Serial.print("             grip <arg2>: set grip pos. arg2: close, normal, open\r\n");
 			Serial.print("             pushrobot: push robot against wall\r\n");
+			Serial.print("             disable_motor\r\n");
 			Serial.print("  p <arg>:   Print internal value.\r\n");
 			Serial.print("             <arg> can be one of:\r\n");
 			Serial.print("             pos:      Print robot's position.\r\n");
