@@ -70,10 +70,13 @@ public:
 		MODULE_C3,
 		MODULE_C4,
 #if ENABLE_EXTRA
+		MODULE_RECAL0,
+		MODULE_RECAL1,
+#endif
 		MODULE_E1,
 		MODULE_E2,
 		MODULE_E3,
-#endif
+		MODULE_E4,
 		WAITING_END,
 		END
 	};
@@ -85,8 +88,9 @@ public:
 	void Start();
 	
 	void SetInitialPosition();
-	void PushRobotAgainstWall(uint32_t duration_ms = 1500);
+	void PushRobotAgainstWall(uint32_t durationMs = 1500, bool goForward = true);
 	void RePosAgainstSideBase();
+	void RePosAgainstFrontBase();
 
 	Side GetSide() { return m_Side; }
 	void SetSide(Side _side);

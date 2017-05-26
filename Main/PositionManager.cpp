@@ -10,6 +10,7 @@
 #include "ControlSystem.h"
 #include "Scheduler.h"
 #include <math.h>
+#include "WProgram.h"
 
 PositionManager PositionManager::Instance;
 
@@ -57,16 +58,25 @@ void PositionManager::Update()
 	m_LeftEncoder = new_left_enc;
 	m_RightEncoder = new_right_enc;
 
-#if 0
-	if (left_enc_diff != 0) {
-		platform_led_toggle(PLATFORM_LED2);
-		//printf("G.");//encG : %d   (sumG : %d)\n\r", (int)left_enc_diff, (int)m_LeftEncoder);
+#if 1
+
+	static int i = 0;
+	if (i++ > 100)
+	{
+		i = 0;
+		Serial.printf("left:%d, right: %d \r\n", (int)m_LeftEncoder, (int)m_RightEncoder);
 	}
 
-	if (right_enc_diff != 0) {
-		platform_led_toggle(PLATFORM_LED3);
-		//printf("D.");//encD : %d   (sumD : %d)\n\r", (int)right_enc_diff, (int)m_RightEncoder);
-	}
+
+	//if (left_enc_diff != 0) {
+	//	//platform_led_toggle(PLATFORM_LED2);
+	//	Serial.printf("G.");//encG : %d   (sumG : %d)\n\r", (int)left_enc_diff, (int)m_LeftEncoder);
+	//}
+
+	//if (right_enc_diff != 0) {
+	//	//platform_led_toggle(PLATFORM_LED3);
+	//	printf("D.");//encD : %d   (sumD : %d)\n\r", (int)right_enc_diff, (int)m_RightEncoder);
+	//}
 #endif
 
 	// Distance

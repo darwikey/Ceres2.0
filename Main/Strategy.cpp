@@ -175,10 +175,22 @@ void Strategy::Task()
 		PushRobotAgainstWall();
 		RePosAgainstSideBase();
 		SetGripState(GripState::FULLY_OPEN);
-		TrajectoryManager::Instance.GotoDistance(-200.f);
+		TrajectoryManager::Instance.GotoDistance(-150.f);
 		break;
 
 #if ENABLE_EXTRA
+	case State::MODULE_RECAL0:
+		TrajectoryManager::Instance.GotoXY(GetCorrectPos(202.f + 150.f, 360.f + 200.f));
+		TrajectoryManager::Instance.GotoDegreeAngle(GetCorrectAngle(0.f));
+		break;
+
+	case State::MODULE_RECAL1:
+		PushRobotAgainstWall(2000, false);
+		RePosAgainstFrontBase();
+		TrajectoryManager::Instance.GotoDistance(150.f);
+		break;
+#endif
+
 	case State::MODULE_E1:
 		SetGripState(GripState::NORMAL);
 		SetArmState(ArmState::NORMAL);
@@ -196,8 +208,14 @@ void Strategy::Task()
 	case State::MODULE_E3:
 		PushRobotAgainstWall(3000);
 		SetGripState(GripState::FULLY_OPEN);
+		delay(500);
+		TrajectoryManager::Instance.GotoDistance(-100.f);
 		break;
-#endif
+
+	case State::MODULE_E4:
+		PushRobotAgainstWall();
+		break;
+
 	default:
 		return;
 	}
@@ -234,12 +252,15 @@ void Strategy::SetInitialPosition()
 	}
 }
 
-void Strategy::PushRobotAgainstWall(uint32_t duration_ms)
+void Strategy::PushRobotAgainstWall(uint32_t durationMs, bool goForward)
 {
 	ControlSystem::Instance.m_Enable = false;
-	MotorManager::Instance.SendCommand(MotorManager::RIGHT, -30);
-	MotorManager::Instance.SendCommand(MotorManager::LEFT, -30);
-	delay(duration_ms);
+	int cmd = -30;
+	if (!goForward)
+		cmd = -cmd;
+	MotorManager::Instance.SendCommand(MotorManager::RIGHT, cmd);
+	MotorManager::Instance.SendCommand(MotorManager::LEFT, cmd);
+	delay(durationMs);
 	MotorManager::Instance.SendCommand(MotorManager::RIGHT, 0);
 	MotorManager::Instance.SendCommand(MotorManager::LEFT, 0);
 	ControlSystem::Instance.Reset();
@@ -250,6 +271,12 @@ void Strategy::RePosAgainstSideBase()
 {
 	PositionManager::Instance.SetAngleDeg(GetCorrectAngle(90.f));
 	PositionManager::Instance.SetPosMm(GetCorrectPos(202.f, PositionManager::Instance.GetPosMm().y));
+}
+
+void Strategy::RePosAgainstFrontBase()
+{
+	PositionManager::Instance.SetAngleDeg(GetCorrectAngle(0.f));
+	PositionManager::Instance.SetPosMm(Float2(PositionManager::Instance.GetPosMm().x, 382.f + ROBOT_CENTER_BACK));
 }
 
 void Strategy::Print()
@@ -351,7 +378,7 @@ void Strategy::SetGripState(GripState _state)
 	switch (_state)
 	{
 	case GripState::CLOSE:
-		Platform::SetServoPos(ServoID::SERVO2, 330);
+		Platform::SetServoPos(ServoID::SERVO2, 310);
 		break;
 	case GripState::NORMAL:
 		Platform::SetServoPos(ServoID::SERVO2, 350);

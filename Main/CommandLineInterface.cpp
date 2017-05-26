@@ -293,7 +293,7 @@ void CommandLineInterface::Task()
 				}
 			}
 			else if (!strncmp(arg, "pushrobot", ARG_LENGTH)) {
-				Strategy::Instance.PushRobotAgainstWall();
+				Strategy::Instance.PushRobotAgainstWall(5000);
 			}
 			else if (!strncmp(arg, "disable_motor", ARG_LENGTH)) {
 				MotorManager::Instance.Enabled = false;
