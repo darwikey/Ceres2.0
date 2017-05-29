@@ -46,14 +46,11 @@ void TrajectoryManager::NextPoint()
 	}
 }
 
-uint32_t TrajectoryManager::GetCurId()
+void TrajectoryManager::Print()
 {
-	return m_CurId;
-}
-
-uint32_t TrajectoryManager::GetLastId()
-{
-	return m_LastId;
+	Serial.printf("cur id: %d\r\n", (int)m_CurId);
+	Serial.printf("last id: %d\r\n", (int)m_LastId);
+	Serial.printf("is paused: %d\r\n", (int)m_Pause);
 }
 
 bool TrajectoryManager::IsForwardMovement()
@@ -158,7 +155,7 @@ void TrajectoryManager::AddPoint(TrajDest point, TrajWhen when)
 
 	if (when == END) {
 		if (TrajIsFull()) {
-			printf("[TrajectoryManager] Warning: List of points is full. Last point not added.\n");
+			Serial.printf("[TrajectoryManager] Warning: List of points is full. Last point not added.\n");
 			return;
 		}
 
@@ -171,7 +168,7 @@ void TrajectoryManager::AddPoint(TrajDest point, TrajWhen when)
 	else if (when == NOW) {
 		if (TrajIsFull()) {
 			DecreaseId(&(m_LastId));
-			printf("[TrajectoryManager] Warning: List of points is full. Last point was removed.\n");
+			Serial.printf("[TrajectoryManager] Warning: List of points is full. Last point was removed.\n");
 		}
 
 		/* Insert a point before the current one */

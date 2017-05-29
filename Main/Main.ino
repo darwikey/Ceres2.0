@@ -24,6 +24,7 @@ void setup() {
 	TrajectoryManager::Instance.Init();
 	Strategy::Instance.Init();
 	Strategy::Instance.SetInitialPosition();
+	CommandLineInterface::Instance.Init();
 
 	delay(500);
 	Platform::DisplayNumber(0);

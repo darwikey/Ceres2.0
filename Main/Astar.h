@@ -1,4 +1,4 @@
-#ifndef _ASTAR_H_
+#if !defined(_ASTAR_H_) && defined(ENABLE_ASTAR)
 #define _ASTAR_H_
 
 #include "Vector.h"

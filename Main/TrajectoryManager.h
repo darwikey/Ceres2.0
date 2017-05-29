@@ -28,8 +28,7 @@ public:
 
 	void NextPoint();
 
-	uint32_t GetCurId();
-	uint32_t GetLastId();
+	void Print();
 	bool IsForwardMovement();
 
 	bool IsPaused();

@@ -58,16 +58,14 @@ void PositionManager::Update()
 	m_LeftEncoder = new_left_enc;
 	m_RightEncoder = new_right_enc;
 
-#if 1
-
+#if 0
 	static int i = 0;
-	if (i++ > 100)
+	//if (i++ > 100)
+	if (abs(left_enc_diff - right_enc_diff) > 4)
 	{
 		i = 0;
-		Serial.printf("left:%d, right: %d \r\n", (int)m_LeftEncoder, (int)m_RightEncoder);
+		Serial.printf("left:%d, right: %d \r\n", (int)left_enc_diff, (int)right_enc_diff); //(int)m_LeftEncoder, (int)m_RightEncoder);
 	}
-
-
 	//if (left_enc_diff != 0) {
 	//	//platform_led_toggle(PLATFORM_LED2);
 	//	Serial.printf("G.");//encG : %d   (sumG : %d)\n\r", (int)left_enc_diff, (int)m_LeftEncoder);

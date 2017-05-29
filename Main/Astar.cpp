@@ -1,3 +1,4 @@
+#ifdef ENABLE_ASTAR
 #include <WProgram.h>
 #include "Astar.h"
 #include "TrajectoryManager.h"
@@ -465,3 +466,4 @@ AStar::ReturnStatus AStar::FindPath(const Node & source, const Node & destinatio
 
 	return ReturnStatus::ERROR_NOT_FOUND;
 }
+#endif
