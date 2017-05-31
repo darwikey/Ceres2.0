@@ -15,8 +15,10 @@ void MotorManager::Init()
 		pinMode(motorPWMs[i], OUTPUT);
 		pinMode(motorDirs[i], OUTPUT);
 	}
-	m_RightMotorPID.Init(1.f, 0.f, 0.5f);
-	m_LeftMotorPID.Init(1.f, 0.f, 0.5f);
+	m_RightMotorPID.Init(0.f, 0.f, 0.f);
+	m_LeftMotorPID.Init(0.f, 0.f, 0.f);
+	SetMotorPidP(1.f);
+	SetMotorPidD(0.5f);
 }
 
 void MotorManager::SetSpeed(MotorId m, int32_t speed)

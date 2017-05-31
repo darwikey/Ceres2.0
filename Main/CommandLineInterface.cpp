@@ -101,6 +101,24 @@ void CommandLineInterface::Init()
 		Serial.printf("Angle D: %f\r\n", value);
 	});
 
+	REGISTER_COMMAND("setPidMotorP", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
+		float value = atof(_argv[0]);
+		MotorManager::Instance.SetMotorPidP(value);
+		Serial.printf("Motor P: %f\r\n", value);
+	});
+
+	REGISTER_COMMAND("setPidMotorI", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
+		float value = atof(_argv[0]);
+		MotorManager::Instance.SetMotorPidI(value);
+		Serial.printf("Motor I: %f\r\n", value);
+	});
+
+	REGISTER_COMMAND("setPidMotorD", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
+		float value = atof(_argv[0]);
+		MotorManager::Instance.SetMotorPidD(value);
+		Serial.printf("Motor D: %f\r\n", value);
+	});
+
 	REGISTER_COMMAND("setAxleTrack", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
 		float value = atof(_argv[0]);
 		PositionManager::Instance.SetAxleTrackMm(value);
@@ -187,6 +205,9 @@ void CommandLineInterface::Init()
 		Serial.printf("Angle PID:    %f, %f, %f\r\n", ControlSystem::Instance.GetAnglePID().GetKP(),
 			ControlSystem::Instance.GetAnglePID().GetKI(),
 			ControlSystem::Instance.GetAnglePID().GetKd());
+		Serial.printf("Motors PID:    %f, %f, %f\r\n", MotorManager::Instance.GetLeftMotorPID().GetKP(),
+			MotorManager::Instance.GetLeftMotorPID().GetKI(),
+			MotorManager::Instance.GetLeftMotorPID().GetKd());
 	});
 
 	#ifdef ENABLE_ASTAR
