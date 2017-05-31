@@ -31,36 +31,16 @@
 #include "PIDController.h"
 
 #include <math.h>
-
- /** @addtogroup Libausbee
-   * @{
-   */
-
-   /** @addtogroup Control_System
-	 * @brief Control engineering module
-	 * @{
-	 */
-
-	 /** @defgroup Controllers
-	   * @brief Controllers for the control engineering module
-	   * @{
-	   */
-
-	   /** @defgroup PID
-		 * @brief PID controller
-		 * @{
-		 */
-
-		 /**
-		  * @fn void Init(float Kp, float Ki, float Kd)
-		  * @brief PIDController structure initialisation.
-		  *
-		  * @param pid Structure reference.
-		  * @param Kp Proportional value.
-		  * @param Ki Integral value.
-		  * @param Kd Derivative value.
-		  *
-		  */
+/**
+* @fn void Init(float Kp, float Ki, float Kd)
+* @brief PIDController structure initialisation.
+*
+* @param pid Structure reference.
+* @param Kp Proportional value.
+* @param Ki Integral value.
+* @param Kd Derivative value.
+*
+*/
 void PIDController::Init(float Kp, float Ki, float Kd)
 {
 	m_Kp = Kp;
@@ -148,26 +128,24 @@ float PIDController::GetKd()
   * @return Output value of the controller (i.e. the command).
   *
   */
-float PIDController::EvaluatePID(void *controller, float error)
+float PIDController::EvaluatePID(float error)
 {
-	PIDController *pid = (PIDController *)controller;
-
-	if ((error < pid->m_error_deadband) && (error > -pid->m_error_deadband))
+	if ((error < m_error_deadband) && (error > -m_error_deadband))
 		error = 0;
 
-	pid->m_error_sum += error;
-	pid->m_error_diff = error - pid->m_last_error;
+	m_error_sum += error;
+	m_error_diff = error - m_last_error;
 
-	float output = pid->m_Kp * error + pid->m_Ki * pid->m_error_sum + pid->m_Kd * pid->m_error_diff;
+	float output = m_Kp * error + m_Ki * m_error_sum + m_Kd * m_error_diff;
 
-	pid->m_last_error = error;
+	m_last_error = error;
 
-	if (output > pid->m_max_output) {
-		output = pid->m_max_output;
+	if (output > m_max_output) {
+		output = m_max_output;
 	}
 
-	if (output < pid->m_min_output) {
-		output = pid->m_min_output;
+	if (output < m_min_output) {
+		output = m_min_output;
 	}
 
 	return output;
@@ -214,21 +192,3 @@ float PIDController::GetErrorDiff()
 {
 	return m_error_diff;
 }
-
-/**
-  * @}
-  */
-
-  /**
-	* @}
-	*/
-
-	/**
-	  * @}
-	  */
-
-	  /**
-		* @}
-		*/
-
-		/************** (C) COPYRIGHT 2013-2014 Eirbot **** END OF FILE ****/

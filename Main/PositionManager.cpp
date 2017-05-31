@@ -123,11 +123,11 @@ double PositionManager::GetAxleTrackMm(void) {
 	return m_AxleTrackMm;
 }
 
-float PositionManager::GetLeftEncoder(void) {
+int32_t PositionManager::GetLeftEncoder(void) {
 	return m_LeftEncoder;
 }
 
-float PositionManager::GetRightEncoder(void) {
+int32_t PositionManager::GetRightEncoder(void) {
 	return m_RightEncoder;
 }
 

@@ -31,8 +31,8 @@ static float measureAngleRad()
 
 void ControlSystem::Start()
 {
-	m_pid_distance.Init(0.15, 0/*0.005*/, 0.1);
-	m_pid_angle.Init(0.3, 0/*0.005*/, 0.2);
+	m_pid_distance.Init(0.05, 0/*0.005*/, 0.1);
+	m_pid_angle.Init(0, 0, 0);//0.3, 0/*0.005*/, 0.2);
 
 	m_pid_distance.SetOutputRange(-100, 100);
 	m_pid_angle.SetOutputRange(-100, 100);
@@ -128,8 +128,8 @@ void ControlSystem::SetMotorsRef(float d_mm, float theta)
 	}
 
 	//printf("cmd right %d   left %d\r\n", (int)right_motor_ref, (int)left_motor_ref);
-	MotorManager::Instance.SendCommand(MotorManager::RIGHT, right_motor_ref);
-	MotorManager::Instance.SendCommand(MotorManager::LEFT, left_motor_ref);
+	MotorManager::Instance.SetSpeed(MotorManager::RIGHT, right_motor_ref);
+	MotorManager::Instance.SetSpeed(MotorManager::LEFT, left_motor_ref);
 }
 
 void ControlSystem::SetDistanceMmDiff(float ref)

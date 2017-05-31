@@ -33,32 +33,13 @@
 
 #include <stdint.h>
 
- /** @addtogroup Libausbee
-   * @{
-   */
-
-   /** @addtogroup Control_System
-	 * @brief Control engineering module
-	 * @{
-	 */
-
-	 /** @addtogroup Controllers
-	   * @brief Controllers for the control engineering module
-	   * @{
-	   */
-
-	   /** @addtogroup PID
-		 * @brief PID controller
-		 * @{
-		 */
-
-		 /**
-		  * @class PIDController
-		  * @brief PID controller structure
-		  *
-		  * PIDController contains all the parameters and status of the PID controller.
-		  *
-		  */
+/**
+* @class PIDController
+* @brief PID controller structure
+*
+* PIDController contains all the parameters and status of the PID controller.
+*
+*/
 class PIDController 
 {
 public:
@@ -78,7 +59,8 @@ public:
 	float GetErrorSum();
 	float GetErrorDiff();
 
-	static float EvaluatePID(void *pid, float error);
+	float EvaluatePID(float error);
+	static float EvaluatePID(void *pid, float error) { return ((PIDController*)pid)->EvaluatePID(error); }
 
 private:
 	float m_Kp; /*!< Proportional value. */
@@ -97,21 +79,3 @@ private:
 };
 
 #endif
-
-/**
-  * @}
-  */
-
-  /**
-	* @}
-	*/
-
-	/**
-	  * @}
-	  */
-
-	  /**
-		* @}
-		*/
-
-		/************** (C) COPYRIGHT 2013-2014 Eirbot **** END OF FILE ****/

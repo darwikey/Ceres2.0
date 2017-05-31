@@ -6,6 +6,9 @@
 #define CLI_DELIMITER ' '
 #define CLI_BUFFER_SIZE 128
 
+#define CLI_ARG_LENGTH 20
+#define CLI_MAX_ARG 5
+
 class CommandLineInterface
 {
 public:
@@ -19,7 +22,7 @@ private:
 	{
 		const char *cmd;
 		const char *help;
-		typedef void (*FunctionDecl)(const char**, int);
+		typedef void (*FunctionDecl)(const char [CLI_MAX_ARG][CLI_ARG_LENGTH], int);
 		FunctionDecl function;
 	};
 

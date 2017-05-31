@@ -23,8 +23,8 @@ public:
 	void SetAxleTrackMm(double axle_track_mm);
 	double GetAxleTrackMm(void);
 
-	float GetLeftEncoder(void);
-	float GetRightEncoder(void);
+	int32_t GetLeftEncoder(void);
+	int32_t GetRightEncoder(void);
 
 	float GetDistanceMm(void);
 	float GetAngleRad(void);

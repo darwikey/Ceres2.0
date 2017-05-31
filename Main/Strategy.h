@@ -3,8 +3,8 @@
 
 #include "Float2.h"
 
-#define ENABLE_POSITIONNING 1
-#define ENABLE_TIMER 1
+#define ENABLE_POSITIONNING 0
+#define ENABLE_TIMER 0
 #define ENABLE_AVOIDANCE 1
 #define ENABLE_EXTRA 1
 
