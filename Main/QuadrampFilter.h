@@ -138,7 +138,7 @@ public:
 
 	void Reset(float value);
 
-	static float Evaluate(void *q, float in);
+	float Evaluate(float in);
 
 private:
 	float m_var_2nd_ord_pos;

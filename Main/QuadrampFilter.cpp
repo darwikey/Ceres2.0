@@ -93,9 +93,8 @@ void QuadrampFilter::Reset(float value)
 //	return (m_prev_out == m_prev_in && m_prev_var == 0);
 //}
 
-float QuadrampFilter::Evaluate(void * data, float in)
+float QuadrampFilter::Evaluate(float in)
 {
-	QuadrampFilter * q = (QuadrampFilter *)data;
 	float d;
 	float pos_target;
 	float var_1st_ord_pos = 0;
@@ -104,20 +103,20 @@ float QuadrampFilter::Evaluate(void * data, float in)
 	float var_2nd_ord_neg = 0;
 	float prev_var, prev_out;
 
-	if (q->m_var_1st_ord_pos)
-		var_1st_ord_pos = q->m_var_1st_ord_pos * q->m_eval_period;
+	if (m_var_1st_ord_pos)
+		var_1st_ord_pos = m_var_1st_ord_pos * m_eval_period;
 
-	if (q->m_var_1st_ord_neg)
-		var_1st_ord_neg = -q->m_var_1st_ord_neg * q->m_eval_period;
+	if (m_var_1st_ord_neg)
+		var_1st_ord_neg = -m_var_1st_ord_neg * m_eval_period;
 
-	if (q->m_var_2nd_ord_pos)
-		var_2nd_ord_pos = q->m_var_2nd_ord_pos * SQUARE(q->m_eval_period);
+	if (m_var_2nd_ord_pos)
+		var_2nd_ord_pos = m_var_2nd_ord_pos * SQUARE(m_eval_period);
 
-	if (q->m_var_2nd_ord_neg)
-		var_2nd_ord_neg = -q->m_var_2nd_ord_neg * SQUARE(q->m_eval_period);
+	if (m_var_2nd_ord_neg)
+		var_2nd_ord_neg = -m_var_2nd_ord_neg * SQUARE(m_eval_period);
 
-	prev_var = q->m_prev_var;
-	prev_out = q->m_prev_out;
+	prev_var = m_prev_var;
+	prev_out = m_prev_out;
 
 	d = in - prev_out;
 
@@ -197,8 +196,8 @@ float QuadrampFilter::Evaluate(void * data, float in)
 	}
 
 	// update prev_out and prev_var
-	q->m_prev_var = prev_var;
-	q->m_prev_out = pos_target;
+	m_prev_var = prev_var;
+	m_prev_out = pos_target;
 
 	return pos_target;
 }

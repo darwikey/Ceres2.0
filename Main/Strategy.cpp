@@ -258,11 +258,11 @@ void Strategy::PushRobotAgainstWall(uint32_t durationMs, bool goForward)
 	int cmd = -30;
 	if (!goForward)
 		cmd = -cmd;
-	MotorManager::Instance.SendCommand(MotorManager::RIGHT, cmd);
-	MotorManager::Instance.SendCommand(MotorManager::LEFT, cmd);
+	MotorManager::Instance.SetSpeed(MotorManager::RIGHT, cmd);
+	MotorManager::Instance.SetSpeed(MotorManager::LEFT, cmd);
 	delay(durationMs);
-	MotorManager::Instance.SendCommand(MotorManager::RIGHT, 0);
-	MotorManager::Instance.SendCommand(MotorManager::LEFT, 0);
+	MotorManager::Instance.SetSpeed(MotorManager::RIGHT, 0);
+	MotorManager::Instance.SetSpeed(MotorManager::LEFT, 0);
 	ControlSystem::Instance.Reset();
 	ControlSystem::Instance.m_Enable = true;
 }

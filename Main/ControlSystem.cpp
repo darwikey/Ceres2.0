@@ -19,20 +19,11 @@
 
 ControlSystem ControlSystem::Instance;
 
-static float measureDistanceMm()
-{
-	return PositionManager::Instance.GetDistanceMm();
-}
-
-static float measureAngleRad()
-{
-	return PositionManager::Instance.GetAngleRad();
-}
 
 void ControlSystem::Start()
 {
-	m_pid_distance.Init(0.05, 0/*0.005*/, 0.1);
-	m_pid_angle.Init(0, 0, 0);//0.3, 0/*0.005*/, 0.2);
+	m_pid_distance.Init(0.05f, 0/*0.005*/, 0.05f);
+	m_pid_angle.Init(0.05f, 0, 0.05f);//0.3, 0/*0.005*/, 0.2);
 
 	m_pid_distance.SetOutputRange(-100, 100);
 	m_pid_angle.SetOutputRange(-100, 100);
@@ -50,55 +41,38 @@ void ControlSystem::Start()
 
 	SetSpeedHigh();
 
-	// Initialise each control system manager
-	m_csm_distance.Init();
-	m_csm_angle.Init();
-
-	// Set target filter
-	m_csm_distance.SetTargetFilter(QuadrampFilter::Evaluate, (void*)&(m_quadramp_distance));
-	m_csm_angle.SetTargetFilter(QuadrampFilter::Evaluate, (void*)&(m_quadramp_angle));
-
-	// Set measure functions
-	m_csm_distance.SetMeasureFetcher(measureDistanceMm);
-	m_csm_angle.SetMeasureFetcher(measureAngleRad);
-
-	// We use a pid controller because we like it here at Eirbot
-	m_csm_distance.SetController(&PIDController::EvaluatePID, (void*)&(m_pid_distance));
-	m_csm_angle.SetController(&PIDController::EvaluatePID, (void*)&(m_pid_angle));
-
-	// Set processing command
-	m_csm_distance.SetProcessCommand(SetDistanceMmDiff);
-	m_csm_angle.SetProcessCommand(SetAngleRadDiff);
-
-	SetDistanceMmDiff(0);
-	SetAngleRadDiff(0);
+	m_DistanceTarget = 0.f;
+	m_AngleTarget = 0.f;
 }
 
 void ControlSystem::Task()
 {
 
-	//for (;;)
+	PositionManager::Instance.Update();
+
+	if (m_Enable)
 	{
-
-		PositionManager::Instance.Update();
-
-		if (m_Enable)
+		//platform_led_toggle(PLATFORM_LED1);
+		float DistanceCmd, AngleCmd;
 		{
-			//platform_led_toggle(PLATFORM_LED1);
-
-			m_csm_distance.Update();
-			m_csm_angle.Update();
-
-			SetMotorsRef(m_distance_mm_diff, m_angle_rad_diff);
+			float Target = m_quadramp_distance.Evaluate(m_DistanceTarget);
+			float Measure = PositionManager::Instance.GetDistanceMm();
+			float Error = Target - Measure;
+			DistanceCmd = m_pid_distance.EvaluatePID(Error);
+			
 		}
-		//ausbee_cs_manage(&(m_csm_right_motor));
-		//ausbee_cs_manage(&(m_csm_left_motor));
+		{
+			float Target = m_quadramp_angle.Evaluate(m_AngleTarget);
+			float Measure = PositionManager::Instance.GetAngleRad();
+			float Error = Target - Measure;
+			AngleCmd = m_pid_angle.EvaluatePID(Error);
+		}
 
-		//vTaskDelay(CONTROL_SYSTEM_PERIOD_S * 1000 / portTICK_RATE_MS);
+		SetMotorCmd(DistanceCmd, AngleCmd);
 	}
 }
 
-void ControlSystem::SetMotorsRef(float d_mm, float theta)
+void ControlSystem::SetMotorCmd(float d_mm, float theta)
 {
 	uint32_t axle_track_mm = PositionManager::Instance.GetAxleTrackMm();
 
@@ -132,21 +106,11 @@ void ControlSystem::SetMotorsRef(float d_mm, float theta)
 	MotorManager::Instance.SetSpeed(MotorManager::LEFT, left_motor_ref);
 }
 
-void ControlSystem::SetDistanceMmDiff(float ref)
-{
-	Instance.m_distance_mm_diff = ref;
-}
-
-void ControlSystem::SetAngleRadDiff(float ref)
-{
-	Instance.m_angle_rad_diff = ref;
-}
-
 // User functions
 void ControlSystem::SetDistanceTarget(float ref)
 {
 	Scheduler::disable();
-	m_csm_distance.SetTarget(ref);
+	m_DistanceTarget = ref;
 	Scheduler::enable();
 }
 
@@ -154,25 +118,15 @@ void ControlSystem::SetDegAngleTarget(float ref_deg)
 {
 	Scheduler::disable();
 	float ref_rad = DEG2RAD(ref_deg);
-	m_csm_angle.SetTarget(ref_rad);
+	m_AngleTarget = ref_rad;
 	Scheduler::enable();
 }
 
 void ControlSystem::SetRadAngleTarget(float ref_rad)
 {
 	Scheduler::disable();
-	m_csm_angle.SetTarget(ref_rad);
+	m_AngleTarget = ref_rad;
 	Scheduler::enable();
-}
-
-void ControlSystem::SetRightMotorTarget(int32_t ref)
-{
-	m_csm_right_motor.SetTarget(ref);
-}
-
-void ControlSystem::SetMotorTarget(int32_t ref)
-{
-	m_csm_left_motor.SetTarget(ref);
 }
 
 void ControlSystem::SetDistanceMaxSpeed(float max_speed)

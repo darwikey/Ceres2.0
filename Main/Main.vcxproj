@@ -96,9 +96,6 @@
     <ClInclude Include="ControlSystem.h">
       <FileType>CppCode</FileType>
     </ClInclude>
-    <ClInclude Include="FilteredController.h">
-      <FileType>CppCode</FileType>
-    </ClInclude>
     <ClInclude Include="DiffFilter.h">
       <FileType>CppCode</FileType>
     </ClInclude>
@@ -133,7 +130,6 @@
     <ClCompile Include="Astar.cpp" />
     <ClCompile Include="CommandLineInterface.cpp" />
     <ClCompile Include="ControlSystem.cpp" />
-    <ClCompile Include="FilteredController.cpp" />
     <ClCompile Include="DiffFilter.cpp" />
     <ClCompile Include="Scheduler.cpp" />
     <ClCompile Include="MotorManager.cpp" />

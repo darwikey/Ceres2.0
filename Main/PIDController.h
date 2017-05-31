@@ -60,7 +60,6 @@ public:
 	float GetErrorDiff();
 
 	float EvaluatePID(float error);
-	static float EvaluatePID(void *pid, float error) { return ((PIDController*)pid)->EvaluatePID(error); }
 
 private:
 	float m_Kp; /*!< Proportional value. */

@@ -10,7 +10,6 @@
 #ifndef CONTROL_SYSTEM_H
 #define CONTROL_SYSTEM_H
 
-#include "FilteredController.h"
 #include "PIDController.h"
 #include "DiffFilter.h"
 #include "QuadrampFilter.h"
@@ -57,28 +56,16 @@ public:
 	bool m_Enable = true;
 
 private:
-	void SetMotorsRef(float d_mm, float theta);
-	static void SetDistanceMmDiff(float ref);
-	static void SetAngleRadDiff(float ref);
+	void SetMotorCmd(float d_mm, float theta);
+	
+	float m_DistanceTarget;
+	float m_AngleTarget;
 
-	FilteredController m_csm_right_motor;
-	FilteredController m_csm_left_motor;
-	FilteredController m_csm_distance;
-	FilteredController m_csm_angle;
-
-	/*DiffFilter diff_right_motor;
-	DiffFilter diff_left_motor;*/
-
-	PIDController m_pid_right_motor;
-	PIDController m_pid_left_motor;
 	PIDController m_pid_distance;
 	PIDController m_pid_angle;
 
 	QuadrampFilter m_quadramp_distance;
 	QuadrampFilter m_quadramp_angle;
-
-	float m_distance_mm_diff;
-	float m_angle_rad_diff;
 
 	uint32_t m_MotorCounter = 0;
 	Float2 m_LastPosition;
