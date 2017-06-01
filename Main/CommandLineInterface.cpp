@@ -280,9 +280,22 @@ void CommandLineInterface::Task()
 		if (c == CLI_DEL_CHAR && m_CurPos > 0)
 		{
 			m_CurPos--;
-			Serial.print("\b");
-			Serial.print((char)0x1B);
-			Serial.print("[K");
+			Serial.print("\b");//cursor to left
+			Serial.print((char)CLI_ESC_CHAR);
+			Serial.print("[K");//clear from cursor to the end of the line
+			continue;
+		}
+		else if (c == CLI_HISTORY_CHAR)
+		{
+			Serial.print((char)CLI_ESC_CHAR);
+			Serial.print("[99D");//cursor to origin
+			Serial.print((char)CLI_ESC_CHAR);
+			Serial.print("[K");//clear from cursor to the end of the line
+
+			// retrieve previous command
+			m_CurPos = strlen(m_History);
+			strcpy(m_Buffer, m_History);
+			Serial.print(m_History);
 			continue;
 		}
 		m_Buffer[m_CurPos] = c;
@@ -299,6 +312,7 @@ void CommandLineInterface::Task()
 	if (end_line)
 	{
 		Serial.print("\r\n");
+
 		// read the incoming byte:
 		char args[CLI_MAX_ARG+1][CLI_ARG_LENGTH] = { 0 };
 
@@ -328,6 +342,12 @@ void CommandLineInterface::Task()
 
 		if (!CmdOk)
 			Serial.print("Invalid command\r\n");
+		else
+		{
+			// copy to history
+			memcpy(m_History, m_Buffer, m_CurPos);
+			m_History[m_CurPos + 1] = '\0';
+		}
 
 		m_CurPos = 0;
 	}
@@ -335,6 +355,7 @@ void CommandLineInterface::Task()
 
 void CommandLineInterface::PrintHelp()
 {
+	Serial.print("History: Press little 2\r\n");
 	for (int c = 0; m_Command[c].cmd; c++)
 	{
 		int CmdLen = Serial.print(m_Command[c].cmd);
