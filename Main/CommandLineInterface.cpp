@@ -154,13 +154,13 @@ void CommandLineInterface::Init()
 		Serial.print("Force servo baudrate\r\n");
 	});
 
-	REGISTER_COMMAND("setServoId", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
+	REGISTER_COMMAND("setServoId", "arg: servo_id", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
 		int id = atoi(_argv[0]);
 		Platform::ForceServoId(id);
 		Serial.printf("Force all connected servo to id %d\r\n. Should be the first instruction sent to the servo\r\n", id);
 	});
 
-	REGISTER_COMMAND("setSide", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
+	REGISTER_COMMAND("setSide", "arg: b(blue) or y(yellow)", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
 		if (_argv[0][0] == 'b')
 			Strategy::Instance.SetSide(Side::BLUE);
 		else if (_argv[0][0] == 'y')
@@ -194,11 +194,11 @@ void CommandLineInterface::Init()
 		Serial.printf("Left encoder value: %d\r\n", PositionManager::Instance.GetLeftEncoder());
 	});
 
-	REGISTER_COMMAND("printTrajectory", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
+	REGISTER_COMMAND("getTrajectory", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
 		TrajectoryManager::Instance.Print();
 	});
 
-	REGISTER_COMMAND("printPID", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
+	REGISTER_COMMAND("getPID", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
 		Serial.printf("Distance PID: %f, %f, %f\r\n", ControlSystem::Instance.GetDistancePID().GetKP(),
 			ControlSystem::Instance.GetDistancePID().GetKI(),
 			ControlSystem::Instance.GetDistancePID().GetKd());
@@ -211,46 +211,46 @@ void CommandLineInterface::Init()
 	});
 
 	#ifdef ENABLE_ASTAR
-	REGISTER_COMMAND("printGraph", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
+	REGISTER_COMMAND("getGraph", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
 		Graph::Instance.Print();
 	});
 	#endif
 
-	REGISTER_COMMAND("printServo", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
+	REGISTER_COMMAND("getServo", "arg: servo_id", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
 		Platform::DebugServoRam(atoi(_argv[0]));
 	});
 	
-	REGISTER_COMMAND("printStrategy", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
+	REGISTER_COMMAND("getStrategy", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
 		Strategy::Instance.Print();
 	});
 
-	REGISTER_COMMAND("printGP2", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
+	REGISTER_COMMAND("getGP2", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
 		Platform::DebugGP2();
 	});
 
-	REGISTER_COMMAND("printButtons", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
+	REGISTER_COMMAND("getButtons", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
 		Platform::DebugButtons();
 	});
 
-	REGISTER_COMMAND("printDate", "Date when the program was compiled", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
+	REGISTER_COMMAND("getDate", "Date when the program was compiled", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
 		extern const char* gCompileDate;
 		extern const char* gCompileTime;
 		Serial.printf("%s - %s\r\n", gCompileDate, gCompileTime);
 	});
 
-	REGISTER_COMMAND("servo1", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
+	REGISTER_COMMAND("servo1", "arg: position(float)", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
 		Platform::InitServo();
 		Platform::SetServoPos(ServoID::SERVO1, atoi(_argv[0]));
 		Serial.print("Move servo 1\r\n");
 	});
 
-	REGISTER_COMMAND("servo2", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
+	REGISTER_COMMAND("servo2", "arg: position(float)", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
 		Platform::InitServo();
 		Platform::SetServoPos(ServoID::SERVO2, atoi(_argv[0]));
 		Serial.print("Move servo 2\r\n");
 	});
 
-	REGISTER_COMMAND("servo3", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
+	REGISTER_COMMAND("servo3", "arg: position(float)", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
 		Platform::InitServo();
 		Platform::SetServoPos(ServoID::SERVO3, atoi(_argv[0]));
 		Serial.print("Move servo 3\r\n");
