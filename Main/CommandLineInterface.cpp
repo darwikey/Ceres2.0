@@ -280,6 +280,9 @@ void CommandLineInterface::Task()
 		if (c == CLI_DEL_CHAR && m_CurPos > 0)
 		{
 			m_CurPos--;
+			Serial.print("\b");
+			Serial.print((char)0x1B);
+			Serial.print("[K");
 			continue;
 		}
 		m_Buffer[m_CurPos] = c;
@@ -295,6 +298,7 @@ void CommandLineInterface::Task()
 
 	if (end_line)
 	{
+		Serial.print("\r\n");
 		// read the incoming byte:
 		char args[CLI_MAX_ARG+1][CLI_ARG_LENGTH] = { 0 };
 
