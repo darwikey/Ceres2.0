@@ -1,5 +1,4 @@
 #ifdef ENABLE_ASTAR
-#include <WProgram.h>
 #include "Astar.h"
 #include "TrajectoryManager.h"
 #include "PositionManager.h"

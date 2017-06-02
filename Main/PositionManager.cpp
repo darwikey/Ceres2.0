@@ -9,8 +9,6 @@
 #include "PositionManager.h"
 #include "ControlSystem.h"
 #include "Scheduler.h"
-#include <math.h>
-#include "WProgram.h"
 
 PositionManager PositionManager::Instance;
 

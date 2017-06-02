@@ -1,6 +1,7 @@
 #ifndef TRAJECTORY_MANAGER_H
 #define TRAJECTORY_MANAGER_H
 
+#include "Globals.h"
 #include "ControlSystem.h"
 
 
@@ -24,7 +25,7 @@ public:
 	/* Remove every points from the trajectory */
 	void Reset();
 	/* Check whether points remain in the trajectory*/
-	int IsEnded();
+	int IsEnded() { return m_Points.IsEmpty(); }
 
 	void NextPoint();
 
@@ -57,15 +58,12 @@ private:
 		OrderType movement;
 	};
 
-	bool TrajIsFull();
-	void DecreaseId(uint32_t *id);
+	bool TrajIsFull() { return m_Points.IsFull(); }
 	void AddPoint(TrajDest point, TrajWhen when);
-	void GotoTarget(const TrajDest* _nextPoint, const Float2 &_target);
+	void GotoTarget(const TrajDest &_nextPoint, const Float2 &_target);
 	void Update();
 
-	TrajDest m_Points[SMOOTH_TRAJ_MAX_NB_POINTS];
-	uint32_t m_CurId;
-	uint32_t m_LastId;
+	CircularBuffer<TrajDest, SMOOTH_TRAJ_MAX_NB_POINTS> m_Points;
 	bool m_Pause;
 };
 #endif /* TRAJECTORY_MANAGER_H */

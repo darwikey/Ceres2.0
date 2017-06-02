@@ -24,12 +24,8 @@
 
 #include "VectorBase.h"
 
-#include <cassert>
 #include <cstring>
 #include <new>
-
-#undef assert
-#define assert(x) ((void)0)
 
 /// %Vector template class.
 template <class T> class Vector : public VectorBase
@@ -165,28 +161,28 @@ public:
     /// Return element at index.
     T& operator [](unsigned index)
     {
-        assert(index < size_);
+        Assert(index < size_);
         return Buffer()[index];
     }
 
     /// Return const element at index.
     const T& operator [](unsigned index) const
     {
-        assert(index < size_);
+        Assert(index < size_);
         return Buffer()[index];
     }
 
     /// Return element at index.
     T& At(unsigned index)
     {
-        assert(index < size_);
+        Assert(index < size_);
         return Buffer()[index];
     }
 
     /// Return const element at index.
     const T& At(unsigned index) const
     {
-        assert(index < size_);
+        Assert(index < size_);
         return Buffer()[index];
     }
 
@@ -415,28 +411,28 @@ public:
     /// Return first element.
     T& Front()
     {
-        assert(size_);
+        Assert(size_);
         return Buffer()[0];
     }
 
     /// Return const first element.
     const T& Front() const
     {
-        assert(size_);
+        Assert(size_);
         return Buffer()[0];
     }
 
     /// Return last element.
     T& Back()
     {
-        assert(size_);
+        Assert(size_);
         return Buffer()[size_ - 1];
     }
 
     /// Return const last element.
     const T& Back() const
     {
-        assert(size_);
+        Assert(size_);
         return Buffer()[size_ - 1];
     }
 
@@ -494,7 +490,7 @@ private:
     template <typename RandomIteratorT>
     Iterator InsertElements(unsigned pos, RandomIteratorT start, RandomIteratorT end)
     {
-        assert(start <= end);
+        Assert(start <= end);
 
         if (pos > size_)
             pos = size_;
@@ -693,28 +689,28 @@ public:
     /// Return element at index.
     T& operator [](unsigned index)
     {
-        assert(index < size_);
+        Assert(index < size_);
         return Buffer()[index];
     }
 
     /// Return const element at index.
     const T& operator [](unsigned index) const
     {
-        assert(index < size_);
+        Assert(index < size_);
         return Buffer()[index];
     }
 
     /// Return element at index.
     T& At(unsigned index)
     {
-        assert(index < size_);
+        Assert(index < size_);
         return Buffer()[index];
     }
 
     /// Return const element at index.
     const T& At(unsigned index) const
     {
-        assert(index < size_);
+        Assert(index < size_);
         return Buffer()[index];
     }
 
@@ -1007,14 +1003,14 @@ public:
     /// Return last element.
     T& Back()
     {
-        assert(size_);
+        Assert(size_);
         return Buffer()[size_ - 1];
     }
 
     /// Return const last element.
     const T& Back() const
     {
-        assert(size_);
+        Assert(size_);
         return Buffer()[size_ - 1];
     }
 

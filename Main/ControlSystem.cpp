@@ -12,7 +12,6 @@
 #include "MotorManager.h"
 #include "ControlSystem.h"
 #include "PositionManager.h"
-#include "WProgram.h"
 
 //#define PI 3.1415926535
 #define DEG2RAD(a) ((a) * PI / 180.0)

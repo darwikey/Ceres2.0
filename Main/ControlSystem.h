@@ -13,7 +13,7 @@
 #include "PIDController.h"
 #include "DiffFilter.h"
 #include "QuadrampFilter.h"
-#include "Float2.h"
+#include "Globals.h"
 
 #define CONTROL_SYSTEM_PERIOD_S 0.01 // in s
 

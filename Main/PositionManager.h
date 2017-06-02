@@ -10,7 +10,7 @@
 #define POSITION_MANAGER_H
 
 #include "QuadDecode.h"
-#include "Float2.h"
+#include "Globals.h"
 
 class PositionManager
 {

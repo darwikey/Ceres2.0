@@ -1,5 +1,5 @@
+#include "Globals.h"
 #include "Platform.h"
-#include "WProgram.h"
 #include <SoftwareSerial.h>
 
 namespace Platform

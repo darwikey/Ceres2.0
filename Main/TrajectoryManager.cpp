@@ -1,6 +1,5 @@
 #include "PositionManager.h"
 #include "TrajectoryManager.h"
-#include "WProgram.h"
 
 #if 0
 	#define TRAJ_DEBUG(msg) Serial.println(msg)
@@ -20,8 +19,6 @@ TrajectoryManager TrajectoryManager::Instance;
 
 void TrajectoryManager::Init()
 {
-	m_CurId = 0;
-	m_LastId = 0;
 	m_Pause = false;
 }
 
@@ -29,35 +26,30 @@ void TrajectoryManager::Reset()
 {
 	ControlSystem::Instance.SetDistanceTarget(PositionManager::Instance.GetDistanceMm());
 	ControlSystem::Instance.SetRadAngleTarget(PositionManager::Instance.GetAngleRad());
-	m_CurId = m_LastId;
-}
-
-int TrajectoryManager::IsEnded()
-{
-	return (m_CurId == m_LastId);
+	m_Points.Clear();
 }
 
 void TrajectoryManager::NextPoint()
 {
 	TRAJ_DEBUG("NextPoint");
-	/* Update list pointer if not empty */
-	if (!IsEnded()) {
-		m_CurId = (m_CurId + 1) % SMOOTH_TRAJ_MAX_NB_POINTS;
+	if (!m_Points.IsEmpty()) {
+		m_Points.PopFront();
 	}
 }
 
 void TrajectoryManager::Print()
 {
-	Serial.printf("cur id: %d\r\n", (int)m_CurId);
-	Serial.printf("last id: %d\r\n", (int)m_LastId);
+	Serial.printf("Number of points: %d", m_Points.GetSize());
+	//Serial.printf("cur id: %d\r\n", (int)m_CurId);
+	//Serial.printf("last id: %d\r\n", (int)m_LastId);
 	Serial.printf("is paused: %d\r\n", (int)m_Pause);
 }
 
 bool TrajectoryManager::IsForwardMovement()
 {
-	if (m_CurId != m_LastId)
+	if (!m_Points.IsEmpty())
 	{
-		return m_Points[m_CurId].movement != BACKWARD;
+		return m_Points.Front().movement != BACKWARD;
 	}
 	return true;
 }
@@ -140,16 +132,6 @@ void TrajectoryManager::Task()
 	Update();
 }
 
-bool TrajectoryManager::TrajIsFull()
-{
-	return (((m_LastId + 1) % SMOOTH_TRAJ_MAX_NB_POINTS) == m_CurId);
-}
-
-void TrajectoryManager::DecreaseId(uint32_t *id)
-{
-	*id = (*id + SMOOTH_TRAJ_MAX_NB_POINTS - 1) % SMOOTH_TRAJ_MAX_NB_POINTS;
-}
-
 void TrajectoryManager::AddPoint(TrajDest point, TrajWhen when)
 {
 
@@ -160,20 +142,16 @@ void TrajectoryManager::AddPoint(TrajDest point, TrajWhen when)
 		}
 
 		/* New points are added at the end of the list */
-		m_Points[m_LastId] = point;
-
-		/* Update end of list pointer */
-		m_LastId = (m_LastId + 1) % SMOOTH_TRAJ_MAX_NB_POINTS;
+		m_Points.PushBack(point);
 	}
 	else if (when == NOW) {
 		if (TrajIsFull()) {
-			DecreaseId(&(m_LastId));
+			m_Points.PopBack();
 			Serial.printf("[TrajectoryManager] Warning: List of points is full. Last point was removed.\n");
 		}
 
 		/* Insert a point before the current one */
-		DecreaseId(&(m_CurId));
-		m_Points[m_CurId] = point;
+		m_Points.PushFront(point);
 	}
 }
 
@@ -182,7 +160,7 @@ void TrajectoryManager::AddPoint(TrajDest point, TrajWhen when)
 void TrajectoryManager::Update()
 {
 	/* Nothing to do if there is no point in the list */
-	if (m_CurId == m_LastId) {
+	if (m_Points.IsEmpty()) {
 		return;
 	}
 
@@ -194,19 +172,19 @@ void TrajectoryManager::Update()
 	}
 
 	// reference to the next waypoint
-	TrajDest* next1 = m_Points + m_CurId;
-	float next1_dist = (PositionManager::Instance.GetPosMm() - next1->pos).Length();
+	const TrajDest& next1 = m_Points.Front();
+	float next1_dist = (PositionManager::Instance.GetPosMm() - next1.pos).Length();
 	// position the robot want to reach
 	Float2 target;
 
 	// it's a rotation
-	if (!IS_UNDEFINED_ANGLE(next1->a))
+	if (!IS_UNDEFINED_ANGLE(next1.a))
 	{
 		TRAJ_DEBUG("Simple rot");
-		if (ABS(next1->a - PositionManager::Instance.GetAngleRad()) < SMOOTH_TRAJ_DEFAULT_PRECISION_A_RAD) {
+		if (ABS(next1.a - PositionManager::Instance.GetAngleRad()) < SMOOTH_TRAJ_DEFAULT_PRECISION_A_RAD) {
 			NextPoint();
 		}
-		ControlSystem::Instance.SetRadAngleTarget(next1->a);
+		ControlSystem::Instance.SetRadAngleTarget(next1.a);
 	}
 	else
 	{
@@ -258,7 +236,7 @@ void TrajectoryManager::Update()
 #endif
 		{
 			TRAJ_DEBUG("one more waypoint");
-			target = next1->pos;
+			target = next1.pos;
 
 			// Waypoint reachs
 			if (next1_dist < SMOOTH_TRAJ_DEFAULT_PRECISION_D_MM)
@@ -278,7 +256,7 @@ float WrapAngle(float a)
 	return a - floor(a / M_TWOPI) * M_TWOPI - M_PI;
 }
 
-void TrajectoryManager::GotoTarget(const TrajDest* _nextPoint, const Float2 &_target)
+void TrajectoryManager::GotoTarget(const TrajDest &_nextPoint, const Float2 &_target)
 {
 	// Compute the angle and distance to send to the control system
 	//float angle_ref, remaining_dist;
@@ -294,16 +272,16 @@ void TrajectoryManager::GotoTarget(const TrajDest* _nextPoint, const Float2 &_ta
 	float AngleRef = atan2f(-(_target.x - PositionManager::Instance.GetXMm()), _target.y - PositionManager::Instance.GetYMm());
 	float RemainingDist = (PositionManager::Instance.GetPosMm() - _target).Length();
 
-	//printf("tar x:%d  y:%d  dist:%f  a:%f\r\n", (int)_target.x, (int)_target.y, (double)_nextPoint->, (double)angle_ref);
+	//printf("tar x:%d  y:%d  dist:%f  a:%f\r\n", (int)_target.x, (int)_target.y, (double)_nextPoint., (double)angle_ref);
 
 	// go backward
-	if (_nextPoint->movement != COMMON)
+	if (_nextPoint.movement != COMMON)
 	{
 		// just asserv in distance
-		if (_nextPoint->movement == BACKWARD) {
+		if (_nextPoint.movement == BACKWARD) {
 			ControlSystem::Instance.SetDistanceTarget(PositionManager::Instance.GetDistanceMm() - RemainingDist);
 		}
-		else if (_nextPoint->movement == FORWARD) {
+		else if (_nextPoint.movement == FORWARD) {
 			ControlSystem::Instance.SetDistanceTarget(PositionManager::Instance.GetDistanceMm() + RemainingDist);
 		}
 	}

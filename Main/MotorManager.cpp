@@ -1,4 +1,3 @@
-#include "WProgram.h"
 #include "MotorManager.h"
 #include "Platform.h"
 #include "PositionManager.h"

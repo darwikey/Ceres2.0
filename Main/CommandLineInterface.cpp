@@ -1,6 +1,3 @@
-#include <string.h>
-#include <WProgram.h>
-
 #include "PositionManager.h"
 #include "TrajectoryManager.h"
 #include "CommandLineInterface.h"
@@ -293,9 +290,12 @@ void CommandLineInterface::Task()
 			Serial.print("[K");//clear from cursor to the end of the line
 
 			// retrieve previous command
-			m_CurPos = strlen(m_History);
-			strcpy(m_Buffer, m_History);
-			Serial.print(m_History);
+			if (!m_History.IsEmpty())
+			{
+				m_CurPos = m_History.Back().Length();
+				strcpy(m_Buffer, m_History.Back().Str());
+				Serial.print(m_History.Back().Str());
+			}
 			continue;
 		}
 		m_Buffer[m_CurPos] = c;
@@ -344,9 +344,13 @@ void CommandLineInterface::Task()
 			Serial.print("Invalid command\r\n");
 		else
 		{
+			if (m_History.IsFull())
+				m_History.PopFront();
 			// copy to history
-			memcpy(m_History, m_Buffer, m_CurPos);
-			m_History[m_CurPos + 1] = '\0';
+			CString<CLI_BUFFER_SIZE> Tmp;
+			memcpy((char*)Tmp.Str(), m_Buffer, m_CurPos);
+			Tmp[m_CurPos + 1] = '\0';
+			m_History.PushBack(Tmp);
 		}
 
 		m_CurPos = 0;

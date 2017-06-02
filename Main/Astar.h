@@ -2,7 +2,7 @@
 #define _ASTAR_H_
 
 #include "Vector.h"
-#include "Float2.h"
+#include "Gloabls.h"
 
 struct AStarCoord
 {

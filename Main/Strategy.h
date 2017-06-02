@@ -1,7 +1,7 @@
 #ifndef _STRATEGY_H_
 #define _STRATEGY_H_
 
-#include "Float2.h"
+#include "Globals.h"
 
 #define ENABLE_POSITIONNING 0
 #define ENABLE_TIMER 0
