@@ -17,6 +17,8 @@ void CommandLineInterface::Init()
 		m_Command[i].help = help;
 		m_Command[i].function = fct;
 		i++;
+		if (i >= (int)_countof(m_Command))
+			Serial.print("too much command\r\n");
 	};
 
 	REGISTER_COMMAND("d", "Goto distance", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
@@ -295,6 +297,12 @@ void CommandLineInterface::Task()
 				m_CurPos = m_History.Back().Length();
 				strcpy(m_Buffer, m_History.Back().Str());
 				Serial.print(m_History.Back().Str());
+
+				m_CurHistoryId++;
+				if (m_CurHistoryId == m_History.GetCapacity())
+					m_CurHistoryId = 0;
+				if (m_CurHistoryId == m_History.GetBackId())
+					m_CurHistoryId = m_History.GetFrontId();
 			}
 			continue;
 		}
@@ -345,12 +353,14 @@ void CommandLineInterface::Task()
 		else
 		{
 			if (m_History.IsFull())
-				m_History.PopFront();
+				m_History.PopBack();
 			// copy to history
 			CString<CLI_BUFFER_SIZE> Tmp;
 			memcpy((char*)Tmp.Str(), m_Buffer, m_CurPos);
 			Tmp[m_CurPos + 1] = '\0';
-			m_History.PushBack(Tmp);
+
+			m_History.PushFront(Tmp);
+			m_CurHistoryId = m_History.GetFrontId();
 		}
 
 		m_CurPos = 0;

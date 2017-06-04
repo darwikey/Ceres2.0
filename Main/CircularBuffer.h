@@ -6,8 +6,9 @@ class CircularBuffer
 {
 public:
 	unsigned GetCapacity() { return CAPACITY; }
-
 	unsigned GetSize() { return (CAPACITY + m_BackId - m_FrontId) % CAPACITY; }
+	unsigned GetFrontId() { return m_FrontId; }
+	unsigned GetBackId() { return m_BackId; }
 
 	void PushFront(const T &_element)
 	{

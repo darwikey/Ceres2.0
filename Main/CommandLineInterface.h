@@ -51,8 +51,7 @@ private:
 
 	char m_Buffer[CLI_BUFFER_SIZE];
 	CircularBuffer<CString<CLI_BUFFER_SIZE>, CLI_HISTORY_MAX> m_History;
-	int m_CurHistoryId = 0;
-	int m_LastHistoryId = 0;
+	unsigned m_CurHistoryId = 0;
 	int m_CurPos = 0;
 };
 #endif /* CLI_H */
