@@ -298,9 +298,10 @@ void CommandLineInterface::Task()
 			// retrieve previous command
 			if (!m_History.IsEmpty())
 			{
-				m_CurPos = m_History.Back().Length();
-				strcpy(m_Buffer, m_History.Back().Str());
-				Serial.print(m_History.Back().Str());
+				const auto& PreviousCmd = m_History[m_CurHistoryId];
+				m_CurPos = PreviousCmd.Length();
+				strcpy(m_Buffer, PreviousCmd.Str());
+				Serial.print(PreviousCmd.Str());
 
 				m_CurHistoryId++;
 				if (m_CurHistoryId == m_History.GetCapacity())
@@ -361,7 +362,7 @@ void CommandLineInterface::Task()
 			// copy to history
 			CString<CLI_BUFFER_SIZE> Tmp;
 			memcpy((char*)Tmp.Str(), m_Buffer, m_CurPos);
-			Tmp[m_CurPos + 1] = '\0';
+			Tmp[m_CurPos] = '\0';
 
 			m_History.PushFront(Tmp);
 			m_CurHistoryId = m_History.GetFrontId();

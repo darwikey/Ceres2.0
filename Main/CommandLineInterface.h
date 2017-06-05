@@ -19,7 +19,7 @@ public:
 	CString() { m_Buffer[0] = '\0'; }
 	CString(const char* s) { strcpy(m_Buffer, s); }
 	CString(const CString &s) { strcpy(m_Buffer, s.m_Buffer); }
-	unsigned Length() { return strlen(m_Buffer); }
+	unsigned Length() const { return strlen(m_Buffer); }
 	char& operator[](unsigned i) { return m_Buffer[i]; }
 	//const char& operator[] const (unsigned i) { return m_Buffer[i]; }
 	const char* Str() const { return m_Buffer; }
