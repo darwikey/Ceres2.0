@@ -40,8 +40,9 @@ void TrajectoryManager::NextPoint()
 void TrajectoryManager::Print()
 {
 	Serial.printf("Number of points: %d", m_Points.GetSize());
-	//Serial.printf("cur id: %d\r\n", (int)m_CurId);
-	//Serial.printf("last id: %d\r\n", (int)m_LastId);
+	m_Points.Apply([](const TrajDest &t){
+		Serial.printf("Dest: mvt:%d, target:(%f, %f), angle:%f", (int)t.movement, t.pos.x, t.pos.y, t.a);
+	});
 	Serial.printf("is paused: %d\r\n", (int)m_Pause);
 }
 
