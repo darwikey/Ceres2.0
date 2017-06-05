@@ -223,6 +223,10 @@ void CommandLineInterface::Init()
 		Strategy::Instance.Print();
 	});
 
+	REGISTER_COMMAND("getControlSystem", "Debug asserv, arg: interval(int) between each draw, -1 to disable", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
+		ControlSystem::Instance.m_DebugInterval = atoi(_argv[0]);
+	});
+
 	REGISTER_COMMAND("getGP2", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
 		Platform::DebugGP2();
 	});

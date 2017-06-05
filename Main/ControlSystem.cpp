@@ -14,7 +14,6 @@
 #include "PositionManager.h"
 
 //#define PI 3.1415926535
-#define DEG2RAD(a) ((a) * PI / 180.0)
 
 ControlSystem ControlSystem::Instance;
 
@@ -46,7 +45,6 @@ void ControlSystem::Start()
 
 void ControlSystem::Task()
 {
-
 	PositionManager::Instance.Update();
 
 	if (m_Enable)
@@ -55,20 +53,31 @@ void ControlSystem::Task()
 		float DistanceCmd, AngleCmd;
 		{
 			float Target = m_quadramp_distance.Evaluate(m_DistanceTarget);
+			Debug("Angle target", Target);
 			float Measure = PositionManager::Instance.GetDistanceMm();
+			Debug("Angle measure", Measure);
 			float Error = Target - Measure;
+			Debug("Angle error", Error);
 			DistanceCmd = m_pid_distance.EvaluatePID(Error);
-			
+			Debug("Angle cmd", DistanceCmd);
 		}
 		{
 			float Target = m_quadramp_angle.Evaluate(m_AngleTarget);
+			Debug("Dist target", Target);
 			float Measure = PositionManager::Instance.GetAngleRad();
+			Debug("Dist measure", Measure);
 			float Error = Target - Measure;
+			Debug("Dist error", Error);
 			AngleCmd = m_pid_angle.EvaluatePID(Error);
+			Debug("Dist cmd", DistanceCmd);
 		}
 
 		SetMotorCmd(DistanceCmd, AngleCmd);
 	}
+
+	m_DebugCounter++;
+	if (m_DebugCounter >= m_DebugInterval)
+		m_DebugCounter = 0;
 }
 
 void ControlSystem::SetMotorCmd(float d_mm, float theta)
@@ -103,6 +112,18 @@ void ControlSystem::SetMotorCmd(float d_mm, float theta)
 	//printf("cmd right %d   left %d\r\n", (int)right_motor_ref, (int)left_motor_ref);
 	MotorManager::Instance.SetSpeed(MotorManager::RIGHT, right_motor_ref);
 	MotorManager::Instance.SetSpeed(MotorManager::LEFT, left_motor_ref);
+}
+
+void ControlSystem::Debug(const char * msg, float value)
+{
+	if (m_DebugInterval >= 0 && m_DebugCounter == 0)
+	{
+		int MsgLen = Serial.print(msg);
+		for (int i = 0; i < 15 - MsgLen; i++)
+			Serial.print(' ');
+		Serial.print(value);
+		Serial.print("\r\n");
+	}
 }
 
 // User functions

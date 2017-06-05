@@ -108,7 +108,7 @@ void TrajectoryManager::GotoDistance(float d) {
 
 void TrajectoryManager::GotoDegreeAngle(float a) {
 	// convert to radian
-	a *= 0.01745329f;
+	a = DEG2RAD(a);
 
 	GotoRadianAngle(a);
 }

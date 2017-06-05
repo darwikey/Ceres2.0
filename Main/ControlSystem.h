@@ -54,9 +54,11 @@ public:
 	void ResetAngle();
 
 	bool m_Enable = true;
+	int m_DebugInterval = -1;
 
 private:
 	void SetMotorCmd(float d_mm, float theta);
+	void Debug(const char *msg, float value);
 	
 	float m_DistanceTarget;
 	float m_AngleTarget;
@@ -69,6 +71,7 @@ private:
 
 	uint32_t m_MotorCounter = 0;
 	Float2 m_LastPosition;
+	int m_DebugCounter = 0;
 };
 
 
