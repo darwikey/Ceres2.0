@@ -178,19 +178,6 @@ void Strategy::Task()
 		TrajectoryManager::Instance.GotoDistance(-150.f);
 		break;
 
-#if ENABLE_EXTRA
-	case State::MODULE_RECAL0:
-		TrajectoryManager::Instance.GotoXY(GetCorrectPos(202.f + 150.f, 360.f + 200.f));
-		TrajectoryManager::Instance.GotoDegreeAngle(GetCorrectAngle(0.f));
-		break;
-
-	case State::MODULE_RECAL1:
-		PushRobotAgainstWall(2000, false);
-		RePosAgainstFrontBase();
-		TrajectoryManager::Instance.GotoDistance(150.f);
-		break;
-#endif
-
 	case State::MODULE_E1:
 		SetGripState(GripState::NORMAL);
 		SetArmState(ArmState::NORMAL);

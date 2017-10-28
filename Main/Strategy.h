@@ -5,8 +5,7 @@
 
 #define ENABLE_POSITIONNING 0
 #define ENABLE_TIMER 0
-#define ENABLE_AVOIDANCE 1
-#define ENABLE_EXTRA 1
+#define ENABLE_AVOIDANCE 0
 
 #define ROBOT_WIDTH 235.f
 #define ROBOT_CENTER_BACK 55.f // distance between axle and back

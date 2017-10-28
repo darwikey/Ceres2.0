@@ -72,7 +72,7 @@ void loop() {
 
 	CommandLineInterface::Instance.Task();
 
-	Strategy::Instance.Task();
+	//Strategy::Instance.Task();
 
 	TrajectoryManager::Instance.Task();
 
