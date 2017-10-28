@@ -20,8 +20,8 @@ ControlSystem ControlSystem::Instance;
 
 void ControlSystem::Start()
 {
-	m_pid_distance.Init(0.05f, 0/*0.005*/, 0.05f);
-	m_pid_angle.Init(0.05f, 0, 0.05f);//0.3, 0/*0.005*/, 0.2);
+	m_pid_distance.Init(0.1f, 0/*0.005*/, 0.05f);
+	m_pid_angle.Init(0.2f, 0, 0.05f);//0.3, 0/*0.005*/, 0.2);
 
 	m_pid_distance.SetOutputRange(-100, 100);
 	m_pid_angle.SetOutputRange(-100, 100);

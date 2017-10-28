@@ -1,6 +1,7 @@
 #include "MotorManager.h"
 #include "Platform.h"
 #include "PositionManager.h"
+#include "ControlSystem.h"
 
 const int motorPWMs[] = { 22, 23 };
 const int motorDirs[] = { 26, 31 };
@@ -46,16 +47,16 @@ void MotorManager::updateMotor(MotorId m, int speed)
 	int32_t curEnc = (m == RIGHT) ? PositionManager::Instance.GetLeftEncoder() : PositionManager::Instance.GetRightEncoder(); // Yep it's not logic...
 	int32_t actualSpeed = curEnc - m_LastEnc[m];
 	m_LastEnc[m] = curEnc;
-	int32_t err = speed - actualSpeed;
+	float err = (speed - actualSpeed);// *(1.f / CONTROL_SYSTEM_PERIOD_S);
 
 	int cmd;
 	if (m == RIGHT)
 	{
-		cmd = m_RightMotorPID.EvaluatePID((float)err);
+		cmd = m_RightMotorPID.EvaluatePID(err);
 	}
 	else
 	{
-		cmd = m_LeftMotorPID.EvaluatePID((float)err);
+		cmd = m_LeftMotorPID.EvaluatePID(err);
 	}
 
 	SendCommand(m, cmd);
