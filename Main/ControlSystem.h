@@ -71,6 +71,7 @@ private:
 
 	uint32_t m_MotorCounter = 0;
 	Float2 m_LastPosition;
+	float m_LastAngle = 0.f;
 	int m_DebugCounter = 0;
 };
 

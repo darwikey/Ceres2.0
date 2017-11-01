@@ -95,9 +95,11 @@ void ControlSystem::SetMotorCmd(float d_mm, float theta)
 		m_MotorCounter = 0;
 
 	// if the robot has changed its position
-	if ((m_LastPosition - PositionManager::Instance.GetPosMm()).LengthSquared() > 20.f * 20.f)
+	if ((m_LastPosition - PositionManager::Instance.GetPosMm()).LengthSquared() > 20.f * 20.f
+		|| abs(m_LastAngle - PositionManager::Instance.GetAngleRad()) > DEG2RAD(20.f))
 	{
 		m_LastPosition = PositionManager::Instance.GetPosMm();
+		m_LastAngle = PositionManager::Instance.GetAngleRad();
 		m_MotorCounter = 0;
 	}
 
