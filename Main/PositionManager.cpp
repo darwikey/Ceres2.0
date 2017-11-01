@@ -42,6 +42,8 @@ void PositionManager::Init(uint32_t ticks_per_m, double axle_track_mm) {
 
 	m_XMm = 0;
 	m_YMm = 0;
+	m_TheoreticalPosMm = Float2();
+	m_TheoreticalAngleRad = 0;
 }
 
 void PositionManager::Update()
@@ -144,13 +146,24 @@ float PositionManager::GetAngleRad(void) {
 }
 
 float PositionManager::GetAngleDeg(void) {
-	return GetAngleRad() * 180.f / M_PI;
+	return RAD2DEG(GetAngleRad());
 }
 
 void PositionManager::SetAngleDeg(float a) {
-	m_AngleRad = a * M_PI / 180.f;
+	m_AngleRad = DEG2RAD(a);
+	m_TheoreticalAngleRad = m_AngleRad;
 	ControlSystem::Instance.SetRadAngleTarget(m_AngleRad);
 	ControlSystem::Instance.ResetAngle();
+}
+
+float PositionManager::GetTheoreticalAngleRad(void)
+{
+	return m_TheoreticalAngleRad;
+}
+
+void PositionManager::SetTheoreticalAngleRad(float a)
+{
+	m_TheoreticalAngleRad = a;
 }
 
 float PositionManager::GetXMm(void) {
@@ -179,7 +192,18 @@ void PositionManager::SetPosMm(const Float2 &_pos){
 	Scheduler::disable();
 	m_XMm = _pos.x;
 	m_YMm = _pos.y;
+	m_TheoreticalPosMm = _pos;
 	Scheduler::enable();
+}
+
+Float2 PositionManager::GetTheoreticalPosMm()
+{
+	return m_TheoreticalPosMm;
+}
+
+void PositionManager::SetTheoreticalPosMm(const Float2 & _pos)
+{
+	m_TheoreticalPosMm = _pos;
 }
 
 int32_t PositionManager::MmToTicks(float value_mm) {

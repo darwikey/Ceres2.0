@@ -30,10 +30,14 @@ public:
 	float GetAngleRad(void);
 	float GetAngleDeg(void);
 	void SetAngleDeg(float a);
+	float GetTheoreticalAngleRad(void);
+	void SetTheoreticalAngleRad(float a);
 	float GetXMm(void);
 	float GetYMm(void);
 	Float2 GetPosMm();
 	void SetPosMm(const Float2 &_pos);
+	Float2 GetTheoreticalPosMm();
+	void SetTheoreticalPosMm(const Float2& _pos);
 
 	int32_t MmToTicks(float value_mm);
 
@@ -49,6 +53,8 @@ private:
 	double m_DistanceMm;
 	double m_AngleRad;
 	double m_XMm, m_YMm;
+	Float2 m_TheoreticalPosMm;
+	float  m_TheoreticalAngleRad;
 };
 
 #endif /* POSITION_MANAGER_H */

@@ -54,7 +54,7 @@ private:
 	struct TrajDest {
 
 		Float2 pos;//mm
-		float a;//rad
+		float angle;//rad
 		OrderType movement;
 	};
 

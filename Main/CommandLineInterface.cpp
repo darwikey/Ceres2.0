@@ -40,9 +40,14 @@ void CommandLineInterface::Init()
 	});
 
 	REGISTER_COMMAND("test", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
-		TrajectoryManager::Instance.GotoXY(Float2(0, 500));
-		TrajectoryManager::Instance.GotoXY(Float2(500, 500));
-		TrajectoryManager::Instance.GotoXY(Float2(500, 0));
+		TrajectoryManager::Instance.GotoDistance(150);
+		TrajectoryManager::Instance.GotoDegreeAngle(90);
+		TrajectoryManager::Instance.GotoDistance(150);
+		TrajectoryManager::Instance.GotoDegreeAngle(180);
+		TrajectoryManager::Instance.GotoDistance(150);
+		TrajectoryManager::Instance.GotoDegreeAngle(270);
+		TrajectoryManager::Instance.GotoDistance(150);
+		TrajectoryManager::Instance.GotoDegreeAngle(0);
 	});
 
 	REGISTER_COMMAND("stop", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
@@ -174,11 +179,13 @@ void CommandLineInterface::Init()
 	});
 
 	REGISTER_COMMAND("getPos", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
-		Serial.printf("Robot pos mm: %f, %f\r\n", PositionManager::Instance.GetXMm(), PositionManager::Instance.GetYMm());
+		Serial.printf("Robot pos mm:    %f, %f\r\n", PositionManager::Instance.GetXMm(), PositionManager::Instance.GetYMm());
+		Serial.printf("theoretical pos: %f, %f\r\n", PositionManager::Instance.GetTheoreticalPosMm().x, PositionManager::Instance.GetTheoreticalPosMm().y);
 	});
 		
 	REGISTER_COMMAND("getA", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
-		Serial.printf("Robot angle deg: %f\r\n", PositionManager::Instance.GetAngleDeg());
+		Serial.printf("Robot angle deg:   %f\r\n", PositionManager::Instance.GetAngleDeg());
+		Serial.printf("theoretical angle: %f\r\n", RAD2DEG(PositionManager::Instance.GetTheoreticalAngleRad()));
 	});
 		
 	REGISTER_COMMAND("getD", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {

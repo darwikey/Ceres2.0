@@ -33,6 +33,17 @@ void TrajectoryManager::NextPoint()
 {
 	TRAJ_DEBUG("NextPoint");
 	if (!m_Points.IsEmpty()) {
+		const TrajDest& current = m_Points.Front();
+
+		// it's a rotation
+		if (!IS_UNDEFINED_ANGLE(current.angle))
+		{
+			PositionManager::Instance.SetTheoreticalAngleRad(current.angle);
+		}
+		else
+		{
+			PositionManager::Instance.SetTheoreticalPosMm(current.pos);
+		}
 		m_Points.PopFront();
 	}
 }
@@ -41,7 +52,7 @@ void TrajectoryManager::Print()
 {
 	Serial.printf("Number of points: %d", m_Points.GetSize());
 	m_Points.Apply([](const TrajDest &t){
-		Serial.printf("Dest: mvt:%d, target:(%f, %f), angle:%f", (int)t.movement, t.pos.x, t.pos.y, t.a);
+		Serial.printf("Dest: mvt:%d, target:(%f, %f), angle:%f", (int)t.movement, t.pos.x, t.pos.y, t.angle);
 	});
 	Serial.printf("is paused: %d\r\n", (int)m_Pause);
 }
@@ -83,23 +94,40 @@ void TrajectoryManager::GotoXY(const Float2 &_pos_mm)
 	TrajDest dest;
 
 	dest.pos = _pos_mm;
-	dest.a = UNDEFINED_ANGLE;
+	dest.angle = UNDEFINED_ANGLE;
 	dest.movement = COMMON;
 
 	AddPoint(dest, END);
 }
 
-void TrajectoryManager::GotoDistance(float d) {
-	float angle = PositionManager::Instance.GetAngleRad();
+void TrajectoryManager::GotoDistance(float _dist) {
+
+	float finalAngle = PositionManager::Instance.GetTheoreticalAngleRad();
+	Float2 finalPos = PositionManager::Instance.GetTheoreticalPosMm();
+
+	auto fct = [&](const TrajDest &t) {
+		// it's a rotation
+		if (!IS_UNDEFINED_ANGLE(t.angle))
+		{
+			finalAngle = t.angle;
+		}
+		else
+		{
+			finalPos = t.pos;
+		}
+	};
+	// find the position & angle at the end
+	m_Points.Apply(fct);
+
 	//Float2 v (d * cos(angle), -d * sin(angle));
-	Float2 v(-d * sin(angle), d * cos(angle));
+	Float2 v(-_dist * sin(finalAngle), _dist * cos(finalAngle));
 
 	TrajDest dest;
-	dest.pos = v + PositionManager::Instance.GetPosMm();
-	dest.a = UNDEFINED_ANGLE;
+	dest.pos = v + finalPos;
+	dest.angle = UNDEFINED_ANGLE;
 	//Serial.printf("x %f, y %f\r\n", dest.pos.x, dest.pos.y);
 
-	if (d >= 0.f)
+	if (_dist >= 0.f)
 		dest.movement = FORWARD;
 	else
 		dest.movement = BACKWARD;
@@ -119,7 +147,7 @@ void TrajectoryManager::GotoRadianAngle(float a)
 	TrajDest dest;
 
 	dest.pos = PositionManager::Instance.GetPosMm();
-	dest.a = a;
+	dest.angle = a;
 	dest.movement = COMMON;
 
 	AddPoint(dest, END);
@@ -179,13 +207,13 @@ void TrajectoryManager::Update()
 	Float2 target;
 
 	// it's a rotation
-	if (!IS_UNDEFINED_ANGLE(next1.a))
+	if (!IS_UNDEFINED_ANGLE(next1.angle))
 	{
 		TRAJ_DEBUG("Simple rot");
-		if (ABS(next1.a - PositionManager::Instance.GetAngleRad()) < SMOOTH_TRAJ_DEFAULT_PRECISION_A_RAD) {
+		if (ABS(next1.angle - PositionManager::Instance.GetAngleRad()) < SMOOTH_TRAJ_DEFAULT_PRECISION_A_RAD) {
 			NextPoint();
 		}
-		ControlSystem::Instance.SetRadAngleTarget(next1.a);
+		ControlSystem::Instance.SetRadAngleTarget(next1.angle);
 	}
 	else
 	{
