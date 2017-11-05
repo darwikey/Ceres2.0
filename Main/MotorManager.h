@@ -1,7 +1,9 @@
 #ifndef MOTOR_MANAGER_H
 #define MOTOR_MANAGER_H
 
+#include "Globals.h"
 #include "PIDController.h"
+#include "CircularBuffer.h"
 
 class MotorManager
 {
@@ -31,7 +33,7 @@ private:
 	PIDController m_RightMotorPID;
 	PIDController m_LeftMotorPID;
 
-	int32_t m_LastEnc[2] = {0};
+	CircularBuffer<int32_t, 6> m_LastEncoder[2];
 };
 
 #endif
