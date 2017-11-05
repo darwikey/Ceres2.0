@@ -40,13 +40,15 @@ void CommandLineInterface::Init()
 	});
 
 	REGISTER_COMMAND("test", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
-		TrajectoryManager::Instance.GotoDistance(150);
+		//square
+		float l = 300;
+		TrajectoryManager::Instance.GotoDistance(l);
 		TrajectoryManager::Instance.GotoDegreeAngle(90);
-		TrajectoryManager::Instance.GotoDistance(150);
+		TrajectoryManager::Instance.GotoDistance(l);
 		TrajectoryManager::Instance.GotoDegreeAngle(180);
-		TrajectoryManager::Instance.GotoDistance(150);
+		TrajectoryManager::Instance.GotoDistance(l);
 		TrajectoryManager::Instance.GotoDegreeAngle(270);
-		TrajectoryManager::Instance.GotoDistance(150);
+		TrajectoryManager::Instance.GotoDistance(l);
 		TrajectoryManager::Instance.GotoDegreeAngle(0);
 	});
 
