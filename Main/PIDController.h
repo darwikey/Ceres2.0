@@ -44,8 +44,7 @@ class PIDController
 {
 public:
 	void Init(float Kp, float Ki, float Kd);
-	void SetOutputRange(float min_output, float max_output);
-	void SetErrorDeadband(float error_deadband);
+	void SetOutputRange(float max_output);
 
 	void SetKP(float Kp);
 	void SetKI(float Ki);
@@ -53,7 +52,7 @@ public:
 
 	float GetKP();
 	float GetKI();
-	float GetKd();
+	float GetKD();
 
 	float GetError();
 	float GetErrorSum();
@@ -70,11 +69,7 @@ private:
 	float m_error_sum; /*!< Sum of previous errors. */
 	float m_error_diff; /*!< Diff with previous errors. */
 
-	float m_min_output; /*!< Minimum saturation output value. */
 	float m_max_output; /*!< Maximum saturation output value. */
-
-	float m_error_deadband; /*!< An error within this deadband is considered equaling zero. */
-
 };
 
 #endif

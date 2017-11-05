@@ -209,13 +209,13 @@ void CommandLineInterface::Init()
 	REGISTER_COMMAND("getPID", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
 		Serial.printf("Distance PID: %f, %f, %f\r\n", ControlSystem::Instance.GetDistancePID().GetKP(),
 			ControlSystem::Instance.GetDistancePID().GetKI(),
-			ControlSystem::Instance.GetDistancePID().GetKd());
+			ControlSystem::Instance.GetDistancePID().GetKD());
 		Serial.printf("Angle PID:    %f, %f, %f\r\n", ControlSystem::Instance.GetAnglePID().GetKP(),
 			ControlSystem::Instance.GetAnglePID().GetKI(),
-			ControlSystem::Instance.GetAnglePID().GetKd());
+			ControlSystem::Instance.GetAnglePID().GetKD());
 		Serial.printf("Motors PID:    %f, %f, %f\r\n", MotorManager::Instance.GetLeftMotorPID().GetKP(),
 			MotorManager::Instance.GetLeftMotorPID().GetKI(),
-			MotorManager::Instance.GetLeftMotorPID().GetKd());
+			MotorManager::Instance.GetLeftMotorPID().GetKD());
 	});
 
 	#ifdef ENABLE_ASTAR
