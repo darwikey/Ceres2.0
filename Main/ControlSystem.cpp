@@ -53,23 +53,23 @@ void ControlSystem::Task()
 		float DistanceCmd, AngleCmd;
 		{
 			float Target = m_quadramp_distance.Evaluate(m_DistanceTarget);
-			Debug("Angle target", Target);
-			float Measure = PositionManager::Instance.GetDistanceMm();
-			Debug("Angle measure", Measure);
-			float Error = Target - Measure;
-			Debug("Angle error", Error);
-			DistanceCmd = m_pid_distance.EvaluatePID(Error);
-			Debug("Angle cmd", DistanceCmd);
-		}
-		{
-			float Target = m_quadramp_angle.Evaluate(m_AngleTarget);
 			Debug("Dist target", Target);
-			float Measure = PositionManager::Instance.GetAngleRad();
+			float Measure = PositionManager::Instance.GetDistanceMm();
 			Debug("Dist measure", Measure);
 			float Error = Target - Measure;
 			Debug("Dist error", Error);
-			AngleCmd = m_pid_angle.EvaluatePID(Error);
+			DistanceCmd = m_pid_distance.EvaluatePID(Error);
 			Debug("Dist cmd", DistanceCmd);
+		}
+		{
+			float Target = m_quadramp_angle.Evaluate(m_AngleTarget);
+			Debug("Angle target", Target);
+			float Measure = PositionManager::Instance.GetAngleRad();
+			Debug("Angle measure", Measure);
+			float Error = Target - Measure;
+			Debug("Angle error", Error);
+			AngleCmd = m_pid_angle.EvaluatePID(Error);
+			Debug("Angle cmd", AngleCmd);
 		}
 
 		SetMotorCmd(DistanceCmd, AngleCmd);
