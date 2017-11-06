@@ -19,8 +19,8 @@ void MotorManager::Init()
 	}
 	m_RightMotorPID.Init(0.f, 0.f, 0.f);
 	m_LeftMotorPID.Init(0.f, 0.f, 0.f);
-	SetMotorPidP(0.5f);
-	SetMotorPidD(0.f);
+	SetMotorPidP(1.f);
+	SetMotorPidD(0.25f);
 }
 
 void MotorManager::SetSpeed(MotorId m, int32_t speed)
@@ -40,7 +40,7 @@ void MotorManager::SendCommand(MotorId m, int32_t cmd)
 	if (AbsCmd < 2)
 		AbsCmd = 0;
 	else
-		AbsCmd += 10;
+		AbsCmd += 12;
 	
 	const int32_t maxi = 255;
 	analogWrite(motorPWMs[m], (AbsCmd > maxi) ? maxi : AbsCmd);
@@ -49,6 +49,14 @@ void MotorManager::SendCommand(MotorId m, int32_t cmd)
 
 void MotorManager::updateMotor(MotorId m, int speed)
 {
+	//static double tt = -45;
+	//if (m == LEFT)
+	//	tt += 0.04;
+	//if (tt > 0)
+	//	speed = (m == RIGHT) ? -tt : tt;
+	//else
+	//	speed = 0;
+
 	int32_t curEnc = (m == RIGHT) ? PositionManager::Instance.GetLeftEncoder() : PositionManager::Instance.GetRightEncoder(); // Yep it's not logic...
 	auto & buffer = m_LastEncoder[m];
 	float actualSpeed = 0;
@@ -72,6 +80,13 @@ void MotorManager::updateMotor(MotorId m, int speed)
 		cmd = m_LeftMotorPID.EvaluatePID(err);
 	}
 
+	//if (tt >= 0)
+	//{
+	//	if (m == LEFT)
+	//		Serial.printf("%d %d %f ", speed, cmd, actualSpeed);
+	//	else
+	//		Serial.printf("%d %f\r\n", -cmd, -actualSpeed);
+	//}
 	SendCommand(m, cmd);
 }
 

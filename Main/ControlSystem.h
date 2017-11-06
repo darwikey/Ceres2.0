@@ -21,7 +21,7 @@
 #define DISTANCE_MAX_ACC   500 // in mm/s^2
 
 #define ANGLE_MAX_SPEED_DEG 180 // in deg/s
-#define ANGLE_MAX_ACC_DEG   360 // in deg/s^2
+#define ANGLE_MAX_ACC_DEG   250 // in deg/s^2
 
 class ControlSystem
 {

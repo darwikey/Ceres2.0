@@ -19,11 +19,11 @@ ControlSystem ControlSystem::Instance;
 
 void ControlSystem::Start()
 {
-	m_pid_distance.Init(0.1f, 0.025f, 0.05f);
-	m_pid_angle.Init(0.2f, 0.05f, 0.05f);
+	m_pid_distance.Init(0.075f, 0.037f, 0.037f);
+	m_pid_angle.Init(0.1f, 0.05f, 0.025f);
 
-	m_pid_distance.SetOutputRange(100);
-	m_pid_angle.SetOutputRange(3);
+	m_pid_distance.SetOutputRange(10.f);
+	m_pid_angle.SetOutputRange(0.25f);
 
 	// Quadramp setup
 	m_quadramp_distance.Init();
@@ -70,6 +70,19 @@ void ControlSystem::Task()
 			AngleCmd = m_pid_angle.EvaluatePID(Error);
 			Debug("Angle cmd", AngleCmd);
 		}
+#if 0
+		static float DistCmdMax = 0.f, AngleCmdMax = 0.f;
+		if (abs(DistanceCmd) > DistCmdMax)
+		{
+			DistCmdMax = abs(DistanceCmd);
+			Serial.printf("cmd dist %f\r\n", DistCmdMax);
+		}
+		if (abs(AngleCmd) > AngleCmdMax)
+		{
+			AngleCmdMax = abs(AngleCmd);
+			Serial.printf("cmd angle %f\r\n", AngleCmdMax);
+		}
+#endif
 
 		SetMotorCmd(DistanceCmd, AngleCmd);
 	}
