@@ -67,8 +67,8 @@ void CommandLineInterface::Init()
 
 	REGISTER_COMMAND("setSpeedRatio", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
 		float value = atof(_argv[0]);
-		ControlSystem::Instance.SetSpeedRatio(value);
-		Serial.printf("Speed: %f\r\n", value);
+		ControlSystem::Instance.SetSpeedAccelerationRatio(value);
+		Serial.printf("ratio : %f\r\n", value);
 	});
 
 	REGISTER_COMMAND("setPidDistP", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
@@ -216,6 +216,13 @@ void CommandLineInterface::Init()
 		Serial.printf("Motors PID:    %f, %f, %f\r\n", MotorManager::Instance.GetLeftMotorPID().GetKP(),
 			MotorManager::Instance.GetLeftMotorPID().GetKI(),
 			MotorManager::Instance.GetLeftMotorPID().GetKD());
+	});
+
+	REGISTER_COMMAND("getQuadramp", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
+		Serial.printf("Distance : speed=%f, acc=%f\r\n", ControlSystem::Instance.GetDistanceQuadramp().Get1stOrderPos(),
+			ControlSystem::Instance.GetDistanceQuadramp().Get2ndOrderPos());
+		Serial.printf("Angle :    speed=%f, acc=%f\r\n", RAD2DEG(ControlSystem::Instance.GetAngleQuadramp().Get1stOrderPos()),
+			RAD2DEG(ControlSystem::Instance.GetAngleQuadramp().Get2ndOrderPos()));
 	});
 
 	#ifdef ENABLE_ASTAR

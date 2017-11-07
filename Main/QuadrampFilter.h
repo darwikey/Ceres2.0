@@ -73,33 +73,10 @@
 #ifndef QUADRAMP_H
 #define QUADRAMP_H
 
- /** @addtogroup Libausbee
-   * @{
-   */
 
-   /** @addtogroup Control_System
-	 * @brief Control engineering module
-	 * @{
-	 */
-
-	 /** @addtogroup Filters
-	   * @brief Filters for the control engineering module
-	   * @{
-	   */
-
-	   /** @addtogroup Quadramp
-		 * @brief Quadramp filter
-		 * @{
-		 */
-
-		 /**
-		  * @struct ausbee_quadramp
-		  * @brief Quadramp filter structure
-		  *
-		  * ausbee_quadramp contains all the parameters and status of the QuadrampFilter
-		  * filter.
-		  *
-		  */
+/**
+ * @brief Quadramp filter structure
+ */
 class QuadrampFilter
 {
 public:
@@ -133,8 +110,10 @@ public:
 	void SetEvalPeriod(float period);
 
 	void Set2ndOrderVars(float var_2nd_ord_pos, float var_2nd_ord_neg);
-
 	void Set1stOrderVars(float var_1st_ord_pos, float var_1st_ord_neg);
+
+	float Get1stOrderPos() const { return m_var_1st_ord_pos; }
+	float Get2ndOrderPos() const { return m_var_2nd_ord_pos; }
 
 	void Reset(float value);
 
@@ -154,21 +133,3 @@ private:
 
 
 #endif /* QUADRAMP_H */
-
-/**
-  * @}
-  */
-
-  /**
-	* @}
-	*/
-
-	/**
-	  * @}
-	  */
-
-	  /**
-		* @}
-		*/
-
-		/************** (C) COPYRIGHT 2013-2014 Eirbot **** END OF FILE ****/

@@ -34,21 +34,21 @@ public:
 	void SetDistanceTarget(float ref_mm);
 	void SetDegAngleTarget(float ref);
 	void SetRadAngleTarget(float ref_rad);
-	void SetRightMotorTarget(int32_t ref);
-	void SetMotorTarget(int32_t ref);
 
 	void SetDistanceMaxSpeed(float max_speed);
 	void SetDistanceMaxAcc(float max_acc);
 	void SetAngleMaxSpeed(float max_speed);
 	void SetAngleMaxAcc(float max_acc);
 
-	void SetSpeedRatio(float ratio);
+	void SetSpeedAccelerationRatio(float ratio);
 	void SetSpeedHigh();
 	void SetSpeedMedium();
 	void SetSpeedLow();
 
-	PIDController& GetDistancePID();
-	PIDController& GetAnglePID();
+	PIDController& GetDistancePID() { return m_DistancePID; }
+	PIDController& GetAnglePID()	{ return m_AnglePID; }
+	const QuadrampFilter & GetDistanceQuadramp() const	{ return m_DistanceQuadramp; }
+	const QuadrampFilter & GetAngleQuadramp() const		{ return m_AngleQuadramp; }
 
 	void Reset();
 	void ResetAngle();
@@ -63,11 +63,11 @@ private:
 	float m_DistanceTarget;
 	float m_AngleTarget;
 
-	PIDController m_pid_distance;
-	PIDController m_pid_angle;
+	PIDController m_DistancePID;
+	PIDController m_AnglePID;
 
-	QuadrampFilter m_quadramp_distance;
-	QuadrampFilter m_quadramp_angle;
+	QuadrampFilter m_DistanceQuadramp;
+	QuadrampFilter m_AngleQuadramp;
 
 	uint32_t m_MotorCounter = 0;
 	Float2 m_LastPosition;

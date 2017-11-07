@@ -19,24 +19,21 @@ ControlSystem ControlSystem::Instance;
 
 void ControlSystem::Start()
 {
-	m_pid_distance.Init(0.075f, 0.037f, 0.037f);
-	m_pid_angle.Init(0.1f, 0.05f, 0.025f);
+	m_DistancePID.Init(0.075f, 0.037f, 0.037f);
+	m_AnglePID.Init(0.1f, 0.05f, 0.025f);
 
-	m_pid_distance.SetOutputRange(10.f);
-	m_pid_angle.SetOutputRange(0.25f);
+	m_DistancePID.SetOutputRange(10.f);
+	m_AnglePID.SetOutputRange(0.25f);
 
 	// Quadramp setup
-	m_quadramp_distance.Init();
-	m_quadramp_angle.Init();
+	m_DistanceQuadramp.Init();
+	m_AngleQuadramp.Init();
 
 	// Setting QuadrampFilter eval period to the control system period
-	m_quadramp_distance.SetEvalPeriod(CONTROL_SYSTEM_PERIOD_S);
-	m_quadramp_angle.SetEvalPeriod(CONTROL_SYSTEM_PERIOD_S);
+	m_DistanceQuadramp.SetEvalPeriod(CONTROL_SYSTEM_PERIOD_S);
+	m_AngleQuadramp.SetEvalPeriod(CONTROL_SYSTEM_PERIOD_S);
 
-	m_quadramp_distance.Set2ndOrderVars(DISTANCE_MAX_ACC, DISTANCE_MAX_ACC); // Translation acceleration (in mm/s^2)
-	m_quadramp_angle.Set2ndOrderVars(DEG2RAD(ANGLE_MAX_ACC_DEG),	DEG2RAD(ANGLE_MAX_ACC_DEG)); // Rotation acceleration (in rad/s^2)
-
-	SetSpeedHigh();
+	SetSpeedHigh();// init quandramp
 
 	m_DistanceTarget = 0.f;
 	m_AngleTarget = 0.f;
@@ -51,23 +48,23 @@ void ControlSystem::Task()
 		//platform_led_toggle(PLATFORM_LED1);
 		float DistanceCmd, AngleCmd;
 		{
-			float Target = m_quadramp_distance.Evaluate(m_DistanceTarget);
+			float Target = m_DistanceQuadramp.Evaluate(m_DistanceTarget);
 			Debug("Dist target", Target);
 			float Measure = PositionManager::Instance.GetDistanceMm();
 			Debug("Dist measure", Measure);
 			float Error = Target - Measure;
 			Debug("Dist error", Error);
-			DistanceCmd = m_pid_distance.EvaluatePID(Error);
+			DistanceCmd = m_DistancePID.EvaluatePID(Error);
 			Debug("Dist cmd", DistanceCmd);
 		}
 		{
-			float Target = m_quadramp_angle.Evaluate(m_AngleTarget);
+			float Target = m_AngleQuadramp.Evaluate(m_AngleTarget);
 			Debug("Angle target", Target);
 			float Measure = PositionManager::Instance.GetAngleRad();
 			Debug("Angle measure", Measure);
 			float Error = Target - Measure;
 			Debug("Angle error", Error);
-			AngleCmd = m_pid_angle.EvaluatePID(Error);
+			AngleCmd = m_AnglePID.EvaluatePID(Error);
 			Debug("Angle cmd", AngleCmd);
 		}
 #if 0
@@ -165,72 +162,59 @@ void ControlSystem::SetRadAngleTarget(float ref_rad)
 
 void ControlSystem::SetDistanceMaxSpeed(float max_speed)
 {
-	m_quadramp_distance.Set1stOrderVars(max_speed, max_speed);
+	m_DistanceQuadramp.Set1stOrderVars(max_speed, max_speed);
 }
 
 void ControlSystem::SetDistanceMaxAcc(float max_acc)
 {
-	m_quadramp_distance.Set2ndOrderVars(max_acc, max_acc);
+	m_DistanceQuadramp.Set2ndOrderVars(max_acc, max_acc);
 }
 
 void ControlSystem::SetAngleMaxSpeed(float max_speed)
 {
-	m_quadramp_angle.Set1stOrderVars(DEG2RAD(max_speed), DEG2RAD(max_speed));
+	m_AngleQuadramp.Set1stOrderVars(DEG2RAD(max_speed), DEG2RAD(max_speed));
 }
 
 void ControlSystem::SetAngleMaxAcc(float max_acc)
 {
-	m_quadramp_angle.Set2ndOrderVars(DEG2RAD(max_acc), DEG2RAD(max_acc));
+	m_AngleQuadramp.Set2ndOrderVars(DEG2RAD(max_acc), DEG2RAD(max_acc));
 }
 
-void ControlSystem::SetSpeedRatio(float ratio)
+void ControlSystem::SetSpeedAccelerationRatio(float ratio)
 {
-	if (ratio < 0) {
-		ratio = 0;
-	}
-	else if (ratio > 1) {
-		ratio = 1;
-	}
+	ratio = Math::Clamp(ratio, 0.f, 1.f);
 
 	SetDistanceMaxSpeed(ratio*DISTANCE_MAX_SPEED); // Translation speed (in mm/s)
-
 	SetAngleMaxSpeed(ratio*ANGLE_MAX_SPEED_DEG); // Rotation speed (in rad/s)
+
+	SetDistanceMaxAcc(ratio * DISTANCE_MAX_ACC); // Translation acceleration (in mm/s^2)
+	SetAngleMaxAcc(ratio * ANGLE_MAX_ACC_DEG); // Rotation acceleration (in rad/s^2)
 }
 
 void ControlSystem::SetSpeedHigh()
 {
-	SetSpeedRatio(1);
+	SetSpeedAccelerationRatio(1);
 }
 
 void ControlSystem::SetSpeedMedium()
 {
-	SetSpeedRatio(0.7);
+	SetSpeedAccelerationRatio(0.7);
 }
 
 void ControlSystem::SetSpeedLow()
 {
-	SetSpeedRatio(0.5);
-}
-
-PIDController& ControlSystem::GetDistancePID()
-{
-	return m_pid_distance;
-}
-
-PIDController& ControlSystem::GetAnglePID()
-{
-	return m_pid_angle;
+	SetSpeedAccelerationRatio(0.5);
 }
 
 void ControlSystem::Reset()
 {
 	SetDistanceTarget(PositionManager::Instance.GetDistanceMm());
 	SetRadAngleTarget(PositionManager::Instance.GetAngleRad());
-	m_quadramp_distance.Reset(PositionManager::Instance.GetDistanceMm());
-	m_quadramp_angle.Reset(PositionManager::Instance.GetAngleRad());
+	m_DistanceQuadramp.Reset(PositionManager::Instance.GetDistanceMm());
+	m_AngleQuadramp.Reset(PositionManager::Instance.GetAngleRad());
 }
 
 void ControlSystem::ResetAngle()
 {
-	m_quadramp_angle.Reset(PositionManager::Instance.GetAngleRad());
+	m_AngleQuadramp.Reset(PositionManager::Instance.GetAngleRad());
 }

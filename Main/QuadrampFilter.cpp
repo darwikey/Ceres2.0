@@ -33,24 +33,6 @@
 
 #define SQUARE(x) ((x) * (x))
 
- /** @addtogroup Libausbee
-   * @{
-   */
-
-   /** @addtogroup Control_System
-	 * @brief Control engineering module
-	 * @{
-	 */
-
-	 /** @addtogroup Filters
-	   * @brief Filters for the control engineering module
-	   * @{
-	   */
-
-	   /** @defgroup Quadramp
-		 * @brief Quadramp filter
-		 * @{
-		 */
 
 void QuadrampFilter::Init()
 {
@@ -95,48 +77,34 @@ void QuadrampFilter::Reset(float value)
 
 float QuadrampFilter::Evaluate(float in)
 {
-	float d;
-	float pos_target;
-	float var_1st_ord_pos = 0;
-	float var_1st_ord_neg = 0;
-	float var_2nd_ord_pos = 0;
-	float var_2nd_ord_neg = 0;
-	float prev_var, prev_out;
+	float var_1st_ord_pos = m_var_1st_ord_pos * m_eval_period;
 
-	if (m_var_1st_ord_pos)
-		var_1st_ord_pos = m_var_1st_ord_pos * m_eval_period;
+	float var_1st_ord_neg = -m_var_1st_ord_neg * m_eval_period;
 
-	if (m_var_1st_ord_neg)
-		var_1st_ord_neg = -m_var_1st_ord_neg * m_eval_period;
+	float var_2nd_ord_pos = m_var_2nd_ord_pos * SQUARE(m_eval_period);
 
-	if (m_var_2nd_ord_pos)
-		var_2nd_ord_pos = m_var_2nd_ord_pos * SQUARE(m_eval_period);
+	float var_2nd_ord_neg = -m_var_2nd_ord_neg * SQUARE(m_eval_period);
 
-	if (m_var_2nd_ord_neg)
-		var_2nd_ord_neg = -m_var_2nd_ord_neg * SQUARE(m_eval_period);
+	float prev_var = m_prev_var;
+	float prev_out = m_prev_out;
 
-	prev_var = m_prev_var;
-	prev_out = m_prev_out;
-
-	d = in - prev_out;
+	float d = in - prev_out;
 
 	/* Deceleration ramp */
 	if (d > 0 && var_2nd_ord_neg) {
-		float ramp_pos;
 		/* var_2nd_ord_neg < 0 */
 		/* real EQ : sqrtf( var_2nd_ord_neg^2/4 - 2.d.var_2nd_ord_neg ) + var_2nd_ord_neg/2 */
-		ramp_pos = sqrtf((var_2nd_ord_neg*var_2nd_ord_neg) / 4 - 2 * d*var_2nd_ord_neg) + var_2nd_ord_neg / 2;
+		float ramp_pos = sqrtf((var_2nd_ord_neg*var_2nd_ord_neg) / 4 - 2 * d*var_2nd_ord_neg) + var_2nd_ord_neg / 2;
 
 		if (ramp_pos < var_1st_ord_pos)
 			var_1st_ord_pos = ramp_pos;
 	}
 
 	else if (d < 0 && var_2nd_ord_pos) {
-		float ramp_neg;
 
 		/* var_2nd_ord_pos > 0 */
 		/* real EQ : sqrtf( var_2nd_ord_pos^2/4 - 2.d.var_2nd_ord_pos ) - var_2nd_ord_pos/2 */
-		ramp_neg = -sqrtf((var_2nd_ord_pos*var_2nd_ord_pos) / 4 - 2 * d*var_2nd_ord_pos) - var_2nd_ord_pos / 2;
+		float ramp_neg = -sqrtf((var_2nd_ord_pos*var_2nd_ord_pos) / 4 - 2 * d*var_2nd_ord_pos) - var_2nd_ord_pos / 2;
 
 		/* ramp_neg < 0 */
 		if (ramp_neg > var_1st_ord_neg)
@@ -179,14 +147,13 @@ float QuadrampFilter::Evaluate(float in)
 			var_1st_ord_neg = prev_var + var_2nd_ord_pos;
 	}
 
-	/*
-	 * Position consign : can we reach the position with our speed ?
-	 */
-	if ( /* var_1st_ord_pos &&  */d > var_1st_ord_pos) {
+	// Position consign : can we reach the position with our speed ?
+	float pos_target;
+	if (d > var_1st_ord_pos) {
 		pos_target = prev_out + var_1st_ord_pos;
 		prev_var = var_1st_ord_pos;
 	}
-	else if ( /* var_1st_ord_neg &&  */d < var_1st_ord_neg) {
+	else if (d < var_1st_ord_neg) {
 		pos_target = prev_out + var_1st_ord_neg;
 		prev_var = var_1st_ord_neg;
 	}
@@ -201,21 +168,3 @@ float QuadrampFilter::Evaluate(float in)
 
 	return pos_target;
 }
-
-/**
-  * @}
-  */
-
-  /**
-	* @}
-	*/
-
-	/**
-	  * @}
-	  */
-
-	  /**
-		* @}
-		*/
-
-		/************** (C) COPYRIGHT 2013-2014 Eirbot **** END OF FILE ****/
