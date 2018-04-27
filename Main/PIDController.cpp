@@ -110,7 +110,7 @@ float PIDController::EvaluatePID(float error)
 	float tempOutput = output + tempErrorI;
 
 	// anti windup
-	if (!(abs(tempOutput) > m_max_output && tempOutput * tempErrorI > 0.f))
+	if (!(abs(25.f * tempOutput) > m_max_output && tempOutput * tempErrorI > 0.f))
 	{
 		m_error_sum += error;
 	}
