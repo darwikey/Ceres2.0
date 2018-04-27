@@ -23,9 +23,9 @@ void Strategy::Init()
 	eeprom_busy_wait();
 	//if (eeprom_read_byte(0) == (uint8_t)Side::BLUE)
 	if (Platform::IsButtonPressed(1))
-		m_Side = Side::BLUE;
+		m_Side = Side::GREEN;
 	else
-		m_Side = Side::YELLOW;
+		m_Side = Side::ORANGE;
 }
 
 void Strategy::Task()
@@ -87,12 +87,12 @@ void Strategy::Task()
 
 	switch (m_State)
 	{
-	case State::MODULE_A0:
+	/*case State::MODULE_A0:
 		TrajectoryManager::Instance.GotoDistance(50.f);
 		break;
 
 	case State::MODULE_A1:
-		if (m_Side == Side::YELLOW)
+		if (m_Side == Side::ORANGE)
 			TrajectoryManager::Instance.GotoXY(GetCorrectPos(1200.f, 600.f));
 		TrajectoryManager::Instance.GotoXY(GetCorrectPos(1000.f, 600.f));
 		break;
@@ -139,7 +139,7 @@ void Strategy::Task()
 		PushRobotAgainstWall();
 		RePosAgainstSideBase();
 		SetGripState(GripState::FULLY_OPEN);
-		if (m_Side == Side::BLUE)
+		if (m_Side == Side::GREEN)
 		{
 			TrajectoryManager::Instance.GotoDistance(-200.f);
 		}
@@ -148,60 +148,7 @@ void Strategy::Task()
 			TrajectoryManager::Instance.GotoDistance(-700.f);
 		}
 		break;
-
-	case State::MODULE_C1:
-		SetGripState(GripState::NORMAL);
-		SetArmState(ArmState::NORMAL);
-		SetGripState(GripState::FULLY_OPEN);
-		if (m_Side == Side::YELLOW)
-			TrajectoryManager::Instance.GotoXY(GetCorrectPos(700.f, 1120.f));
-		break;
-
-	case State::MODULE_C2:
-		TrajectoryManager::Instance.GotoXY(GetCorrectPos(500.f, 1120.f));
-		break;
-
-	case State::MODULE_C3:
-		SetGripState(GripState::CLOSE);
-		SetArmState(ArmState::EMPTYING);
-		if (m_Side == Side::YELLOW)
-			TrajectoryManager::Instance.GotoXY(GetCorrectPos(250.f, 1035.f));
-		else
-			TrajectoryManager::Instance.GotoXY(GetCorrectPos(250.f, 1045.f));
-		TrajectoryManager::Instance.GotoDegreeAngle(GetCorrectAngle(90.f));
-		break;
-
-	case State::MODULE_C4:
-		PushRobotAgainstWall();
-		RePosAgainstSideBase();
-		SetGripState(GripState::FULLY_OPEN);
-		TrajectoryManager::Instance.GotoDistance(-150.f);
-		break;
-
-	case State::MODULE_E1:
-		SetGripState(GripState::NORMAL);
-		SetArmState(ArmState::NORMAL);
-		SetGripState(GripState::FULLY_OPEN);
-		TrajectoryManager::Instance.GotoXY(GetCorrectPos(800.f, 1850.f));
-		break;
-
-	case State::MODULE_E2:
-		SetGripState(GripState::CLOSE);
-		SetArmState(ArmState::EMPTYING);
-		TrajectoryManager::Instance.GotoDistance(-100.f);
-		TrajectoryManager::Instance.GotoDegreeAngle(GetCorrectAngle(-135.f));
-		break;
-
-	case State::MODULE_E3:
-		PushRobotAgainstWall(3000);
-		SetGripState(GripState::FULLY_OPEN);
-		delay(500);
-		TrajectoryManager::Instance.GotoDistance(-100.f);
-		break;
-
-	case State::MODULE_E4:
-		PushRobotAgainstWall();
-		break;
+*/
 
 	default:
 		return;
@@ -222,14 +169,14 @@ void Strategy::Start()
 		m_StartTime = millis();
 		Platform::InitServo();
 		SetArmState(ArmState::NORMAL);
-		SetGripState(GripState::FULLY_OPEN);
+		SetDoorState(DoorState::CLOSE);
 	}
 }
 
 void Strategy::SetInitialPosition()
 {
 	float y = ROBOT_CENTER_BACK;//360.f - ROBOT_CENTER_FRONT
-	if (m_Side == Side::BLUE)
+	if (m_Side == Side::GREEN)
 	{
 		PositionManager::Instance.SetPosMm(Float2(1070.f - 0.5f * ROBOT_WIDTH, y));
 	}
@@ -284,7 +231,7 @@ void Strategy::Print()
 		Serial.printf("actions (%d)\r\n", (int)m_State);
 		break;
 	};
-	Serial.printf("Side: %s\r\n", m_Side == Side::BLUE ? "Blue" : "Yellow");
+	Serial.printf("Side: %s\r\n", m_Side == Side::GREEN ? "Green" : "Orange");
 	Serial.printf("Time since start: %ds\r\n", (millis() - m_StartTime) / 1000);
 	Serial.printf("Is trajectory paused: %d\r\n", (int)TrajectoryManager::Instance.IsPaused());
 }
@@ -297,42 +244,42 @@ void Strategy::SetSide(Side _side)
 	Serial.println("set initial pos");
 	SetInitialPosition();
 }
-
-Float2 Strategy::GetGameElementPosition(GameElement _module)
-{
-	if (m_Side == Side::BLUE)
-	{
-		if (_module == GameElement::MODULE_A)
-			return Float2(1000.f, 600.f);
-		if (_module == GameElement::MODULE_B)
-			return Float2(200.f, 600.f);
-		if (_module == GameElement::MODULE_C)
-			return Float2(500.f, 1100.f);
-		if (_module == GameElement::MODULE_D)
-			return Float2(900.f, 1400.f);
-		if (_module == GameElement::MODULE_E)
-			return Float2(800.f, 1850.f);
-	}
-	else
-	{
-		if (_module == GameElement::MODULE_A)
-			return Float2(2000.f, 600.f);
-		if (_module == GameElement::MODULE_B)
-			return Float2(2800.f, 600.f);
-		if (_module == GameElement::MODULE_C)
-			return Float2(2500.f, 1100.f);
-		if (_module == GameElement::MODULE_D)
-			return Float2(2100.f, 1400.f);
-		if (_module == GameElement::MODULE_E)
-			return Float2(2200.f, 1850.f);
-	}
-	Serial.println("incorrect game element");
-	return Float2();
-}
+//
+//Float2 Strategy::GetGameElementPosition(GameElement _module)
+//{
+//	if (m_Side == Side::BLUE)
+//	{
+//		if (_module == GameElement::MODULE_A)
+//			return Float2(1000.f, 600.f);
+//		if (_module == GameElement::MODULE_B)
+//			return Float2(200.f, 600.f);
+//		if (_module == GameElement::MODULE_C)
+//			return Float2(500.f, 1100.f);
+//		if (_module == GameElement::MODULE_D)
+//			return Float2(900.f, 1400.f);
+//		if (_module == GameElement::MODULE_E)
+//			return Float2(800.f, 1850.f);
+//	}
+//	else
+//	{
+//		if (_module == GameElement::MODULE_A)
+//			return Float2(2000.f, 600.f);
+//		if (_module == GameElement::MODULE_B)
+//			return Float2(2800.f, 600.f);
+//		if (_module == GameElement::MODULE_C)
+//			return Float2(2500.f, 1100.f);
+//		if (_module == GameElement::MODULE_D)
+//			return Float2(2100.f, 1400.f);
+//		if (_module == GameElement::MODULE_E)
+//			return Float2(2200.f, 1850.f);
+//	}
+//	Serial.println("incorrect game element");
+//	return Float2();
+//}
 
 Float2 Strategy::GetCorrectPos(float x, float y)
 {
-	if (m_Side == Side::BLUE)
+	if (m_Side == Side::GREEN)
 		return Float2(x, y);
 	else
 		return Float2(3000.f - x, y);
@@ -340,7 +287,7 @@ Float2 Strategy::GetCorrectPos(float x, float y)
 
 float Strategy::GetCorrectAngle(float a)
 {
-	if (m_Side == Side::BLUE)
+	if (m_Side == Side::GREEN)
 		return a;
 	else
 		return -a;
@@ -351,44 +298,27 @@ void Strategy::SetArmState(ArmState _state)
 	switch (_state)
 	{
 	case ArmState::NORMAL:
-		Platform::SetServoPos(ServoID::SERVO1, 825);
+		Platform::SetServoPos(ServoID::SERVO2, 800);
 		break;
-	case ArmState::EMPTYING:
-		Platform::SetServoPos(ServoID::SERVO1, 500);
+	case ArmState::OPEN:
+		Platform::SetServoPos(ServoID::SERVO2, 100);
 		break;
 	}
 	delay(1000);
 }
 
-void Strategy::SetGripState(GripState _state)
+void Strategy::SetDoorState(DoorState _state)
 {
 	switch (_state)
 	{
-	case GripState::CLOSE:
-		Platform::SetServoPos(ServoID::SERVO2, 310);
+	case DoorState::CLOSE:
+		Platform::SetServoPos(ServoID::SERVO3, 237);
 		break;
-	case GripState::NORMAL:
-		Platform::SetServoPos(ServoID::SERVO2, 350);
-		break;
-	case GripState::FULLY_OPEN:
-		Platform::SetServoPos(ServoID::SERVO2, 400);
+	case DoorState::OPEN:
+		Platform::SetServoPos(ServoID::SERVO3, 400);
 		break;
 	}
 	delay(500);
-}
-
-void Strategy::SetFunnyState(FunnyState _state)
-{
-	switch (_state)
-	{
-		case FunnyState::NORMAL:
-			Platform::SetServoPos(ServoID::SERVO3, 250);
-			break;
-
-		case FunnyState::EJECT:
-			Platform::SetServoPos(ServoID::SERVO3, 0);
-			break;
-	}
 }
 
 Strategy::State operator++(Strategy::State &s, int)

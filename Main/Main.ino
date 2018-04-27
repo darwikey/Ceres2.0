@@ -67,7 +67,7 @@ void loop() {
 	Side side = Strategy::Instance.GetSide();
 	Platform::SetLed(0, (time & 0x200) != 0);
 	//Platform::SetLed(3, side == Side::BLUE);
-	Platform::SetLed(4, side == Side::YELLOW);
+	Platform::SetLed(4, side == Side::ORANGE);
 
 	CommandLineInterface::Instance.Task();
 

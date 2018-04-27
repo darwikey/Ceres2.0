@@ -166,13 +166,13 @@ void CommandLineInterface::Init()
 		Serial.printf("Force all connected servo to id %d\r\n. Should be the first instruction sent to the servo\r\n", id);
 	});
 
-	REGISTER_COMMAND("setSide", "arg: b(blue) or y(yellow)", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
-		if (_argv[0][0] == 'b')
-			Strategy::Instance.SetSide(Side::BLUE);
-		else if (_argv[0][0] == 'y')
-			Strategy::Instance.SetSide(Side::YELLOW);
+	REGISTER_COMMAND("setSide", "arg: g(green) or o(orange)", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
+		if (_argv[0][0] == 'g')
+			Strategy::Instance.SetSide(Side::GREEN);
+		else if (_argv[0][0] == 'o')
+			Strategy::Instance.SetSide(Side::ORANGE);
 		else
-			Serial.print("incorrect side, must be \'b\' or \'y\'\r\n");
+			Serial.print("incorrect side, must be \'g\' or \'o\'\r\n");
 		Strategy::Instance.Print();
 	});
 
