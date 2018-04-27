@@ -45,10 +45,9 @@ void loop() {
 	// put your main code here, to run repeatedly:
 	static int time = 0;
 	static int clock = 0;
-	//static int step = 0;
 	
 	// Debug
-	if (clock >= 1000)
+	if (clock >= 500)
 	{
 		static int led = 0;
 		clock = 0;
