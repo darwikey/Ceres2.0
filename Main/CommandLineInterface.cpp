@@ -278,6 +278,24 @@ void CommandLineInterface::Init()
 	REGISTER_COMMAND("pushRobot", "Push robot against wall", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
 		Strategy::Instance.PushRobotAgainstWall();
 	});
+
+	REGISTER_COMMAND("arm", "arg: normal|close", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
+		if (!strcmp(_argv[0], "normal"))
+			Strategy::Instance.SetArmState(ArmState::NORMAL);
+		else if (!strcmp(_argv[0], "open"))
+			Strategy::Instance.SetArmState(ArmState::OPEN);
+		else
+			Serial.print("incorrect param, must be normal|close");
+	});
+
+	REGISTER_COMMAND("door", "arg: close|open", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
+		if (!strcmp(_argv[0], "close"))
+			Strategy::Instance.SetDoorState(DoorState::CLOSE);
+		else if (!strcmp(_argv[0], "open"))
+			Strategy::Instance.SetDoorState(DoorState::OPEN);
+		else
+			Serial.print("incorrect param, must be close|open");
+	});
 	
 	REGISTER_COMMAND("disableMotor", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
 		MotorManager::Instance.Enabled = false;

@@ -317,7 +317,7 @@ void Strategy::SetDoorState(DoorState _state)
 	switch (_state)
 	{
 	case DoorState::CLOSE:
-		Platform::SetServoPos(ServoID::SERVO3, 237);
+		Platform::SetServoPos(ServoID::SERVO3, 210);
 		break;
 	case DoorState::OPEN:
 		Platform::SetServoPos(ServoID::SERVO3, 400);
