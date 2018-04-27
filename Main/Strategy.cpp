@@ -22,7 +22,7 @@ void Strategy::Init()
 	eeprom_initialize();
 	eeprom_busy_wait();
 	//if (eeprom_read_byte(0) == (uint8_t)Side::BLUE)
-	if (Platform::IsButtonPressed(1))
+	if (Platform::IsButtonPressed(2))
 		m_Side = Side::GREEN;
 	else
 		m_Side = Side::ORANGE;
@@ -58,12 +58,7 @@ void Strategy::Task()
 #if ENABLE_TIMER
 	if (millis() > m_StartTime + 90000)
 	{
-		if (m_State != State::END && (millis() > m_StartTime + 91000))
-		{
-			SetFunnyState(FunnyState::EJECT);
-
-			m_State = State::END;
-		}
+		m_State = State::END;
 		TrajectoryManager::Instance.Pause();
 		MotorManager::Instance.Enabled = false;
 		return;
@@ -87,6 +82,14 @@ void Strategy::Task()
 
 	switch (m_State)
 	{
+	case State::WATER_TOWER0:
+		TrajectoryManager::Instance.GotoXY(GetCorrectPos(2390.f, 1700.f));
+		break;
+
+	case State::WATER_PLANT0:
+		TrajectoryManager::Instance.GotoXY(GetCorrectPos(1870.f, 1500.f));
+		break;
+
 	/*case State::MODULE_A0:
 		TrajectoryManager::Instance.GotoDistance(50.f);
 		break;
@@ -175,14 +178,16 @@ void Strategy::Start()
 
 void Strategy::SetInitialPosition()
 {
-	float y = ROBOT_CENTER_BACK;//360.f - ROBOT_CENTER_FRONT
+	float y = 650.f - 0.5f * ROBOT_WIDTH;
 	if (m_Side == Side::GREEN)
 	{
-		PositionManager::Instance.SetPosMm(Float2(1070.f - 0.5f * ROBOT_WIDTH, y));
+		PositionManager::Instance.SetAngleDeg(-90.f);
+		PositionManager::Instance.SetPosMm(Float2(400.f - ROBOT_CENTER_FRONT, y));
 	}
 	else
 	{
-		PositionManager::Instance.SetPosMm(Float2(1930.f + 0.5f * ROBOT_WIDTH, y));
+		PositionManager::Instance.SetAngleDeg(90.f);
+		PositionManager::Instance.SetPosMm(Float2(2600.f + ROBOT_CENTER_FRONT, y));
 	}
 }
 
