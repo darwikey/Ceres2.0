@@ -39,7 +39,7 @@ namespace Platform
 	void InitServo()
 	{
 		// slow moving servos
-		Platform::SendServoPacket((int)ServoID::ALL, XL320::Address::GOAL_SPEED, 200);
+		//Platform::SendServoPacket((int)ServoID::ALL, XL320::Address::GOAL_SPEED, 200);
 	}
 
 	void DisplayNumber(int n)

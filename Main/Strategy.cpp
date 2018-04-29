@@ -83,75 +83,55 @@ void Strategy::Task()
 	switch (m_State)
 	{
 	case State::WATER_TOWER0:
-		TrajectoryManager::Instance.GotoXY(GetCorrectPos(2390.f, 1700.f));
+		TrajectoryManager::Instance.GotoXY(GetCorrectPos(2260.f, 1540.f));
+		TrajectoryManager::Instance.GotoDegreeAngle(0.f);
+		TrajectoryManager::Instance.GotoXY(GetCorrectPos(2260.f, 1800.f));
+		break;
+
+	case State::WATER_TOWER1:
+		PushRobotAgainstWall();
+		RePosAgainstBackWall();
+		TrajectoryManager::Instance.GotoDistance(-50.f);
+		TrajectoryManager::Instance.GotoDegreeAngle(-90.f);
+		break;
+
+	case State::WATER_TOWER2:
+		PushRobotAgainstWall(1500, m_Side == Side::GREEN);// go backward when side=green
+		RePosAgainstWaterPlantSide();
+		if (m_Side == Side::GREEN)
+			TrajectoryManager::Instance.GotoDistance(2390.f - PositionManager::Instance.GetTheoreticalPosMm().x);//forward
+		else
+			TrajectoryManager::Instance.GotoDistance(610.f - PositionManager::Instance.GetTheoreticalPosMm().x);//backward
+		//TrajectoryManager::Instance.GotoXY(GetCorrectPos(2390.f, PositionManager::Instance.GetPosMm().y));
+		break;
+
+	case State::WATER_TOWER3:
+		SetArmState(ArmState::OPEN);
 		break;
 
 	case State::WATER_PLANT0:
+		TrajectoryManager::Instance.GotoXY(GetCorrectPos(2390.f, 1500.f));
 		TrajectoryManager::Instance.GotoXY(GetCorrectPos(1870.f, 1500.f));
+		TrajectoryManager::Instance.GotoDegreeAngle(0.f);
 		break;
 
-	/*case State::MODULE_A0:
-		TrajectoryManager::Instance.GotoDistance(50.f);
-		break;
-
-	case State::MODULE_A1:
-		if (m_Side == Side::ORANGE)
-			TrajectoryManager::Instance.GotoXY(GetCorrectPos(1200.f, 600.f));
-		TrajectoryManager::Instance.GotoXY(GetCorrectPos(1000.f, 600.f));
-		break;
-
-	case State::MODULE_A2:
-		SetGripState(GripState::CLOSE);
-		SetArmState(ArmState::EMPTYING);
-		TrajectoryManager::Instance.GotoXY(GetCorrectPos(775, 790.f));
-		TrajectoryManager::Instance.GotoXY(GetCorrectPos(250, 775.f));
-		break;
-
-	case State::MODULE_A3:
+	case State::WATER_PLANT1:
 		PushRobotAgainstWall();
-		RePosAgainstSideBase();
-		SetGripState(GripState::FULLY_OPEN);
-		TrajectoryManager::Instance.GotoDistance(-100.f);
+		RePosAgainstWaterPlantFront();
+		TrajectoryManager::Instance.GotoDistance(-50.f);
+		TrajectoryManager::Instance.GotoDegreeAngle(-90.f);
 		break;
 
-	case State::MODULE_B1:
-		SetGripState(GripState::NORMAL);
-		SetArmState(ArmState::NORMAL);
-		SetGripState(GripState::FULLY_OPEN);
-		break;
-	
-	case State::MODULE_B2:
-		TrajectoryManager::Instance.GotoXY(GetCorrectPos(200, 600.f));
-		break;
-
-	case State::MODULE_B3:
-		SetGripState(GripState::CLOSE);
-		SetArmState(ArmState::EMPTYING);
-		TrajectoryManager::Instance.GotoDistance(-200.f);
-		break;
-
-	case State::MODULE_B4:
-		TrajectoryManager::Instance.GotoXY(GetCorrectPos(400.f, 920.f));
-		break;
-
-	case State::MODULE_B5:
-		TrajectoryManager::Instance.GotoXY(GetCorrectPos(250.f, 920.f));
-		break;
-
-	case State::MODULE_B6:
-		PushRobotAgainstWall();
-		RePosAgainstSideBase();
-		SetGripState(GripState::FULLY_OPEN);
-		if (m_Side == Side::GREEN)
+	case State::WATER_PLANT2:
+		SetDoorState(DoorState::OPEN);
+		delay(2000);
+		for (int i = 0; i < 2; i++) // shake the door
 		{
-			TrajectoryManager::Instance.GotoDistance(-200.f);
-		}
-		else
-		{
-			TrajectoryManager::Instance.GotoDistance(-700.f);
+			SetDoorState(DoorState::CLOSE);
+			SetDoorState(DoorState::OPEN);
+			delay(2000);
 		}
 		break;
-*/
 
 	default:
 		return;
@@ -206,16 +186,27 @@ void Strategy::PushRobotAgainstWall(uint32_t durationMs, bool goForward)
 	ControlSystem::Instance.m_Enable = true;
 }
 
-void Strategy::RePosAgainstSideBase()
-{
-	PositionManager::Instance.SetAngleDeg(GetCorrectAngle(90.f));
-	PositionManager::Instance.SetPosMm(GetCorrectPos(202.f, PositionManager::Instance.GetPosMm().y));
-}
-
-void Strategy::RePosAgainstFrontBase()
+void Strategy::RePosAgainstBackWall()
 {
 	PositionManager::Instance.SetAngleDeg(GetCorrectAngle(0.f));
-	PositionManager::Instance.SetPosMm(Float2(PositionManager::Instance.GetPosMm().x, 382.f + ROBOT_CENTER_BACK));
+	PositionManager::Instance.SetPosMm(Float2(PositionManager::Instance.GetPosMm().x, 2000.f - ROBOT_CENTER_FRONT));
+}
+
+void Strategy::RePosAgainstWaterPlantSide()
+{
+	PositionManager::Instance.SetAngleDeg(GetCorrectAngle(90.f));
+	float x;
+	if (m_Side == Side::GREEN)
+		x = 2100.f + ROBOT_CENTER_BACK;
+	else
+		x = 900.f - ROBOT_CENTER_FRONT;
+	PositionManager::Instance.SetPosMm(Float2(x, PositionManager::Instance.GetPosMm().y));
+}
+
+void Strategy::RePosAgainstWaterPlantFront()
+{
+	PositionManager::Instance.SetAngleDeg(GetCorrectAngle(0.f));
+	PositionManager::Instance.SetPosMm(Float2(PositionManager::Instance.GetPosMm().x, 1750.f - ROBOT_CENTER_FRONT));
 }
 
 void Strategy::Print()
@@ -249,38 +240,6 @@ void Strategy::SetSide(Side _side)
 	Serial.println("set initial pos");
 	SetInitialPosition();
 }
-//
-//Float2 Strategy::GetGameElementPosition(GameElement _module)
-//{
-//	if (m_Side == Side::BLUE)
-//	{
-//		if (_module == GameElement::MODULE_A)
-//			return Float2(1000.f, 600.f);
-//		if (_module == GameElement::MODULE_B)
-//			return Float2(200.f, 600.f);
-//		if (_module == GameElement::MODULE_C)
-//			return Float2(500.f, 1100.f);
-//		if (_module == GameElement::MODULE_D)
-//			return Float2(900.f, 1400.f);
-//		if (_module == GameElement::MODULE_E)
-//			return Float2(800.f, 1850.f);
-//	}
-//	else
-//	{
-//		if (_module == GameElement::MODULE_A)
-//			return Float2(2000.f, 600.f);
-//		if (_module == GameElement::MODULE_B)
-//			return Float2(2800.f, 600.f);
-//		if (_module == GameElement::MODULE_C)
-//			return Float2(2500.f, 1100.f);
-//		if (_module == GameElement::MODULE_D)
-//			return Float2(2100.f, 1400.f);
-//		if (_module == GameElement::MODULE_E)
-//			return Float2(2200.f, 1850.f);
-//	}
-//	Serial.println("incorrect game element");
-//	return Float2();
-//}
 
 Float2 Strategy::GetCorrectPos(float x, float y)
 {

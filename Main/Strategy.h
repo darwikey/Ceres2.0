@@ -39,7 +39,13 @@ public:
 		WAITING_START,
 		
 		WATER_TOWER0,
+		WATER_TOWER1,
+		WATER_TOWER2,
+		WATER_TOWER3,
+
 		WATER_PLANT0,
+		WATER_PLANT1,
+		WATER_PLANT2,
 
 		WAITING_END,
 		END
@@ -53,8 +59,9 @@ public:
 	
 	void SetInitialPosition();
 	void PushRobotAgainstWall(uint32_t durationMs = 1500, bool goForward = true);
-	void RePosAgainstSideBase();
-	void RePosAgainstFrontBase();
+	void RePosAgainstBackWall();
+	void RePosAgainstWaterPlantSide();
+	void RePosAgainstWaterPlantFront();
 
 	Side GetSide() { return m_Side; }
 	void SetSide(Side _side);

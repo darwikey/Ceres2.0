@@ -275,17 +275,19 @@ void CommandLineInterface::Init()
 		Serial.print("Move servo 3\r\n");
 	});
 
-	REGISTER_COMMAND("pushRobot", "Push robot against wall", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
-		Strategy::Instance.PushRobotAgainstWall();
+	REGISTER_COMMAND("pushRobot", "Push robot against wall, arg: backward?(bool)", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int _argc) {
+		bool backward = atoi(_argv[0]) != 0;
+		Strategy::Instance.PushRobotAgainstWall(1500, !backward);
+		PositionManager::Instance.SetPosMm(PositionManager::Instance.GetPosMm());
 	});
 
-	REGISTER_COMMAND("arm", "arg: normal|close", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
+	REGISTER_COMMAND("arm", "arg: normal|open", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
 		if (!strcmp(_argv[0], "normal"))
 			Strategy::Instance.SetArmState(ArmState::NORMAL);
 		else if (!strcmp(_argv[0], "open"))
 			Strategy::Instance.SetArmState(ArmState::OPEN);
 		else
-			Serial.print("incorrect param, must be normal|close");
+			Serial.print("incorrect param, must be normal|open");
 	});
 
 	REGISTER_COMMAND("door", "arg: close|open", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
