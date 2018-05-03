@@ -85,6 +85,9 @@ void Strategy::Task()
 	case State::WATER_TOWER0:
 		TrajectoryManager::Instance.GotoXY(GetCorrectPos(2260.f, 1540.f));
 		TrajectoryManager::Instance.GotoDegreeAngle(0.f);
+		break;
+
+	case State::WATER_TOWER01:
 		TrajectoryManager::Instance.GotoXY(GetCorrectPos(2260.f, 1800.f));
 		break;
 
@@ -96,7 +99,7 @@ void Strategy::Task()
 		break;
 
 	case State::WATER_TOWER2:
-		PushRobotAgainstWall(1500, m_Side == Side::GREEN);// go backward when side=green
+		PushRobotAgainstWall(1500, m_Side == Side::ORANGE);// go backward when side=green
 		RePosAgainstWaterPlantSide();
 		if (m_Side == Side::GREEN)
 			TrajectoryManager::Instance.GotoDistance(2390.f - PositionManager::Instance.GetTheoreticalPosMm().x);//forward
@@ -174,12 +177,15 @@ void Strategy::SetInitialPosition()
 void Strategy::PushRobotAgainstWall(uint32_t durationMs, bool goForward)
 {
 	ControlSystem::Instance.m_Enable = false;
-	int cmd = -30;
+	int cmd = -60;
 	if (!goForward)
 		cmd = -cmd;
-	MotorManager::Instance.SetSpeed(MotorManager::RIGHT, cmd);
-	MotorManager::Instance.SetSpeed(MotorManager::LEFT, cmd);
-	delay(durationMs);
+	for (uint32_t i = 0; i < durationMs / 10; i++)
+	{
+		MotorManager::Instance.SetSpeed(MotorManager::RIGHT, cmd);
+		MotorManager::Instance.SetSpeed(MotorManager::LEFT, cmd);
+		delay(10);
+	}
 	MotorManager::Instance.SetSpeed(MotorManager::RIGHT, 0);
 	MotorManager::Instance.SetSpeed(MotorManager::LEFT, 0);
 	ControlSystem::Instance.Reset();
@@ -194,7 +200,7 @@ void Strategy::RePosAgainstBackWall()
 
 void Strategy::RePosAgainstWaterPlantSide()
 {
-	PositionManager::Instance.SetAngleDeg(GetCorrectAngle(90.f));
+	PositionManager::Instance.SetAngleDeg(-90.f);
 	float x;
 	if (m_Side == Side::GREEN)
 		x = 2100.f + ROBOT_CENTER_BACK;
