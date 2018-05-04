@@ -3,6 +3,8 @@
 
 #include "XL320.h"
 
+#include "ceres.h"
+
 #define _countof(a) (sizeof(a)/sizeof(*(a)))
 
 #define GP2_BLOCK_AT   432 /*288*/
@@ -33,8 +35,14 @@ namespace Platform
 	const int leds[] = { 11, 12, 13, 20, 21 };
 	const int buttons[] = { 5, 6, 7 , 8 };
 	const int startPull = 2;
+
+#if CERES == 3
+	const int gp2Pins[] = { A19, A18, A16, A7 };
+	const bool gp2IsFront[] = { true, true, false, false };
+#else
 	const int gp2Pins[] = { 0, 2, 3 };// {0, 1, 2, 3};
 	const bool gp2IsFront[] = { false, true, true };
+#endif
 
 	void Init();
 	void InitServo();
