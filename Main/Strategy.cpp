@@ -88,7 +88,10 @@ void Strategy::Task()
 		break;
 
 	case State::WATER_TOWER01:
-		TrajectoryManager::Instance.GotoXY(GetCorrectPos(2260.f, 1800.f));
+		if (m_Side == Side::GREEN)
+			TrajectoryManager::Instance.GotoXY(GetCorrectPos(2280.f, 1800.f));
+		else
+			TrajectoryManager::Instance.GotoXY(GetCorrectPos(2260.f, 1800.f));
 		break;
 
 	case State::WATER_TOWER1:
@@ -102,7 +105,7 @@ void Strategy::Task()
 		PushRobotAgainstWall(1500, m_Side == Side::ORANGE);// go backward when side=green
 		RePosAgainstWaterPlantSide();
 		if (m_Side == Side::GREEN)
-			TrajectoryManager::Instance.GotoDistance(2390.f - PositionManager::Instance.GetTheoreticalPosMm().x);//forward
+			TrajectoryManager::Instance.GotoDistance(235 + 25.f);//2390.f - PositionManager::Instance.GetTheoreticalPosMm().x);//forward =235mm
 		else
 			TrajectoryManager::Instance.GotoDistance(610.f - PositionManager::Instance.GetTheoreticalPosMm().x);//backward
 		//TrajectoryManager::Instance.GotoXY(GetCorrectPos(2390.f, PositionManager::Instance.GetPosMm().y));
