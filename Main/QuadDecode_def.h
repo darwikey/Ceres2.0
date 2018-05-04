@@ -23,29 +23,32 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 #include "wiring.h"
 //#include "usb_serial.h"
 
+#include "ceres.h"
+
 //  Constructor execution not guaranteed, need to explictly call setup
 template <int N>
 void QuadDecode<N>::setup(){
     // Set up input pins
-    if (N<2){	//FTM1
-	// K20 pin 28,29
-	// Bit 8-10 is Alt Assignment
-	PORTA_PCR12 = 0x00000712;   //Alt7-QD_FTM1,FilterEnable,Pulldown
-	PORTA_PCR13 = 0x00000712;   //Alt7-QD_FTM1,FilterEnable,Pulldown
-	//Default is input, don't need to write PDDR (Direction)
-
-	//Can also set up on K20 pin 35, 36 - not tested
-	//PORTB_PCR1 = 0x00000612;   //Alt6-QD_FTM1,FilterEnable,Pulldown
-	//PORTB_PCR1 = 0x00000612;   //Alt6-QD_FTM1,FilterEnable,Pulldown
-	//Default is input, don't need to write PDDR (Direction)
-
-    }else{  // FTM2
-	// K20 pin 41,42
-	// Bit 8-10 is Alt Assignment
-	PORTB_PCR18 = 0x00000612;   //Alt6-QD_FTM2,FilterEnable,Pulldown
-	PORTB_PCR19 = 0x00000612;   //Alt6-QD_FTM2,FilterEnable,Pulldown
-	//Default is input, don't need to write PDDR (Direction)
-    };
+	if (N<2){	//FTM1
+#if CERES != 3
+		// K20 pin 28,29
+		// Bit 8-10 is Alt Assignment
+		PORTA_PCR12 = 0x00000712;   //Alt7-QD_FTM1,FilterEnable,Pulldown
+		PORTA_PCR13 = 0x00000712;   //Alt7-QD_FTM1,FilterEnable,Pulldown
+		//Default is input, don't need to write PDDR (Direction)
+#else
+		//Can also set up on K20 pin 35, 36 - not tested
+		PORTB_PCR0 = 0x00000612;   //Alt6-QD_FTM1,FilterEnable,Pulldown
+		PORTB_PCR1 = 0x00000612;   //Alt6-QD_FTM1,FilterEnable,Pulldown
+		//Default is input, don't need to write PDDR (Direction)
+#endif
+	}else{  // FTM2
+		// K20 pin 41,42
+		// Bit 8-10 is Alt Assignment
+		PORTB_PCR18 = 0x00000612;   //Alt6-QD_FTM2,FilterEnable,Pulldown
+		PORTB_PCR19 = 0x00000612;   //Alt6-QD_FTM2,FilterEnable,Pulldown
+		//Default is input, don't need to write PDDR (Direction)
+	};
 
     //Set FTMEN to be able to write registers
     FTM_MODE=0x04;	    // Write protect disable - reset value

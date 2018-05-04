@@ -31,4 +31,5 @@
 Main/.vs
 Main/__vm
 Main/Debug
-MAin/Release
+Main/Release
+Main/ceres.h

@@ -3,8 +3,16 @@
 #include "PositionManager.h"
 #include "ControlSystem.h"
 
+#include "ceres.h"
+
+#if CERES == 3
+const int motorPWMs[] = { 22, 23 };
+const int motorDirs[] = { 24, 31 };
+const int motorNegDirs[] = { 33, 26 };
+#else
 const int motorPWMs[] = { 22, 23 };
 const int motorDirs[] = { 26, 31 };
+#endif
 
 MotorManager MotorManager::Instance;
 
@@ -16,7 +24,10 @@ void MotorManager::Init()
 		pinMode(motorPWMs[i], OUTPUT);
 		analogWriteFrequency(motorPWMs[i], 10000.f);//PWM 10KHz
 		pinMode(motorDirs[i], OUTPUT);
-	}
+#if CERES == 3
+		pinMode(motorNegDirs[i], OUTPUT);
+#endif
+  }
 	m_RightMotorPID.Init(0.f, 0.f, 0.f);
 	m_LeftMotorPID.Init(0.f, 0.f, 0.f);
 	SetMotorPidP(1.f);
@@ -44,7 +55,10 @@ void MotorManager::SendCommand(MotorId m, int32_t cmd)
 	
 	const int32_t maxi = 255;
 	analogWrite(motorPWMs[m], (AbsCmd > maxi) ? maxi : AbsCmd);
-	digitalWrite(motorDirs[m], (cmd >= 0) ? HIGH : LOW);
+	digitalWrite(motorDirs[m], (cmd > 0) ? HIGH : LOW);
+#if CERES == 3
+	digitalWrite(motorNegDirs[m], (cmd < 0) ? HIGH : LOW);
+#endif
 }
 
 void MotorManager::updateMotor(MotorId m, int speed)
