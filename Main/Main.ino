@@ -51,7 +51,9 @@ void loop() {
 	{
 		static int led = 0;
 		clock = 0;
-		if (led == 0)
+		if (TrajectoryManager::Instance.IsPaused())
+			Platform::SetServoLED(ServoID::ALL, ServoLED::RED);
+		else if (led == 0)
 			Platform::SetServoLED(ServoID::SERVO1, ServoLED::RED);
 		else if (led == 1)
 			Platform::SetServoLED(ServoID::SERVO2, ServoLED::GREEN);

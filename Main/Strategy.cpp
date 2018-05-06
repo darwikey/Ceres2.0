@@ -66,8 +66,9 @@ void Strategy::Task()
 #endif
 
 #if ENABLE_AVOIDANCE
-	if (Platform::IsGP2Occluded(TrajectoryManager::Instance.IsForwardMovement()))
+	if (m_EnableAvoidance && Platform::IsGP2Occluded(TrajectoryManager::Instance.IsForwardMovement()))
 	{
+		ControlSystem::Instance.Reset();
 		TrajectoryManager::Instance.Pause();
 		return;
 	}
@@ -83,7 +84,10 @@ void Strategy::Task()
 	switch (m_State)
 	{
 	case State::WATER_TOWER0:
-		TrajectoryManager::Instance.GotoXY(GetCorrectPos(2260.f, 1540.f));
+		if (m_Side == Side::GREEN)
+			TrajectoryManager::Instance.GotoXY(GetCorrectPos(2280.f, 1540.f));
+		else
+			TrajectoryManager::Instance.GotoXY(GetCorrectPos(2260.f, 1540.f));
 		TrajectoryManager::Instance.GotoDegreeAngle(0.f);
 		break;
 
@@ -98,12 +102,17 @@ void Strategy::Task()
 		PushRobotAgainstWall();
 		RePosAgainstBackWall();
 		TrajectoryManager::Instance.GotoDistance(-50.f);
+		break;
+
+	case State::WATER_TOWER10:
+		m_EnableAvoidance = false;
 		TrajectoryManager::Instance.GotoDegreeAngle(-90.f);
 		break;
 
 	case State::WATER_TOWER2:
 		PushRobotAgainstWall(1500, m_Side == Side::ORANGE);// go backward when side=green
 		RePosAgainstWaterPlantSide();
+		m_EnableAvoidance = true;
 		if (m_Side == Side::GREEN)
 			TrajectoryManager::Instance.GotoDistance(235 + 25.f);//2390.f - PositionManager::Instance.GetTheoreticalPosMm().x);//forward =235mm
 		else
@@ -118,20 +127,27 @@ void Strategy::Task()
 	case State::WATER_PLANT0:
 		TrajectoryManager::Instance.GotoXY(GetCorrectPos(2390.f, 1500.f));
 		TrajectoryManager::Instance.GotoXY(GetCorrectPos(1870.f, 1500.f));
+		m_EnableAvoidance = false;
 		TrajectoryManager::Instance.GotoDegreeAngle(0.f);
 		break;
 
 	case State::WATER_PLANT1:
 		PushRobotAgainstWall();
 		RePosAgainstWaterPlantFront();
+		m_EnableAvoidance = true;
 		TrajectoryManager::Instance.GotoDistance(-50.f);
+		break;
+	
+	case State::WATER_PLANT2:
+		m_EnableAvoidance = false;
 		TrajectoryManager::Instance.GotoDegreeAngle(-90.f);
 		break;
 
-	case State::WATER_PLANT2:
+	case State::WATER_PLANT3:
+		m_EnableAvoidance = true;
 		SetDoorState(DoorState::OPEN);
 		delay(2000);
-		for (int i = 0; i < 2; i++) // shake the door
+		for (int i = 0; i < 3; i++) // shake the door
 		{
 			SetDoorState(DoorState::CLOSE);
 			SetDoorState(DoorState::OPEN);

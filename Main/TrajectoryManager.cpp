@@ -76,6 +76,8 @@ bool TrajectoryManager::IsPaused()
 void TrajectoryManager::Pause()
 {
 	m_Pause = true;
+	m_PauseDist = PositionManager::Instance.GetDistanceMm();
+	m_pauseAngle = PositionManager::Instance.GetAngleRad();
 }
 
 void TrajectoryManager::Resume()
@@ -195,8 +197,8 @@ void TrajectoryManager::Update()
 
 	if (m_Pause)
 	{
-		ControlSystem::Instance.SetDistanceTarget(PositionManager::Instance.GetDistanceMm());
-		ControlSystem::Instance.SetRadAngleTarget(PositionManager::Instance.GetAngleRad());
+		ControlSystem::Instance.SetDistanceTarget(m_PauseDist);
+		ControlSystem::Instance.SetRadAngleTarget(m_pauseAngle);
 		return;
 	}
 

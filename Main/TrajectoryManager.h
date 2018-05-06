@@ -65,5 +65,6 @@ private:
 
 	CircularBuffer<TrajDest, SMOOTH_TRAJ_MAX_NB_POINTS> m_Points;
 	bool m_Pause;
+	float m_PauseDist, m_pauseAngle;
 };
 #endif /* TRAJECTORY_MANAGER_H */

@@ -5,8 +5,8 @@
 
 #define _countof(a) (sizeof(a)/sizeof(*(a)))
 
-#define GP2_BLOCK_AT   432 /*288*/
-#define GP2_UNBLOCK_AT 324 /*216*/
+#define GP2_BLOCK_AT   350 /*288*/
+//#define GP2_UNBLOCK_AT 324 /*216*/
 
 enum class ServoID
 {
@@ -33,8 +33,8 @@ namespace Platform
 	const int leds[] = { 11, 12, 13, 20, 21 };
 	const int buttons[] = { 5, 6, 7 , 8 };
 	const int startPull = 2;
-	const int gp2Pins[] = { 0, 2, 3 };// {0, 1, 2, 3};
-	const bool gp2IsFront[] = { false, true, true };
+	const int gp2Pins[] = {0, 1, 2, 3};
+	const bool gp2IsFront[] = { true, true, false, false };
 
 	void Init();
 	void InitServo();

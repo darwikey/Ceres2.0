@@ -4,8 +4,8 @@
 #include "Globals.h"
 
 #define ENABLE_POSITIONNING 0
-#define ENABLE_TIMER 0
-#define ENABLE_AVOIDANCE 0
+#define ENABLE_TIMER 1
+#define ENABLE_AVOIDANCE 1
 
 #define ROBOT_WIDTH 235.f
 #define ROBOT_CENTER_BACK 55.f // distance between axle and back
@@ -41,12 +41,14 @@ public:
 		WATER_TOWER0,
 		WATER_TOWER01,
 		WATER_TOWER1,
+		WATER_TOWER10,
 		WATER_TOWER2,
 		WATER_TOWER3,
 
 		WATER_PLANT0,
 		WATER_PLANT1,
 		WATER_PLANT2,
+		WATER_PLANT3,
 
 		WAITING_END,
 		END
@@ -78,6 +80,7 @@ private:
 	Side		m_Side = Side::GREEN;
 	State		m_State = (State)0;
 	uint32_t	m_StartTime = 0;
+	bool		m_EnableAvoidance = true;
 };
 
 Strategy::State operator++(Strategy::State &s, int);
