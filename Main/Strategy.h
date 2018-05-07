@@ -3,9 +3,10 @@
 
 #include "Globals.h"
 
-#define ENABLE_POSITIONNING 0
+#define ENABLE_POSITIONNING 1
 #define ENABLE_TIMER 1
 #define ENABLE_AVOIDANCE 1
+#define ENABLE_LAZY_MODE 1 // for approval
 
 #define ROBOT_WIDTH 235.f
 #define ROBOT_CENTER_BACK 55.f // distance between axle and back
@@ -39,17 +40,21 @@ public:
 		WAITING_START,
 		
 		WATER_TOWER0,
-		WATER_TOWER01,
 		WATER_TOWER1,
-		WATER_TOWER10,
+
+#if ENABLE_LAZY_MODE
+		
+#else
 		WATER_TOWER2,
 		WATER_TOWER3,
+		WATER_TOWER4,
+		WATER_TOWER5,
 
 		WATER_PLANT0,
 		WATER_PLANT1,
 		WATER_PLANT2,
 		WATER_PLANT3,
-
+#endif
 		WAITING_END,
 		END
 	};

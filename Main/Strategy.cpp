@@ -31,11 +31,20 @@ void Strategy::Init()
 void Strategy::Task()
 {
 #if ENABLE_POSITIONNING
+	const float POSITIONING_OFFSET = 100;
 	if (m_State == State::POSITIONING)
 	{
 		if (Platform::IsStartPulled())
 		{
-			TrajectoryManager::Instance.GotoXY(Float2(PositionManager::Instance.GetXMm(), 360.f - ROBOT_CENTER_FRONT - 30.f));
+			//TrajectoryManager::Instance.GotoXY(Float2(PositionManager::Instance.GetXMm(), 360.f - ROBOT_CENTER_FRONT - 30.f));
+			if (m_Side == Side::GREEN)
+			{
+				//TrajectoryManager::Instance.GotoDistance(-POSITIONING_OFFSET);
+			}
+			else
+			{
+				TrajectoryManager::Instance.GotoDistance(POSITIONING_OFFSET);
+			}
 			m_State++;
 		}
 	}
@@ -83,6 +92,18 @@ void Strategy::Task()
 
 	switch (m_State)
 	{
+#if ENABLE_LAZY_MODE
+	case State::WATER_TOWER0:
+		if (m_Side == Side::GREEN)
+			TrajectoryManager::Instance.GotoDistance(190 + ROBOT_CENTER_FRONT + 30);
+		else
+			TrajectoryManager::Instance.GotoDistance(-220 - POSITIONING_OFFSET);// (190 + ROBOT_CENTER_FRONT - 30));
+		break;
+
+	case State::WATER_TOWER1:
+		SetArmState(ArmState::OPEN);
+		break;
+#else
 	case State::WATER_TOWER0:
 		if (m_Side == Side::GREEN)
 			TrajectoryManager::Instance.GotoXY(GetCorrectPos(2280.f, 1540.f));
@@ -91,25 +112,25 @@ void Strategy::Task()
 		TrajectoryManager::Instance.GotoDegreeAngle(0.f);
 		break;
 
-	case State::WATER_TOWER01:
+	case State::WATER_TOWER1:
 		if (m_Side == Side::GREEN)
 			TrajectoryManager::Instance.GotoXY(GetCorrectPos(2280.f, 1800.f));
 		else
 			TrajectoryManager::Instance.GotoXY(GetCorrectPos(2260.f, 1800.f));
 		break;
 
-	case State::WATER_TOWER1:
+	case State::WATER_TOWER2:
 		PushRobotAgainstWall();
 		RePosAgainstBackWall();
 		TrajectoryManager::Instance.GotoDistance(-50.f);
 		break;
 
-	case State::WATER_TOWER10:
+	case State::WATER_TOWER3:
 		m_EnableAvoidance = false;
 		TrajectoryManager::Instance.GotoDegreeAngle(-90.f);
 		break;
 
-	case State::WATER_TOWER2:
+	case State::WATER_TOWER4:
 		PushRobotAgainstWall(1500, m_Side == Side::ORANGE);// go backward when side=green
 		RePosAgainstWaterPlantSide();
 		m_EnableAvoidance = true;
@@ -120,7 +141,7 @@ void Strategy::Task()
 		//TrajectoryManager::Instance.GotoXY(GetCorrectPos(2390.f, PositionManager::Instance.GetPosMm().y));
 		break;
 
-	case State::WATER_TOWER3:
+	case State::WATER_TOWER5:
 		SetArmState(ArmState::OPEN);
 		break;
 
@@ -154,7 +175,7 @@ void Strategy::Task()
 			delay(2000);
 		}
 		break;
-
+#endif
 	default:
 		return;
 	}
@@ -175,11 +196,18 @@ void Strategy::Start()
 		Platform::InitServo();
 		SetArmState(ArmState::NORMAL);
 		SetDoorState(DoorState::CLOSE);
+#if ENABLE_LAZY_MODE
+		ControlSystem::Instance.SetSpeedLow();
+#endif
 	}
 }
 
 void Strategy::SetInitialPosition()
 {
+#if ENABLE_LAZY_MODE
+	PositionManager::Instance.SetAngleDeg(0.f);
+	PositionManager::Instance.SetPosMm(Float2(0.f, 0.f));
+#else
 	float y = 650.f - 0.5f * ROBOT_WIDTH;
 	if (m_Side == Side::GREEN)
 	{
@@ -191,6 +219,7 @@ void Strategy::SetInitialPosition()
 		PositionManager::Instance.SetAngleDeg(90.f);
 		PositionManager::Instance.SetPosMm(Float2(2600.f + ROBOT_CENTER_FRONT, y));
 	}
+#endif
 }
 
 void Strategy::PushRobotAgainstWall(uint32_t durationMs, bool goForward)
