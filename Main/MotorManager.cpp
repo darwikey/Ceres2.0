@@ -14,7 +14,7 @@ void MotorManager::Init()
 	for (unsigned i = 0; i < _countof(motorPWMs); ++i)
 	{
 		pinMode(motorPWMs[i], OUTPUT);
-		analogWriteFrequency(motorPWMs[i], 10000.f);//PWM 10KHz
+		analogWriteFrequency(motorPWMs[i], 15000.f);//PWM 15KHz
 		pinMode(motorDirs[i], OUTPUT);
 	}
 	m_RightMotorPID.Init(0.f, 0.f, 0.f);
