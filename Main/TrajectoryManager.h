@@ -10,7 +10,7 @@
 #define SMOOTH_TRAJ_MAX_NB_POINTS 50
 
 #define SMOOTH_TRAJ_DEFAULT_PRECISION_D_MM  40.0
-#define SMOOTH_TRAJ_DEFAULT_PRECISION_A_RAD (DEG2RAD(3.0f))
+#define SMOOTH_TRAJ_DEFAULT_PRECISION_A_RAD (DEG2RAD(5.0f))
 
 #define SMOOTH_TRAJ_STEER_DISTANCE_MM 70
 
@@ -31,6 +31,7 @@ public:
 
 	void Print();
 	bool IsForwardMovement();
+	bool IsOnlyRotation(); 
 
 	bool IsPaused();
 	void Pause();
@@ -66,5 +67,6 @@ private:
 	CircularBuffer<TrajDest, SMOOTH_TRAJ_MAX_NB_POINTS> m_Points;
 	bool m_Pause;
 	float m_PauseDist, m_pauseAngle;
+	bool m_IsOnlyRotation;
 };
 #endif /* TRAJECTORY_MANAGER_H */

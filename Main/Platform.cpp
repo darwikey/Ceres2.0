@@ -120,6 +120,7 @@ namespace Platform
 			{
 				Serial.printf("button %d : %d\r\n", i, (int)IsButtonPressed(i));
 			}
+			Serial.printf("start pull: %d\r\n", (int)IsStartPulled());
 			Serial.println();
 			delay(500);
 		} while (Serial.available() == 0);

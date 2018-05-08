@@ -8,6 +8,8 @@
 
 Strategy Strategy::Instance;
 
+const Float2 Strategy::POSITIONING_OFFSET = Float2(55, 100);
+
 Strategy::Strategy()
 {
 }
@@ -31,20 +33,22 @@ void Strategy::Init()
 void Strategy::Task()
 {
 #if ENABLE_POSITIONNING
-	const float POSITIONING_OFFSET = 100;
 	if (m_State == State::POSITIONING)
 	{
 		if (Platform::IsStartPulled())
 		{
-			//TrajectoryManager::Instance.GotoXY(Float2(PositionManager::Instance.GetXMm(), 360.f - ROBOT_CENTER_FRONT - 30.f));
+#if ENABLE_LAZY_MODE
 			if (m_Side == Side::GREEN)
 			{
-				//TrajectoryManager::Instance.GotoDistance(-POSITIONING_OFFSET);
+				//TrajectoryManager::Instance.GotoDistance(-POSITIONING_OFFSET.y);
 			}
 			else
 			{
-				TrajectoryManager::Instance.GotoDistance(POSITIONING_OFFSET);
+				TrajectoryManager::Instance.GotoDistance(POSITIONING_OFFSET.y);
 			}
+#else
+			TrajectoryManager::Instance.GotoDistance(-POSITIONING_OFFSET.y);
+#endif
 			m_State++;
 		}
 	}
@@ -65,7 +69,7 @@ void Strategy::Task()
 	}
 
 #if ENABLE_TIMER
-	if (millis() > m_StartTime + 90000)
+	if (millis() > m_StartTime + 95000)
 	{
 		m_State = State::END;
 		TrajectoryManager::Instance.Pause();
@@ -73,9 +77,12 @@ void Strategy::Task()
 		return;
 	}
 #endif
-
+	//Serial.printf("forward %d", (int)TrajectoryManager::Instance.IsForwardMovement());
 #if ENABLE_AVOIDANCE
-	if (m_EnableAvoidance && Platform::IsGP2Occluded(TrajectoryManager::Instance.IsForwardMovement()))
+	if ((int)m_State > ((int)State::WAITING_START + 1)
+		&& m_EnableAvoidance 
+		&& Platform::IsGP2Occluded(TrajectoryManager::Instance.IsForwardMovement())
+		&& !TrajectoryManager::Instance.IsOnlyRotation())
 	{
 		ControlSystem::Instance.Reset();
 		TrajectoryManager::Instance.Pause();
@@ -97,7 +104,7 @@ void Strategy::Task()
 		if (m_Side == Side::GREEN)
 			TrajectoryManager::Instance.GotoDistance(190 + ROBOT_CENTER_FRONT + 30);
 		else
-			TrajectoryManager::Instance.GotoDistance(-220 - POSITIONING_OFFSET);// (190 + ROBOT_CENTER_FRONT - 30));
+			TrajectoryManager::Instance.GotoDistance(-220 - POSITIONING_OFFSET.y);// (190 + ROBOT_CENTER_FRONT - 30));
 		break;
 
 	case State::WATER_TOWER1:
@@ -106,15 +113,15 @@ void Strategy::Task()
 #else
 	case State::WATER_TOWER0:
 		if (m_Side == Side::GREEN)
-			TrajectoryManager::Instance.GotoXY(GetCorrectPos(2280.f, 1540.f));
+			TrajectoryManager::Instance.GotoXY(GetCorrectPos(2300.f, 1280.f));
 		else
-			TrajectoryManager::Instance.GotoXY(GetCorrectPos(2260.f, 1540.f));
+			TrajectoryManager::Instance.GotoXY(GetCorrectPos(2260.f, 1280.f));
 		TrajectoryManager::Instance.GotoDegreeAngle(0.f);
 		break;
 
 	case State::WATER_TOWER1:
 		if (m_Side == Side::GREEN)
-			TrajectoryManager::Instance.GotoXY(GetCorrectPos(2280.f, 1800.f));
+			TrajectoryManager::Instance.GotoXY(GetCorrectPos(2300.f, 1800.f));
 		else
 			TrajectoryManager::Instance.GotoXY(GetCorrectPos(2260.f, 1800.f));
 		break;
@@ -147,7 +154,16 @@ void Strategy::Task()
 
 	case State::WATER_PLANT0:
 		TrajectoryManager::Instance.GotoXY(GetCorrectPos(2390.f, 1500.f));
+		TrajectoryManager::Instance.GotoXY(GetCorrectPos(1870.f - 100.f, 1500.f));
+		//TrajectoryManager::Instance.GotoDegreeAngle(GetCorrectAngle(90.f));
+		break;
+
+	case State::WATER_PLANT01:
+		//TrajectoryManager::Instance.GotoDistance(-100.f);
 		TrajectoryManager::Instance.GotoXY(GetCorrectPos(1870.f, 1500.f));
+		break;
+
+	case State::WATER_PLANT02:
 		m_EnableAvoidance = false;
 		TrajectoryManager::Instance.GotoDegreeAngle(0.f);
 		break;
@@ -208,7 +224,7 @@ void Strategy::SetInitialPosition()
 	PositionManager::Instance.SetAngleDeg(0.f);
 	PositionManager::Instance.SetPosMm(Float2(0.f, 0.f));
 #else
-	float y = 650.f - 0.5f * ROBOT_WIDTH;
+	float y = 650.f - 0.5f * ROBOT_WIDTH - POSITIONING_OFFSET.x;
 	if (m_Side == Side::GREEN)
 	{
 		PositionManager::Instance.SetAngleDeg(-90.f);
@@ -248,7 +264,7 @@ void Strategy::RePosAgainstBackWall()
 
 void Strategy::RePosAgainstWaterPlantSide()
 {
-	PositionManager::Instance.SetAngleDeg(-90.f);
+	PositionManager::Instance.SetAngleDeg(m_Side == Side::GREEN ? (-90.f+360.f) : (-90.f));
 	float x;
 	if (m_Side == Side::GREEN)
 		x = 2100.f + ROBOT_CENTER_BACK;
@@ -284,6 +300,7 @@ void Strategy::Print()
 	Serial.printf("Side: %s\r\n", m_Side == Side::GREEN ? "Green" : "Orange");
 	Serial.printf("Time since start: %ds\r\n", (millis() - m_StartTime) / 1000);
 	Serial.printf("Is trajectory paused: %d\r\n", (int)TrajectoryManager::Instance.IsPaused());
+	Serial.printf("is avoidance enabled:  %d\r\n", (int)m_EnableAvoidance);
 }
 
 void Strategy::SetSide(Side _side)

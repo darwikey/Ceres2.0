@@ -11,15 +11,47 @@ TrajectoryManager TrajectoryManager::Instance;
 
 #define ABS(x) (((x) < 0)? -(x): (x))
 #define SQUARE(x) ((x)*(x))
-#define UNDEFINED_ANGLE (NAN)
-#define IS_UNDEFINED_ANGLE(x) (isnan(x))
+#define UNDEFINED_ANGLE (1000.f)
+#define IS_UNDEFINED_ANGLE(x) (x==UNDEFINED_ANGLE)
 
+float WrapAngle(float a)
+{
+	a += M_PI;
+	return a - floor(a / M_TWOPI) * M_TWOPI - M_PI;
+}
+
+float GetAngleRef(const Float2 &_target, float *_diff = nullptr)
+{
+	float start_angle0 = atan2f(-(_target.x - PositionManager::Instance.GetXMm()), _target.y - PositionManager::Instance.GetYMm());
+	float start_angle1 = start_angle0 + (float)M_TWOPI;
+	float start_angle2 = start_angle0 - (float)M_TWOPI;
+
+	float diff0 = fabs(PositionManager::Instance.GetAngleRad() - start_angle0);
+	float diff1 = fabs(PositionManager::Instance.GetAngleRad() - start_angle1);
+	float diff2 = fabs(PositionManager::Instance.GetAngleRad() - start_angle2);
+	/*Serial.printf("diff0: %f", diff0);
+	Serial.printf("diff1: %f", diff1);
+	Serial.printf("diff2: %f", diff2);*/
+
+	if (_diff)
+	{
+		*_diff = min(diff0, min(diff1, diff2));
+	}
+
+	if (diff2 < diff1 && diff2 < diff0)
+		return start_angle2;
+	if (diff1 < diff0)
+		return start_angle1;
+	else
+		return start_angle0;
+}
 
 /******************** User functions ********************/
 
 void TrajectoryManager::Init()
 {
 	m_Pause = false;
+	m_IsOnlyRotation = false;
 }
 
 void TrajectoryManager::Reset()
@@ -66,6 +98,36 @@ bool TrajectoryManager::IsForwardMovement()
 	return true;
 }
 
+bool TrajectoryManager::IsOnlyRotation()
+{
+	if (!m_Points.IsEmpty())
+	{
+		const TrajDest& next1 = m_Points.Front();
+		if (next1.movement == BACKWARD)
+			return false;
+		// it's a rotation
+		if (!IS_UNDEFINED_ANGLE(next1.angle))
+		{
+			return true;
+		}
+		else
+		{
+			//TODO duplicate with gototarget
+			Float2 _target = next1.pos;
+			float AngleRef = atan2f(-(_target.x - PositionManager::Instance.GetXMm()), _target.y - PositionManager::Instance.GetYMm());
+			float DiffAngle = WrapAngle(AngleRef - PositionManager::Instance.GetAngleRad());
+			AngleRef = DiffAngle + PositionManager::Instance.GetAngleRad();
+
+			// only apply a rotation if the difference of angle is too important
+			if (fabs(AngleRef - PositionManager::Instance.GetAngleRad()) > 0.5f)
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 /******************** Movement functions ********************/
 
 bool TrajectoryManager::IsPaused()
@@ -89,8 +151,8 @@ void TrajectoryManager::GotoXY(const Float2 &_pos_mm)
 {
 	// if it's the first point, we turn the robot face to the next point
 	if (TrajectoryManager::IsEnded()) {
-		float start_angle = atan2f(-(_pos_mm.x - PositionManager::Instance.GetXMm()), _pos_mm.y - PositionManager::Instance.GetYMm());
-		TrajectoryManager::GotoRadianAngle(start_angle);
+		
+		TrajectoryManager::GotoRadianAngle(GetAngleRef(_pos_mm));
 	}
 
 	TrajDest dest;
@@ -106,6 +168,10 @@ void TrajectoryManager::GotoDistance(float _dist) {
 
 	float finalAngle = PositionManager::Instance.GetTheoreticalAngleRad();
 	Float2 finalPos = PositionManager::Instance.GetTheoreticalPosMm();
+
+	Serial.print("goto d\r\n");
+	Serial.printf("Robot pos mm:    %f, %f\r\n", PositionManager::Instance.GetXMm(), PositionManager::Instance.GetYMm());
+	Serial.printf("theoretical pos: %f, %f\r\n", PositionManager::Instance.GetTheoreticalPosMm().x, PositionManager::Instance.GetTheoreticalPosMm().y);
 
 	auto fct = [&](const TrajDest &t) {
 		// it's a rotation
@@ -147,7 +213,7 @@ void TrajectoryManager::GotoDegreeAngle(float a) {
 void TrajectoryManager::GotoRadianAngle(float a)
 {
 	TrajDest dest;
-
+	Serial.printf("GotoRadianAngle: %f", a);
 	dest.pos = PositionManager::Instance.GetPosMm();
 	dest.angle = a;
 	dest.movement = COMMON;
@@ -190,6 +256,9 @@ void TrajectoryManager::AddPoint(TrajDest point, TrajWhen when)
 // work in progress
 void TrajectoryManager::Update()
 {
+	//Serial.printf("only rot %d", (int)m_IsOnlyRotation);
+	m_IsOnlyRotation = false;
+
 	/* Nothing to do if there is no point in the list */
 	if (m_Points.IsEmpty()) {
 		return;
@@ -212,9 +281,11 @@ void TrajectoryManager::Update()
 	if (!IS_UNDEFINED_ANGLE(next1.angle))
 	{
 		TRAJ_DEBUG("Simple rot");
+		
 		if (ABS(next1.angle - PositionManager::Instance.GetAngleRad()) < SMOOTH_TRAJ_DEFAULT_PRECISION_A_RAD) {
 			NextPoint();
 		}
+		m_IsOnlyRotation = true;
 		ControlSystem::Instance.SetRadAngleTarget(next1.angle);
 	}
 	else
@@ -281,12 +352,6 @@ void TrajectoryManager::Update()
 	}
 }
 
-float WrapAngle(float a)
-{
-	a += M_PI;
-	return a - floor(a / M_TWOPI) * M_TWOPI - M_PI;
-}
-
 void TrajectoryManager::GotoTarget(const TrajDest &_nextPoint, const Float2 &_target)
 {
 	// Compute the angle and distance to send to the control system
@@ -300,7 +365,8 @@ void TrajectoryManager::GotoTarget(const TrajDest &_nextPoint, const Float2 &_ta
 	}
 	else*/
 
-	float AngleRef = atan2f(-(_target.x - PositionManager::Instance.GetXMm()), _target.y - PositionManager::Instance.GetYMm());
+	float AngleRefDiff;
+	float AngleRef = GetAngleRef(_target, &AngleRefDiff);// atan2f(-(_target.x - PositionManager::Instance.GetXMm()), _target.y - PositionManager::Instance.GetYMm());
 	float RemainingDist = (PositionManager::Instance.GetPosMm() - _target).Length();
 
 	//printf("tar x:%d  y:%d  dist:%f  a:%f\r\n", (int)_target.x, (int)_target.y, (double)_nextPoint., (double)angle_ref);
@@ -318,12 +384,14 @@ void TrajectoryManager::GotoTarget(const TrajDest &_nextPoint, const Float2 &_ta
 	}
 	else
 	{
-		float DiffAngle = WrapAngle(AngleRef - PositionManager::Instance.GetAngleRad());
-		AngleRef = DiffAngle + PositionManager::Instance.GetAngleRad();
+		//float DiffAngle = WrapAngle(AngleRef - PositionManager::Instance.GetAngleRad());
+		//AngleRef = DiffAngle + PositionManager::Instance.GetAngleRad();
 
 		// only apply a rotation if the difference of angle is too important
-		if (fabs(AngleRef - PositionManager::Instance.GetAngleRad()) > 0.5f)
+		//Serial.printf("angle: %f,  %f\r\n", AngleRef, PositionManager::Instance.GetAngleRad());
+		if (AngleRefDiff > 0.5f)//fabs(AngleRef - PositionManager::Instance.GetAngleRad()) > 0.5f)
 		{
+			m_IsOnlyRotation = true;
 			RemainingDist = 0.f;
 		}
 

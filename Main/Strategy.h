@@ -51,6 +51,8 @@ public:
 		WATER_TOWER5,
 
 		WATER_PLANT0,
+		WATER_PLANT01,
+		WATER_PLANT02,
 		WATER_PLANT1,
 		WATER_PLANT2,
 		WATER_PLANT3,
@@ -82,6 +84,8 @@ public:
 	void SetDoorState(DoorState _state);
 
 private:
+	static const Float2 POSITIONING_OFFSET;
+
 	Side		m_Side = Side::GREEN;
 	State		m_State = (State)0;
 	uint32_t	m_StartTime = 0;
