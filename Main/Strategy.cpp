@@ -77,14 +77,14 @@ void Strategy::Task()
 		return;
 	}
 #endif
-	//Serial.printf("forward %d", (int)TrajectoryManager::Instance.IsForwardMovement());
+	//Serial.printf(" %d,", (int)m_EnableAvoidance);// TrajectoryManager::Instance.IsForwardMovement());
 #if ENABLE_AVOIDANCE
 	if ((int)m_State > ((int)State::WAITING_START + 1)
 		&& m_EnableAvoidance 
 		&& Platform::IsGP2Occluded(TrajectoryManager::Instance.IsForwardMovement())
 		&& !TrajectoryManager::Instance.IsOnlyRotation())
 	{
-		ControlSystem::Instance.Reset();
+		//ControlSystem::Instance.Reset();
 		TrajectoryManager::Instance.Pause();
 		return;
 	}
@@ -115,7 +115,7 @@ void Strategy::Task()
 		if (m_Side == Side::GREEN)
 			TrajectoryManager::Instance.GotoXY(GetCorrectPos(2300.f, 1280.f));
 		else
-			TrajectoryManager::Instance.GotoXY(GetCorrectPos(2260.f, 1280.f));
+			TrajectoryManager::Instance.GotoXY(GetCorrectPos(2230.f, 1280.f));
 		TrajectoryManager::Instance.GotoDegreeAngle(0.f);
 		break;
 
@@ -123,13 +123,13 @@ void Strategy::Task()
 		if (m_Side == Side::GREEN)
 			TrajectoryManager::Instance.GotoXY(GetCorrectPos(2300.f, 1800.f));
 		else
-			TrajectoryManager::Instance.GotoXY(GetCorrectPos(2260.f, 1800.f));
+			TrajectoryManager::Instance.GotoXY(GetCorrectPos(2230.f, 1800.f));
 		break;
 
 	case State::WATER_TOWER2:
 		PushRobotAgainstWall();
 		RePosAgainstBackWall();
-		TrajectoryManager::Instance.GotoDistance(-50.f);
+		TrajectoryManager::Instance.GotoDistance(-65.f);//-50.f);
 		break;
 
 	case State::WATER_TOWER3:
@@ -171,7 +171,7 @@ void Strategy::Task()
 	case State::WATER_PLANT1:
 		PushRobotAgainstWall();
 		RePosAgainstWaterPlantFront();
-		m_EnableAvoidance = true;
+		//m_EnableAvoidance = true;
 		TrajectoryManager::Instance.GotoDistance(-50.f);
 		break;
 	

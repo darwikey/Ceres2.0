@@ -53,7 +53,11 @@ void loop() {
 		clock = 0;
 		if (TrajectoryManager::Instance.IsPaused())
 			Platform::SetServoLED(ServoID::ALL, ServoLED::RED);
-		else if (led == 0)
+		else if (Strategy::Instance.m_EnableAvoidance)
+			Platform::SetServoLED(ServoID::ALL, ServoLED::GREEN);
+		else
+			Platform::SetServoLED(ServoID::ALL, ServoLED::BLUE);
+		/*else if (led == 0)
 			Platform::SetServoLED(ServoID::SERVO1, ServoLED::RED);
 		else if (led == 1)
 			Platform::SetServoLED(ServoID::SERVO2, ServoLED::GREEN);
@@ -63,7 +67,7 @@ void loop() {
 		{
 			Platform::SetServoLED(ServoID::ALL, ServoLED::NONE);
 			led = -1;
-		}
+		}*/
 		led++;
 	}
 	Side side = Strategy::Instance.GetSide();

@@ -6,7 +6,7 @@
 #define ENABLE_POSITIONNING 1
 #define ENABLE_TIMER 1
 #define ENABLE_AVOIDANCE 1
-#define ENABLE_LAZY_MODE 1 // for approval
+#define ENABLE_LAZY_MODE 0 // for approval
 
 #define ROBOT_WIDTH 235.f
 #define ROBOT_CENTER_BACK 55.f // distance between axle and back
@@ -89,6 +89,7 @@ private:
 	Side		m_Side = Side::GREEN;
 	State		m_State = (State)0;
 	uint32_t	m_StartTime = 0;
+public:
 	bool		m_EnableAvoidance = true;
 };
 
