@@ -69,7 +69,7 @@ void Strategy::Task()
 	}
 
 #if ENABLE_TIMER
-	if (millis() > m_StartTime + 95000)
+	if (isTimeOut())
 	{
 		m_State = State::END;
 		TrajectoryManager::Instance.Pause();
@@ -142,7 +142,7 @@ void Strategy::Task()
 		RePosAgainstWaterPlantSide();
 		m_EnableAvoidance = true;
 		if (m_Side == Side::GREEN)
-			TrajectoryManager::Instance.GotoDistance(235 + 25.f);//2390.f - PositionManager::Instance.GetTheoreticalPosMm().x);//forward =235mm
+			TrajectoryManager::Instance.GotoDistance(235 + 12.f);//2390.f - PositionManager::Instance.GetTheoreticalPosMm().x);//forward =235mm
 		else
 			TrajectoryManager::Instance.GotoDistance(610.f - PositionManager::Instance.GetTheoreticalPosMm().x);//backward
 		//TrajectoryManager::Instance.GotoXY(GetCorrectPos(2390.f, PositionManager::Instance.GetPosMm().y));
@@ -176,12 +176,18 @@ void Strategy::Task()
 		break;
 	
 	case State::WATER_PLANT2:
-		m_EnableAvoidance = false;
-		TrajectoryManager::Instance.GotoDegreeAngle(-90.f);
+		m_EnableAvoidance = true;
+		// try to get closer to the water plant
+		TrajectoryManager::Instance.GotoDegreeAngle(-80.f);
+		TrajectoryManager::Instance.GotoDistance(150.f);
 		break;
 
 	case State::WATER_PLANT3:
-		m_EnableAvoidance = true;
+		TrajectoryManager::Instance.GotoDegreeAngle(-90.f);
+		break;
+
+	case State::WATER_PLANT4:
+		//m_EnableAvoidance = true;
 		SetDoorState(DoorState::OPEN);
 		delay(2000);
 		for (int i = 0; i < 3; i++) // shake the door
@@ -210,8 +216,8 @@ void Strategy::Start()
 		m_State++;
 		m_StartTime = millis();
 		Platform::InitServo();
-		SetArmState(ArmState::NORMAL);
-		SetDoorState(DoorState::CLOSE);
+		SetArmState(ArmState::NORMAL, false);
+		SetDoorState(DoorState::CLOSE, false);
 #if ENABLE_LAZY_MODE
 		ControlSystem::Instance.SetSpeedLow();
 #endif
@@ -312,6 +318,11 @@ void Strategy::SetSide(Side _side)
 	SetInitialPosition();
 }
 
+bool Strategy::isTimeOut()
+{
+	return millis() > m_StartTime + 95000;
+}
+
 Float2 Strategy::GetCorrectPos(float x, float y)
 {
 	if (m_Side == Side::GREEN)
@@ -328,8 +339,13 @@ float Strategy::GetCorrectAngle(float a)
 		return -a;
 }
 
-void Strategy::SetArmState(ArmState _state)
+void Strategy::SetArmState(ArmState _state, bool _waitUntilFinish)
 {
+	if (isTimeOut())
+	{
+		Serial.print("timeout!");
+		return;
+	}
 	switch (_state)
 	{
 	case ArmState::NORMAL:
@@ -339,11 +355,17 @@ void Strategy::SetArmState(ArmState _state)
 		Platform::SetServoPos(ServoID::SERVO2, 100);
 		break;
 	}
-	delay(1000);
+	if (_waitUntilFinish)
+		delay(1000);
 }
 
-void Strategy::SetDoorState(DoorState _state)
+void Strategy::SetDoorState(DoorState _state, bool _waitUntilFinish)
 {
+	if (isTimeOut())
+	{
+		Serial.print("timeout!");
+		return;
+	}
 	switch (_state)
 	{
 	case DoorState::CLOSE:
@@ -353,7 +375,8 @@ void Strategy::SetDoorState(DoorState _state)
 		Platform::SetServoPos(ServoID::SERVO3, 400);
 		break;
 	}
-	delay(500);
+	if (_waitUntilFinish)
+		delay(500);
 }
 
 Strategy::State operator++(Strategy::State &s, int)

@@ -56,6 +56,7 @@ public:
 		WATER_PLANT1,
 		WATER_PLANT2,
 		WATER_PLANT3,
+		WATER_PLANT4,
 #endif
 		WAITING_END,
 		END
@@ -75,13 +76,14 @@ public:
 
 	Side GetSide() { return m_Side; }
 	void SetSide(Side _side);
+	bool isTimeOut();
 	void Print();
 
 	Float2 GetCorrectPos(float x, float y);
 	float GetCorrectAngle(float a);
 
-	void SetArmState(ArmState _state);
-	void SetDoorState(DoorState _state);
+	void SetArmState(ArmState _state, bool _waitUntilFinish = true);
+	void SetDoorState(DoorState _state, bool _waitUntilFinish = true);
 
 private:
 	static const Float2 POSITIONING_OFFSET;
