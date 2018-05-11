@@ -281,6 +281,10 @@ void CommandLineInterface::Init()
 		PositionManager::Instance.SetPosMm(PositionManager::Instance.GetPosMm());
 	});
 
+	REGISTER_COMMAND("shakeRobot", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int _argc) {
+		Strategy::Instance.ShakeRobot();
+	});
+
 	REGISTER_COMMAND("arm", "arg: normal|open|inter", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
 		if (!strcmp(_argv[0], "normal"))
 			Strategy::Instance.SetArmState(ArmState::NORMAL);

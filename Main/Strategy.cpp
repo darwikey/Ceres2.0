@@ -205,6 +205,7 @@ void Strategy::Task()
 			SetDoorState(DoorState::OPEN);
 			delay(2000);
 		}
+		ShakeRobot();
 		break;
 #endif
 	default:
@@ -267,6 +268,22 @@ void Strategy::PushRobotAgainstWall(uint32_t durationMs, bool goForward)
 	}
 	MotorManager::Instance.SetSpeed(MotorManager::RIGHT, 0);
 	MotorManager::Instance.SetSpeed(MotorManager::LEFT, 0);
+	ControlSystem::Instance.Reset();
+	ControlSystem::Instance.m_Enable = true;
+}
+
+void Strategy::ShakeRobot(uint32_t durationMs)
+{
+	ControlSystem::Instance.m_Enable = false;
+
+	const float cmd = 20;
+	for (uint32_t i = 0; i < durationMs / 50; i++)
+	{
+		MotorManager::Instance.SetSpeed(MotorManager::RIGHT, cmd*sin((float)i * 0.5f));
+		MotorManager::Instance.SetSpeed(MotorManager::LEFT, 0);
+		delay(50);
+	}
+
 	ControlSystem::Instance.Reset();
 	ControlSystem::Instance.m_Enable = true;
 }

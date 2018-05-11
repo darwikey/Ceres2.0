@@ -71,6 +71,7 @@ public:
 	
 	void SetInitialPosition();
 	void PushRobotAgainstWall(uint32_t durationMs = 1500, bool goForward = true);
+	void ShakeRobot(uint32_t durationMs = 2000);
 	void RePosAgainstBackWall();
 	void RePosAgainstWaterPlantSide();
 	void RePosAgainstWaterPlantFront();
