@@ -281,13 +281,15 @@ void CommandLineInterface::Init()
 		PositionManager::Instance.SetPosMm(PositionManager::Instance.GetPosMm());
 	});
 
-	REGISTER_COMMAND("arm", "arg: normal|open", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
+	REGISTER_COMMAND("arm", "arg: normal|open|inter", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
 		if (!strcmp(_argv[0], "normal"))
 			Strategy::Instance.SetArmState(ArmState::NORMAL);
 		else if (!strcmp(_argv[0], "open"))
 			Strategy::Instance.SetArmState(ArmState::OPEN);
+		else if (!strcmp(_argv[0], "inter"))
+			Strategy::Instance.SetArmState(ArmState::INTERMEDIATE);
 		else
-			Serial.print("incorrect param, must be normal|open");
+			Serial.print("incorrect param, must be normal|open|inter");
 	});
 
 	REGISTER_COMMAND("door", "arg: close|open", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {

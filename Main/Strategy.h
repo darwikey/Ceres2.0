@@ -21,6 +21,7 @@ enum class Side
 enum class ArmState
 {
 	NORMAL,
+	INTERMEDIATE,
 	OPEN
 };
 

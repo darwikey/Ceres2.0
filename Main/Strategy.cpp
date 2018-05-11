@@ -77,6 +77,14 @@ void Strategy::Task()
 		return;
 	}
 #endif
+
+	// HACK: open the door even if the robot is blocked
+	if (((m_State == State::WATER_PLANT2) || (m_State == State::WATER_PLANT3))
+		&& millis() > m_StartTime + 70000)
+	{
+		m_State = State::WATER_PLANT4;
+	}
+
 	//Serial.printf(" %d,", (int)m_EnableAvoidance);// TrajectoryManager::Instance.IsForwardMovement());
 #if ENABLE_AVOIDANCE
 	if ((int)m_State > ((int)State::WAITING_START + 1)
@@ -113,17 +121,19 @@ void Strategy::Task()
 #else
 	case State::WATER_TOWER0:
 		if (m_Side == Side::GREEN)
-			TrajectoryManager::Instance.GotoXY(GetCorrectPos(2300.f, 1280.f));
+			TrajectoryManager::Instance.GotoXY(GetCorrectPos(2310.f, 1280.f));
 		else
-			TrajectoryManager::Instance.GotoXY(GetCorrectPos(2230.f, 1280.f));
+			TrajectoryManager::Instance.GotoXY(GetCorrectPos(2220.f, 1280.f));
 		TrajectoryManager::Instance.GotoDegreeAngle(0.f);
 		break;
 
 	case State::WATER_TOWER1:
+		m_EnableAvoidance = false;//YOLO
+
 		if (m_Side == Side::GREEN)
-			TrajectoryManager::Instance.GotoXY(GetCorrectPos(2300.f, 1800.f));
+			TrajectoryManager::Instance.GotoXY(GetCorrectPos(2310.f, 1800.f));
 		else
-			TrajectoryManager::Instance.GotoXY(GetCorrectPos(2230.f, 1800.f));
+			TrajectoryManager::Instance.GotoXY(GetCorrectPos(2220.f, 1800.f));
 		break;
 
 	case State::WATER_TOWER2:
@@ -133,7 +143,6 @@ void Strategy::Task()
 		break;
 
 	case State::WATER_TOWER3:
-		m_EnableAvoidance = false;
 		TrajectoryManager::Instance.GotoDegreeAngle(-90.f);
 		break;
 
@@ -144,7 +153,7 @@ void Strategy::Task()
 		if (m_Side == Side::GREEN)
 			TrajectoryManager::Instance.GotoDistance(235 + 12.f);//2390.f - PositionManager::Instance.GetTheoreticalPosMm().x);//forward =235mm
 		else
-			TrajectoryManager::Instance.GotoDistance(610.f - PositionManager::Instance.GetTheoreticalPosMm().x);//backward
+			TrajectoryManager::Instance.GotoDistance(610.f - PositionManager::Instance.GetTheoreticalPosMm().x - 24.f);//backward
 		//TrajectoryManager::Instance.GotoXY(GetCorrectPos(2390.f, PositionManager::Instance.GetPosMm().y));
 		break;
 
@@ -216,7 +225,7 @@ void Strategy::Start()
 		m_State++;
 		m_StartTime = millis();
 		Platform::InitServo();
-		SetArmState(ArmState::NORMAL, false);
+		SetArmState(ArmState::INTERMEDIATE, false);
 		SetDoorState(DoorState::CLOSE, false);
 #if ENABLE_LAZY_MODE
 		ControlSystem::Instance.SetSpeedLow();
@@ -350,6 +359,9 @@ void Strategy::SetArmState(ArmState _state, bool _waitUntilFinish)
 	{
 	case ArmState::NORMAL:
 		Platform::SetServoPos(ServoID::SERVO2, 800);
+		break;
+	case ArmState::INTERMEDIATE:
+		Platform::SetServoPos(ServoID::SERVO2, 400);
 		break;
 	case ArmState::OPEN:
 		Platform::SetServoPos(ServoID::SERVO2, 100);
