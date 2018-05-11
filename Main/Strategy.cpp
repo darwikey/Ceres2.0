@@ -38,14 +38,14 @@ void Strategy::Task()
 		if (Platform::IsStartPulled())
 		{
 #if ENABLE_LAZY_MODE
-			if (m_Side == Side::GREEN)
-			{
-				//TrajectoryManager::Instance.GotoDistance(-POSITIONING_OFFSET.y);
-			}
-			else
-			{
-				TrajectoryManager::Instance.GotoDistance(POSITIONING_OFFSET.y);
-			}
+			//if (m_Side == Side::GREEN)
+			//{
+			//	//TrajectoryManager::Instance.GotoDistance(-POSITIONING_OFFSET.y);
+			//}
+			//else
+			//{
+			//	TrajectoryManager::Instance.GotoDistance(POSITIONING_OFFSET.y);
+			//}
 #else
 			TrajectoryManager::Instance.GotoDistance(-POSITIONING_OFFSET.y);
 #endif

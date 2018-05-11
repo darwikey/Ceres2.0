@@ -32,8 +32,7 @@ public:
 	void Task();
 
 	void SetDistanceTarget(float ref_mm);
-	void SetDegAngleTarget(float ref);
-	void SetRadAngleTarget(float ref_rad);
+	void SetRadAngleTarget(float ref_rad, bool _useQuadramp = true);
 
 	void SetDistanceMaxSpeed(float max_speed);
 	void SetDistanceMaxAcc(float max_acc);

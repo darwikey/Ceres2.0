@@ -39,6 +39,13 @@ void CommandLineInterface::Init()
 		Serial.printf("Goto xy: %f  %f\r\n", p.x, p.y);
 	});
 
+	REGISTER_COMMAND("circle", "Goto circular, arg: center_x, center_y, angle", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
+		Float2 center(atof(_argv[0]), atof(_argv[1]));
+		float angle = atof(_argv[2]);
+		TrajectoryManager::Instance.GotoCircular(center, DEG2RAD(angle));
+		Serial.printf("Goto circular, center: (%f, %f), radius: %f\r\n", center.x, center.y, angle);
+	});
+
 	REGISTER_COMMAND("test", "", [](const char _argv[CLI_MAX_ARG][CLI_ARG_LENGTH], int) {
 		//square
 		float l = 300;

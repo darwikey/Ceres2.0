@@ -22,7 +22,7 @@ float WrapAngle(float a)
 
 float GetAngleRef(const Float2 &_target, float *_diff = nullptr)
 {
-	float start_angle0 = atan2f(-(_target.x - PositionManager::Instance.GetXMm()), _target.y - PositionManager::Instance.GetYMm());
+	float start_angle0 = Math::GetVectorAngle(_target - PositionManager::Instance.GetPosMm());
 	float start_angle1 = start_angle0 + (float)M_TWOPI;
 	float start_angle2 = start_angle0 - (float)M_TWOPI;
 
@@ -114,7 +114,7 @@ bool TrajectoryManager::IsOnlyRotation()
 		{
 			//TODO duplicate with gototarget
 			Float2 _target = next1.pos;
-			float AngleRef = atan2f(-(_target.x - PositionManager::Instance.GetXMm()), _target.y - PositionManager::Instance.GetYMm());
+			float AngleRef = Math::GetVectorAngle(_target - PositionManager::Instance.GetPosMm());
 			float DiffAngle = WrapAngle(AngleRef - PositionManager::Instance.GetAngleRad());
 			AngleRef = DiffAngle + PositionManager::Instance.GetAngleRad();
 
@@ -221,6 +221,18 @@ void TrajectoryManager::GotoRadianAngle(float a)
 	AddPoint(dest, END);
 }
 
+void TrajectoryManager::GotoCircular(const Float2 &_center, float _angle)
+{
+	Float2 finalPos = PositionManager::Instance.GetTheoreticalPosMm();//TODO get final position like gotoDistance
+
+	TrajDest dest;
+	dest.pos = _center;
+	dest.angle = Math::GetVectorAngle(finalPos -_center) + _angle;
+	dest.radius = (finalPos - _center).Length();
+	dest.movement = CIRCULAR;
+	AddPoint(dest, END);
+}
+
 
 /****************** Internal functions ******************/
 
@@ -277,8 +289,30 @@ void TrajectoryManager::Update()
 	// position the robot want to reach
 	Float2 target;
 
+	if (next1.movement == CIRCULAR)
+	{
+		Float2 RC = PositionManager::Instance.GetPosMm() - next1.pos;//pos - center
+		Float2 Normal(-RC.y, RC.x);//trigonometric angle
+		float NormalAngle = Math::GetVectorAngle(Normal);
+		float RadiusDiff = next1.radius - RC.Length();
+		ControlSystem::Instance.SetRadAngleTarget(Math::Lerp(PositionManager::Instance.GetAngleRad(), NormalAngle, 0.02f) /*- 0.005f * RadiusDiff*/, false);
+		
+		float RemainingDist = next1.radius * (next1.angle - Math::GetVectorAngle(RC));
+
+		if (ABS(RemainingDist) < SMOOTH_TRAJ_DEFAULT_PRECISION_D_MM) {
+			NextPoint();
+		}
+
+		//if (ABS(WrapAngle(NormalAngle - PositionManager::Instance.GetAngleRad())) < DEG2RAD(10))
+			//RemainingDist = 0;
+		
+		ControlSystem::Instance.SetDistanceTarget(PositionManager::Instance.GetDistanceMm() + RemainingDist);
+		Serial.printf("%f   %f\r\n", RC.Length(), RemainingDist);
+
+		
+	}
 	// it's a rotation
-	if (!IS_UNDEFINED_ANGLE(next1.angle))
+	else if (!IS_UNDEFINED_ANGLE(next1.angle))
 	{
 		TRAJ_DEBUG("Simple rot");
 		
@@ -366,7 +400,7 @@ void TrajectoryManager::GotoTarget(const TrajDest &_nextPoint, const Float2 &_ta
 	else*/
 
 	float AngleRefDiff;
-	float AngleRef = GetAngleRef(_target, &AngleRefDiff);// atan2f(-(_target.x - PositionManager::Instance.GetXMm()), _target.y - PositionManager::Instance.GetYMm());
+	float AngleRef = GetAngleRef(_target, &AngleRefDiff);
 	float RemainingDist = (PositionManager::Instance.GetPosMm() - _target).Length();
 
 	//printf("tar x:%d  y:%d  dist:%f  a:%f\r\n", (int)_target.x, (int)_target.y, (double)_nextPoint., (double)angle_ref);

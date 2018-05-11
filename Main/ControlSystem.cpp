@@ -145,18 +145,11 @@ void ControlSystem::SetDistanceTarget(float ref)
 	Scheduler::enable();
 }
 
-void ControlSystem::SetDegAngleTarget(float ref_deg)
-{
-	Scheduler::disable();
-	float ref_rad = DEG2RAD(ref_deg);
-	m_AngleTarget = ref_rad;
-	Scheduler::enable();
-}
-
-void ControlSystem::SetRadAngleTarget(float ref_rad)
+void ControlSystem::SetRadAngleTarget(float ref_rad, bool _useQuadramp)
 {
 	Scheduler::disable();
 	m_AngleTarget = ref_rad;
+	m_AngleQuadramp.SetEnable(_useQuadramp);
 	Scheduler::enable();
 }
 

@@ -43,9 +43,6 @@ public:
 		WATER_TOWER0,
 		WATER_TOWER1,
 
-#if ENABLE_LAZY_MODE
-		
-#else
 		WATER_TOWER2,
 		WATER_TOWER3,
 		WATER_TOWER4,
@@ -58,7 +55,7 @@ public:
 		WATER_PLANT2,
 		WATER_PLANT3,
 		WATER_PLANT4,
-#endif
+	
 		WAITING_END,
 		END
 	};

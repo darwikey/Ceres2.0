@@ -42,6 +42,7 @@ public:
 	void GotoDistance(float d_mm);
 	void GotoDegreeAngle(float a);
 	void GotoRadianAngle(float a);
+	void GotoCircular(const Float2 &_center, float _angle);
 
 private:
 	enum TrajWhen {
@@ -49,13 +50,14 @@ private:
 	};
 
 	enum OrderType {
-		COMMON, FORWARD, BACKWARD
+		COMMON, FORWARD, BACKWARD, CIRCULAR
 	};
 
 	struct TrajDest {
 
 		Float2 pos;//mm
 		float angle;//rad
+		float radius;//only for circular
 		OrderType movement;
 	};
 

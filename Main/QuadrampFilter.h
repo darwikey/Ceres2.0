@@ -83,6 +83,9 @@ public:
 	/** Initialization of the filter */
 	void Init();
 
+	/** When disable, Evaluate() return the input */
+	void SetEnable(bool _e) { m_Enable = _e; }
+
 	/**
 	* By default eval period is set to 1.
 	* Setting this parameter to the period Evaluate is called
@@ -129,6 +132,7 @@ private:
 	float m_prev_out; /*!< Previous ouput value. */
 
 	float m_eval_period;
+	bool m_Enable;
 };
 
 

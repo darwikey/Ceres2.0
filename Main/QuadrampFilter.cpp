@@ -44,6 +44,7 @@ void QuadrampFilter::Init()
 	m_prev_var = 0;
 	m_prev_out = 0;
 	m_eval_period = 1;
+	m_Enable = true;
 }
 
 void QuadrampFilter::SetEvalPeriod(float period)
@@ -77,6 +78,12 @@ void QuadrampFilter::Reset(float value)
 
 float QuadrampFilter::Evaluate(float in)
 {
+	if (!m_Enable)
+	{
+		Reset(in);
+		return in;
+	}
+
 	float var_1st_ord_pos = m_var_1st_ord_pos * m_eval_period;
 
 	float var_1st_ord_neg = -m_var_1st_ord_neg * m_eval_period;
