@@ -149,16 +149,24 @@ void Strategy::Task()
 	case State::WATER_TOWER4:
 		PushRobotAgainstWall(1500, m_Side == Side::ORANGE);// go backward when side=green
 		RePosAgainstWaterPlantSide();
+		SetArmState(ArmState::INTERMEDIATE);
 		m_EnableAvoidance = true;
 		if (m_Side == Side::GREEN)
 			TrajectoryManager::Instance.GotoDistance(235 + 12.f);//2390.f - PositionManager::Instance.GetTheoreticalPosMm().x);//forward =235mm
 		else
-			TrajectoryManager::Instance.GotoDistance(610.f - PositionManager::Instance.GetTheoreticalPosMm().x - 24.f);//backward
+			TrajectoryManager::Instance.GotoDistance(610.f - PositionManager::Instance.GetTheoreticalPosMm().x - 44.f);//backward
 		//TrajectoryManager::Instance.GotoXY(GetCorrectPos(2390.f, PositionManager::Instance.GetPosMm().y));
 		break;
 
 	case State::WATER_TOWER5:
 		SetArmState(ArmState::OPEN);
+		if (m_Side == Side::ORANGE)
+		{
+			delay(2000);
+			SetArmState(ArmState::NORMAL);
+			delay(2000);
+			SetArmState(ArmState::OPEN);
+		}
 		break;
 
 	case State::WATER_PLANT0:
@@ -226,7 +234,7 @@ void Strategy::Start()
 		m_State++;
 		m_StartTime = millis();
 		Platform::InitServo();
-		SetArmState(ArmState::INTERMEDIATE, false);
+		SetArmState(ArmState::NORMAL, false);
 		SetDoorState(DoorState::CLOSE, false);
 #if ENABLE_LAZY_MODE
 		ControlSystem::Instance.SetSpeedLow();
